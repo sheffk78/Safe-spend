@@ -8,13 +8,12 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Brand */}
                     <div className="md:col-span-1">
-                        <div className="flex items-center gap-2 text-ss-text font-heading font-bold text-lg mb-4">
-                            <div className="w-7 h-7 rounded-lg bg-ss-accent flex items-center justify-center">
-                                <svg className="w-4 h-4 text-ss-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                            Safe-Spend
+                        <div className="mb-4">
+                            <img 
+                                src="/logo-safespend-compact.svg" 
+                                alt="Safe-Spend" 
+                                className="h-7"
+                            />
                         </div>
                         <p className="text-ss-text-secondary text-sm mb-4">
                             by Agentic Trust

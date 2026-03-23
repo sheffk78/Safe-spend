@@ -61,13 +61,12 @@ const DashboardLayout = () => {
             <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-ss-code border-r border-[rgba(255,255,255,0.06)] flex flex-col transform transition-transform duration-200 lg:transform-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
                 {/* Logo */}
                 <div className="p-6 border-b border-[rgba(255,255,255,0.06)]">
-                    <Link to="/" className="flex items-center gap-2 text-ss-text font-heading font-bold text-lg">
-                        <div className="w-8 h-8 rounded-lg bg-ss-accent flex items-center justify-center">
-                            <svg className="w-5 h-5 text-ss-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </div>
-                        Safe-Spend
+                    <Link to="/" className="flex items-center">
+                        <img 
+                            src="/logo-safespend-compact.svg" 
+                            alt="Safe-Spend" 
+                            className="h-7"
+                        />
                     </Link>
                 </div>
 
@@ -122,13 +121,12 @@ const DashboardLayout = () => {
                     >
                         <Menu size={24} />
                     </button>
-                    <Link to="/" className="flex items-center gap-2 text-ss-text font-heading font-bold">
-                        <div className="w-7 h-7 rounded-lg bg-ss-accent flex items-center justify-center">
-                            <svg className="w-4 h-4 text-ss-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </div>
-                        Safe-Spend
+                    <Link to="/" className="flex items-center">
+                        <img 
+                            src="/logo-safespend-icon-only.svg" 
+                            alt="Safe-Spend" 
+                            className="h-7"
+                        />
                     </Link>
                     <div className="w-10" /> {/* Spacer for centering */}
                 </div>
