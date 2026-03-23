@@ -2,17 +2,19 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
+const { evaluateSpendRequest } = require('../services/rules-engine');
+const { getDateBoundaries } = require('../services/rules-helpers');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 /**
  * POST /v1/spend
- * Create a spend request
- * NOTE: This is a PLACEHOLDER implementation. The full 13-step rules engine
- * will be implemented in Prompt 03.
+ * Create a spend request - runs the full 13-step rules engine
  */
 router.post('/', requireAuth, async (req, res) => {
+    const startTime = Date.now();
+    
     try {
         const {
             escrow_id,
@@ -36,134 +38,27 @@ router.post('/', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'amount_cents must be positive' });
         }
         
-        // Check idempotency
-        if (idempotency_key) {
-            const existing = await prisma.spendRequest.findUnique({
+        // Build context for rules engine
+        const currentTime = new Date();
+        
+        // Fetch all required data
+        const [escrowAccount, existingRequest] = await Promise.all([
+            prisma.escrowAccount.findFirst({
+                where: { id: escrow_id, orgId: req.org.id }
+            }),
+            idempotency_key ? prisma.spendRequest.findUnique({
                 where: { idempotencyKey: idempotency_key }
-            });
-            
-            if (existing) {
-                return res.json(formatSpendRequest(existing));
-            }
-        }
-        
-        // Verify escrow account exists and belongs to org
-        const escrow = await prisma.escrowAccount.findFirst({
-            where: { id: escrow_id, orgId: req.org.id }
-        });
-        
-        if (!escrow) {
-            return res.status(404).json({ error: 'Escrow account not found' });
-        }
-        
-        // Check account status
-        if (escrow.status !== 'active') {
-            const spendRequest = await prisma.spendRequest.create({
-                data: {
-                    id: generateId('spendRequest'),
-                    escrowId: escrow_id,
-                    orgId: req.org.id,
-                    apiKeyId: req.apiKey?.id,
-                    amountCents: amount_cents,
-                    currency,
-                    vendor,
-                    category,
-                    description,
-                    idempotencyKey: idempotency_key,
-                    status: 'denied',
-                    resolvedAt: new Date(),
-                    resolvedBy: 'system',
-                    denialReason: `Account is ${escrow.status}`,
-                    rulesEvaluated: JSON.stringify([{ rule: 'account_status', passed: false, reason: `Account is ${escrow.status}` }]),
-                    balanceBeforeCents: escrow.balanceCents,
-                    metadata: JSON.stringify(metadata)
-                }
-            });
-            
-            return res.status(400).json({
-                ...formatSpendRequest(spendRequest),
-                error: `Account is ${escrow.status}`
-            });
-        }
-        
-        // PLACEHOLDER: Basic balance check (full rules engine in Prompt 03)
-        const balanceBefore = escrow.balanceCents;
-        
-        if (balanceBefore < amount_cents) {
-            // Insufficient funds
-            const spendRequest = await prisma.spendRequest.create({
-                data: {
-                    id: generateId('spendRequest'),
-                    escrowId: escrow_id,
-                    orgId: req.org.id,
-                    apiKeyId: req.apiKey?.id,
-                    amountCents: amount_cents,
-                    currency,
-                    vendor,
-                    category,
-                    description,
-                    idempotencyKey: idempotency_key,
-                    status: 'denied',
-                    resolvedAt: new Date(),
-                    resolvedBy: 'system',
-                    denialReason: 'insufficient_funds',
-                    rulesEvaluated: JSON.stringify([{ rule: 'balance_check', passed: false, reason: 'Insufficient funds' }]),
-                    balanceBeforeCents: balanceBefore,
-                    metadata: JSON.stringify(metadata)
-                }
-            });
-            
-            // Update denied total
-            await prisma.escrowAccount.update({
-                where: { id: escrow_id },
-                data: { totalDeniedCents: escrow.totalDeniedCents + amount_cents }
-            });
-            
-            // Audit event
-            await prisma.auditEvent.create({
-                data: {
-                    id: generateId('auditEvent'),
-                    orgId: req.org.id,
-                    escrowId: escrow_id,
-                    eventType: 'spend.denied',
-                    actorType: req.authType === 'api_key' ? 'agent' : 'human',
-                    actorId: req.apiKey?.id || req.org.id,
-                    details: JSON.stringify({
-                        spend_request_id: spendRequest.id,
-                        amount_cents,
-                        vendor,
-                        denial_reason: 'insufficient_funds'
-                    }),
-                    ipAddress: req.ip
-                }
-            });
-            
-            return res.status(400).json({
-                ...formatSpendRequest(spendRequest),
-                error: 'Insufficient funds'
-            });
-        }
-        
-        // PLACEHOLDER: Approve the spend (full rules engine in Prompt 03)
-        // TODO: Implement 13-step validation cascade in Prompt 03
-        const rulesEvaluated = JSON.stringify([
-            { rule: 'placeholder', passed: true, reason: 'Rules engine to be implemented in Prompt 03' }
+            }) : null
         ]);
         
-        // Deduct from balance
-        const updatedEscrow = await prisma.escrowAccount.update({
-            where: { id: escrow_id },
-            data: {
-                balanceCents: balanceBefore - amount_cents,
-                totalSpentCents: escrow.totalSpentCents + amount_cents,
-                status: balanceBefore - amount_cents <= 0 ? 'depleted' : 'active'
-            }
-        });
+        // If idempotent replay, return existing request
+        if (existingRequest) {
+            return res.json(formatSpendRequest(existingRequest));
+        }
         
-        // Create spend request
-        const spendRequest = await prisma.spendRequest.create({
-            data: {
-                id: generateId('spendRequest'),
+        // Escrow account not found
+        if (!escrowAccount) {
+            const deniedRequest = await createDeniedSpendRequest({
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 apiKeyId: req.apiKey?.id,
@@ -173,64 +68,298 @@ router.post('/', requireAuth, async (req, res) => {
                 category,
                 description,
                 idempotencyKey: idempotency_key,
-                status: 'approved',
-                resolvedAt: new Date(),
-                resolvedBy: 'system',
-                rulesEvaluated,
-                balanceBeforeCents: balanceBefore,
-                balanceAfterCents: updatedEscrow.balanceCents,
-                metadata: JSON.stringify(metadata)
-            }
+                denialReason: 'escrow_not_found',
+                rulesEvaluated: [{ rule: 'escrow_account_check', passed: false, reason: 'Escrow account not found' }],
+                metadata
+            });
+            
+            return res.status(404).json({
+                ...formatSpendRequest(deniedRequest),
+                error: 'Escrow account not found'
+            });
+        }
+        
+        // Fetch active policies for this escrow
+        const policies = await prisma.spendingPolicy.findMany({
+            where: { escrowId: escrow_id, orgId: req.org.id, isActive: true }
         });
         
-        // Update spend tracking (basic implementation)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Parse policy JSON fields
+        const parsedPolicies = policies.map(p => ({
+            ...p,
+            allowedVendors: parseJson(p.allowedVendors, []),
+            blockedVendors: parseJson(p.blockedVendors, []),
+            allowedCategories: parseJson(p.allowedCategories, []),
+            blockedCategories: parseJson(p.blockedCategories, []),
+            activeDays: parseJson(p.activeDays, ['mon', 'tue', 'wed', 'thu', 'fri'])
+        }));
         
-        await prisma.dailySpendTracking.upsert({
-            where: {
-                escrowId_date: {
-                    escrowId: escrow_id,
-                    date: today
-                }
+        // Get date boundaries for tracking
+        const timezone = parsedPolicies[0]?.activeTimezone || 'UTC';
+        const { today, weekStart, monthStart } = getDateBoundaries(currentTime, timezone);
+        
+        // Fetch spend tracking
+        const [dailyTracking, weeklyTracking, monthlyTracking] = await Promise.all([
+            prisma.dailySpendTracking.findUnique({
+                where: { escrowId_date: { escrowId: escrow_id, date: today } }
+            }),
+            prisma.weeklySpendTracking.findUnique({
+                where: { escrowId_weekStart: { escrowId: escrow_id, weekStart } }
+            }),
+            prisma.monthlySpendTracking.findUnique({
+                where: { escrowId_monthStart: { escrowId: escrow_id, monthStart } }
+            })
+        ]);
+        
+        // Build evaluation context
+        const context = {
+            org: req.org,
+            apiKey: req.apiKey,
+            escrowAccount,
+            policies: parsedPolicies,
+            dailyTracking,
+            weeklyTracking,
+            monthlyTracking,
+            request: {
+                amountCents: amount_cents,
+                currency,
+                vendor,
+                category,
+                description,
+                idempotencyKey: idempotency_key
             },
-            update: {
-                totalSpentCents: { increment: amount_cents },
-                transactionCount: { increment: 1 }
-            },
-            create: {
+            currentTime,
+            existingRequest
+        };
+        
+        // Run the 13-step rules engine
+        const result = evaluateSpendRequest(context);
+        
+        // Handle replay (idempotency)
+        if (result.status === 'replay') {
+            return res.json(formatSpendRequest(result.existingRequest));
+        }
+        
+        // Handle denial
+        if (result.status === 'denied') {
+            const deniedRequest = await createDeniedSpendRequest({
                 escrowId: escrow_id,
-                date: today,
-                totalSpentCents: amount_cents,
-                transactionCount: 1
-            }
-        });
-        
-        // Audit event
-        await prisma.auditEvent.create({
-            data: {
-                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                apiKeyId: req.apiKey?.id,
+                amountCents: amount_cents,
+                currency,
+                vendor,
+                category,
+                description,
+                idempotencyKey: idempotency_key,
+                denialReason: result.denialReason,
+                denialRuleId: result.denialRuleId,
+                rulesEvaluated: result.rulesEvaluated,
+                balanceBeforeCents: escrowAccount.balanceCents,
+                metadata
+            });
+            
+            // Update denied total
+            await prisma.escrowAccount.update({
+                where: { id: escrow_id },
+                data: { totalDeniedCents: escrowAccount.totalDeniedCents + amount_cents }
+            });
+            
+            // Audit event
+            await createAuditEvent({
                 orgId: req.org.id,
                 escrowId: escrow_id,
-                eventType: 'spend.approved',
+                eventType: 'spend.denied',
                 actorType: req.authType === 'api_key' ? 'agent' : 'human',
                 actorId: req.apiKey?.id || req.org.id,
-                details: JSON.stringify({
-                    spend_request_id: spendRequest.id,
+                details: {
+                    spend_request_id: deniedRequest.id,
                     amount_cents,
                     vendor,
                     category,
-                    balance_before: balanceBefore,
-                    balance_after: updatedEscrow.balanceCents
-                }),
+                    denial_reason: result.denialReason,
+                    denial_rule_id: result.denialRuleId,
+                    rules_evaluated: result.rulesEvaluated,
+                    evaluation_time_ms: Date.now() - startTime
+                },
                 ipAddress: req.ip
-            }
+            });
+            
+            return res.status(400).json({
+                ...formatSpendRequest(deniedRequest),
+                error: result.denialReason
+            });
+        }
+        
+        // Handle pending approval
+        if (result.status === 'pending_approval') {
+            const expiresAt = new Date(currentTime.getTime() + result.approvalTimeoutMinutes * 60 * 1000);
+            
+            // Create spend request with pending status
+            const pendingRequest = await prisma.spendRequest.create({
+                data: {
+                    id: generateId('spendRequest'),
+                    escrowId: escrow_id,
+                    orgId: req.org.id,
+                    apiKeyId: req.apiKey?.id,
+                    amountCents: amount_cents,
+                    currency,
+                    vendor,
+                    category,
+                    description,
+                    idempotencyKey: idempotency_key,
+                    status: 'pending',
+                    rulesEvaluated: JSON.stringify(result.rulesEvaluated),
+                    balanceBeforeCents: escrowAccount.balanceCents,
+                    metadata: JSON.stringify(metadata)
+                }
+            });
+            
+            // Create approval record
+            const approval = await prisma.approval.create({
+                data: {
+                    id: generateId('approval'),
+                    spendRequestId: pendingRequest.id,
+                    orgId: req.org.id,
+                    status: 'pending',
+                    expiresAt
+                }
+            });
+            
+            // Audit event
+            await createAuditEvent({
+                orgId: req.org.id,
+                escrowId: escrow_id,
+                eventType: 'approval.requested',
+                actorType: req.authType === 'api_key' ? 'agent' : 'human',
+                actorId: req.apiKey?.id || req.org.id,
+                details: {
+                    spend_request_id: pendingRequest.id,
+                    approval_id: approval.id,
+                    amount_cents,
+                    vendor,
+                    category,
+                    expires_at: expiresAt.toISOString(),
+                    rules_evaluated: result.rulesEvaluated,
+                    evaluation_time_ms: Date.now() - startTime
+                },
+                ipAddress: req.ip
+            });
+            
+            return res.status(202).json({
+                ...formatSpendRequest(pendingRequest),
+                approval_id: approval.id,
+                approval_expires_at: expiresAt.toISOString()
+            });
+        }
+        
+        // Handle approved - execute the spend
+        const balanceBefore = escrowAccount.balanceCents;
+        const balanceAfter = balanceBefore - amount_cents;
+        
+        // Use a transaction for atomicity
+        const [updatedEscrow, spendRequest] = await prisma.$transaction([
+            // Deduct from balance
+            prisma.escrowAccount.update({
+                where: { id: escrow_id },
+                data: {
+                    balanceCents: balanceAfter,
+                    totalSpentCents: escrowAccount.totalSpentCents + amount_cents,
+                    status: balanceAfter <= 0 ? 'depleted' : 'active'
+                }
+            }),
+            // Create spend request
+            prisma.spendRequest.create({
+                data: {
+                    id: generateId('spendRequest'),
+                    escrowId: escrow_id,
+                    orgId: req.org.id,
+                    apiKeyId: req.apiKey?.id,
+                    amountCents: amount_cents,
+                    currency,
+                    vendor,
+                    category,
+                    description,
+                    idempotencyKey: idempotency_key,
+                    status: 'approved',
+                    resolvedAt: new Date(),
+                    resolvedBy: req.authType === 'api_key' ? 'system:auto_approved' : 'human:' + req.org.id,
+                    rulesEvaluated: JSON.stringify(result.rulesEvaluated),
+                    balanceBeforeCents: balanceBefore,
+                    balanceAfterCents: balanceAfter,
+                    metadata: JSON.stringify(metadata)
+                }
+            })
+        ]);
+        
+        // Update spend tracking (outside transaction for performance)
+        await Promise.all([
+            prisma.dailySpendTracking.upsert({
+                where: { escrowId_date: { escrowId: escrow_id, date: today } },
+                update: {
+                    totalSpentCents: { increment: amount_cents },
+                    transactionCount: { increment: 1 }
+                },
+                create: {
+                    escrowId: escrow_id,
+                    date: today,
+                    totalSpentCents: amount_cents,
+                    transactionCount: 1
+                }
+            }),
+            prisma.weeklySpendTracking.upsert({
+                where: { escrowId_weekStart: { escrowId: escrow_id, weekStart } },
+                update: {
+                    totalSpentCents: { increment: amount_cents },
+                    transactionCount: { increment: 1 }
+                },
+                create: {
+                    escrowId: escrow_id,
+                    weekStart,
+                    totalSpentCents: amount_cents,
+                    transactionCount: 1
+                }
+            }),
+            prisma.monthlySpendTracking.upsert({
+                where: { escrowId_monthStart: { escrowId: escrow_id, monthStart } },
+                update: {
+                    totalSpentCents: { increment: amount_cents },
+                    transactionCount: { increment: 1 }
+                },
+                create: {
+                    escrowId: escrow_id,
+                    monthStart,
+                    totalSpentCents: amount_cents,
+                    transactionCount: 1
+                }
+            })
+        ]);
+        
+        // Audit event
+        await createAuditEvent({
+            orgId: req.org.id,
+            escrowId: escrow_id,
+            eventType: 'spend.approved',
+            actorType: req.authType === 'api_key' ? 'agent' : 'human',
+            actorId: req.apiKey?.id || req.org.id,
+            details: {
+                spend_request_id: spendRequest.id,
+                amount_cents,
+                vendor,
+                category,
+                balance_before: balanceBefore,
+                balance_after: balanceAfter,
+                rules_evaluated: result.rulesEvaluated,
+                evaluation_time_ms: Date.now() - startTime
+            },
+            ipAddress: req.ip
         });
         
         res.status(201).json({
             ...formatSpendRequest(spendRequest),
-            remaining_balance_cents: updatedEscrow.balanceCents
+            remaining_balance_cents: balanceAfter
         });
+        
     } catch (error) {
         console.error('Spend request error:', error);
         res.status(500).json({ error: 'Failed to process spend request' });
@@ -325,12 +454,77 @@ router.post('/:id/cancel', requireAuth, async (req, res) => {
             }
         });
         
+        // Also update any related approval
+        await prisma.approval.updateMany({
+            where: { spendRequestId: spendRequest.id, status: 'pending' },
+            data: { status: 'cancelled' }
+        });
+        
         res.json(formatSpendRequest(updated));
     } catch (error) {
         console.error('Cancel spend request error:', error);
         res.status(500).json({ error: 'Failed to cancel spend request' });
     }
 });
+
+/**
+ * Helper to create a denied spend request
+ */
+async function createDeniedSpendRequest(data) {
+    return await prisma.spendRequest.create({
+        data: {
+            id: generateId('spendRequest'),
+            escrowId: data.escrowId,
+            orgId: data.orgId,
+            apiKeyId: data.apiKeyId,
+            amountCents: data.amountCents,
+            currency: data.currency || 'usd',
+            vendor: data.vendor,
+            category: data.category,
+            description: data.description,
+            idempotencyKey: data.idempotencyKey,
+            status: 'denied',
+            resolvedAt: new Date(),
+            resolvedBy: 'system',
+            denialReason: data.denialReason,
+            denialRuleId: data.denialRuleId,
+            rulesEvaluated: JSON.stringify(data.rulesEvaluated || []),
+            balanceBeforeCents: data.balanceBeforeCents,
+            metadata: JSON.stringify(data.metadata || {})
+        }
+    });
+}
+
+/**
+ * Helper to create audit event
+ */
+async function createAuditEvent(data) {
+    return await prisma.auditEvent.create({
+        data: {
+            id: generateId('auditEvent'),
+            orgId: data.orgId,
+            escrowId: data.escrowId,
+            eventType: data.eventType,
+            actorType: data.actorType,
+            actorId: data.actorId,
+            details: JSON.stringify(data.details),
+            ipAddress: data.ipAddress
+        }
+    });
+}
+
+/**
+ * Helper to parse JSON
+ */
+function parseJson(str, defaultValue) {
+    if (!str) return defaultValue;
+    if (typeof str !== 'string') return str;
+    try {
+        return JSON.parse(str);
+    } catch {
+        return defaultValue;
+    }
+}
 
 /**
  * Format spend request for API response
@@ -349,10 +543,11 @@ function formatSpendRequest(sr) {
         resolved_at: sr.resolvedAt,
         resolved_by: sr.resolvedBy,
         denial_reason: sr.denialReason,
-        rules_evaluated: JSON.parse(sr.rulesEvaluated || '[]'),
+        denial_rule_id: sr.denialRuleId,
+        rules_evaluated: parseJson(sr.rulesEvaluated, []),
         balance_before_cents: sr.balanceBeforeCents,
         balance_after_cents: sr.balanceAfterCents,
-        metadata: JSON.parse(sr.metadata || '{}'),
+        metadata: parseJson(sr.metadata, {}),
         created_at: sr.createdAt
     };
 }

@@ -15,10 +15,11 @@ import PrivacyPage from "@/pages/PrivacyPage";
 // Dashboard
 import DashboardLayout from "@/layouts/DashboardLayout";
 import DashboardOverview from "@/pages/dashboard/DashboardOverview";
+import TransactionsPage from "@/pages/dashboard/TransactionsPage";
+import TransactionDetailPage from "@/pages/dashboard/TransactionDetailPage";
 import {
     EscrowAccountsPage,
     SpendingRulesPage,
-    TransactionsPage,
     ApprovalsPage,
     ApiKeysPage,
     WebhooksPage,
@@ -52,6 +53,7 @@ function App() {
                         <Route path="accounts" element={<EscrowAccountsPage />} />
                         <Route path="rules" element={<SpendingRulesPage />} />
                         <Route path="transactions" element={<TransactionsPage />} />
+                        <Route path="transactions/:id" element={<TransactionDetailPage />} />
                         <Route path="approvals" element={<ApprovalsPage />} />
                         <Route path="keys" element={<ApiKeysPage />} />
                         <Route path="webhooks" element={<WebhooksPage />} />

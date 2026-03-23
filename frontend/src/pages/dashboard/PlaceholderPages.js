@@ -39,13 +39,6 @@ export const SpendingRulesPage = () => (
     />
 );
 
-export const TransactionsPage = () => (
-    <PlaceholderPage 
-        title="Transactions" 
-        description="View and filter all spend requests and their outcomes" 
-    />
-);
-
 export const ApprovalsPage = () => (
     <PlaceholderPage 
         title="Approvals" 
