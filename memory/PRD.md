@@ -4,8 +4,8 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 03 Complete - Rules Engine
-**Last Updated:** January 2026
+**Current Phase:** Prompt 04 Complete - Dashboard Pages
+**Last Updated:** March 2026
 
 ---
 
@@ -79,40 +79,67 @@ Every spend request passes through these checks in exact order:
 - **pending** - Requires human approval (returns approval_id)
 - **replay** - Idempotent request returning existing result
 
-#### Policy Configuration
-```javascript
-{
-  per_transaction_limit_cents: 10000,  // $100 max per tx
-  daily_limit_cents: 25000,            // $250/day
-  weekly_limit_cents: 100000,          // $1000/week
-  monthly_limit_cents: 500000,         // $5000/month
-  allowed_vendors: ["Google Ads", "Meta Ads", "Anthropic"],
-  blocked_vendors: [],
-  vendor_match_mode: "exact",          // exact | contains | regex
-  allowed_categories: ["advertising", "ai_compute"],
-  blocked_categories: ["transfers"],
-  active_days: ["mon", "tue", "wed", "thu", "fri"],
-  active_hours_start: "06:00",
-  active_hours_end: "22:00",
-  active_timezone: "America/Denver",
-  auto_approve_under_cents: 5000,      // Auto-approve < $50
-  require_human_above_cents: 7500      // Require human > $75
-}
-```
+### Prompt 04 - Dashboard Pages (Completed - March 2026)
 
-#### Frontend Updates
-- [x] TransactionsPage - Lists all spend requests with status
-- [x] TransactionDetailPage - Shows complete rule evaluation timeline
-- [x] Pass/fail icons for each rule step
-- [x] Denial reasons with policy references
-- [x] Balance impact visualization
+#### Implemented Features:
+1. **Dashboard Overview** - Real-time stats from API
+   - Total Escrowed, Total Spent, Active Rules, Pending Approvals
+   - Quick Actions section
+   - Recent Transactions feed
+
+2. **Escrow Accounts Page** (`/dashboard/accounts`)
+   - List view with summary cards
+   - Create account modal with initial funding option
+   - Fund account modal with balance preview
+   - Action menu: Pause, Resume, Close
+
+3. **Spending Rules Page** (`/dashboard/rules`)
+   - Policy cards with expandable details
+   - Create/Edit modal with 6 tabs:
+     - Basic Info (name, escrow, active toggle)
+     - Amount Limits (per-tx, daily, weekly, monthly)
+     - Vendor Controls (allowed/blocked, match mode)
+     - Categories (allowed/blocked)
+     - Time Window (days, hours, timezone)
+     - Approval Rules (auto-approve, require-human thresholds)
+   - Toggle active status, delete policy
+
+4. **Transactions Page** (`/dashboard/transactions`)
+   - List view with status badges
+   - Filter by status (pending, approved, denied)
+   - Links to transaction detail page
+
+5. **Transaction Detail Page** (`/dashboard/transactions/:id`)
+   - Transaction summary (amount, vendor, category)
+   - Balance impact visualization
+   - 12-step rules evaluation timeline with pass/fail indicators
+
+6. **Approvals Page** (`/dashboard/approvals`)
+   - Tabs: Pending, Approved, Denied, Expired
+   - Approval cards with request details
+   - Approve button
+   - Deny button with reason dropdown and note field
+
+7. **API Keys Page** (`/dashboard/keys`)
+   - Grouped by type: Live, Test, Agent
+   - Create key modal with type selection and permissions
+   - Copy key warning (shown once)
+   - Toggle active/inactive, Revoke
+
+8. **Audit Log Page** (`/dashboard/audit`)
+   - Filterable table with event types
+   - Filter panel: Event Type, Actor Type, Escrow Account
+   - Event detail panel with full JSON
+
+#### API Client Layer
+- `/app/frontend/src/lib/api.js` - Centralized API calls with auth handling
 
 ---
 
 ## Prioritized Backlog
 
 ### P0 - Critical (Next Prompts)
-1. **Dashboard Functionality (Prompt 04)** - Wire remaining pages to API
+1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
 2. **Stripe Integration** - Real funding and disbursement
 
 ### P1 - High Priority
@@ -129,20 +156,34 @@ Every spend request passes through these checks in exact order:
 
 ## Architecture Summary
 
-### Rules Engine Files
-- `/app/backend/src/services/rules-engine.js` - Main 13-step evaluation
+### Backend Files
+- `/app/backend/src/services/rules-engine.js` - 13-step evaluation
 - `/app/backend/src/services/rules-helpers.js` - Vendor matching, time checks
-- `/app/backend/src/routes/spend.js` - POST /v1/spend endpoint
+- `/app/backend/src/routes/` - All API endpoints
 
-### Key Frontend Files
+### Frontend Dashboard Files
+- `/app/frontend/src/lib/api.js` - API client layer
+- `/app/frontend/src/pages/dashboard/DashboardOverview.js`
+- `/app/frontend/src/pages/dashboard/EscrowAccountsPage.js`
+- `/app/frontend/src/pages/dashboard/SpendingRulesPage.js`
 - `/app/frontend/src/pages/dashboard/TransactionsPage.js`
 - `/app/frontend/src/pages/dashboard/TransactionDetailPage.js`
+- `/app/frontend/src/pages/dashboard/ApprovalsPage.js`
+- `/app/frontend/src/pages/dashboard/ApiKeysPage.js`
+- `/app/frontend/src/pages/dashboard/AuditLogPage.js`
 
 ---
 
-## Next Tasks (Prompt 04 Preview)
-1. Escrow Accounts page - create, fund, pause/resume
-2. Spending Rules page - create/edit policies
-3. Approvals page - approve/deny pending requests
-4. API Keys page - create/revoke keys
-5. Dashboard Overview - real data from API
+## Testing
+
+### Iteration 4 Results (March 2026)
+- Backend: 100% (31/31 tests passed)
+- Frontend: 100% (all pages functional)
+- Test credentials: demo@test.com / Test123!
+
+---
+
+## Next Tasks
+1. Stripe integration for real fiat funding
+2. Webhook delivery system
+3. API documentation page
