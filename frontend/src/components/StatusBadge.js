@@ -30,6 +30,36 @@ const statusStyles = {
         bg: 'rgba(239, 68, 68, 0.1)',
         text: '#EF4444',
         dot: '#EF4444'
+    },
+    closed: {
+        bg: 'rgba(107, 114, 128, 0.1)',
+        text: '#6B7280',
+        dot: '#6B7280'
+    },
+    expired: {
+        bg: 'rgba(107, 114, 128, 0.1)',
+        text: '#6B7280',
+        dot: '#6B7280'
+    },
+    cancelled: {
+        bg: 'rgba(107, 114, 128, 0.1)',
+        text: '#6B7280',
+        dot: '#6B7280'
+    },
+    live: {
+        bg: 'rgba(16, 185, 129, 0.1)',
+        text: '#10B981',
+        dot: '#10B981'
+    },
+    test: {
+        bg: 'rgba(245, 158, 11, 0.1)',
+        text: '#F59E0B',
+        dot: '#F59E0B'
+    },
+    agent: {
+        bg: 'rgba(59, 130, 246, 0.1)',
+        text: '#3B82F6',
+        dot: '#3B82F6'
     }
 };
 

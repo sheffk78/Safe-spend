@@ -17,13 +17,13 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import DashboardOverview from "@/pages/dashboard/DashboardOverview";
 import TransactionsPage from "@/pages/dashboard/TransactionsPage";
 import TransactionDetailPage from "@/pages/dashboard/TransactionDetailPage";
+import EscrowAccountsPage from "@/pages/dashboard/EscrowAccountsPage";
+import SpendingRulesPage from "@/pages/dashboard/SpendingRulesPage";
+import ApprovalsPage from "@/pages/dashboard/ApprovalsPage";
+import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
+import AuditLogPage from "@/pages/dashboard/AuditLogPage";
 import {
-    EscrowAccountsPage,
-    SpendingRulesPage,
-    ApprovalsPage,
-    ApiKeysPage,
     WebhooksPage,
-    AuditLogPage,
     SettingsPage
 } from "@/pages/dashboard/PlaceholderPages";
 

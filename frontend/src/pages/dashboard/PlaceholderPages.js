@@ -24,46 +24,11 @@ const PlaceholderPage = ({ title, description }) => {
     );
 };
 
-// Individual page exports with specific content
-export const EscrowAccountsPage = () => (
-    <PlaceholderPage 
-        title="Escrow Accounts" 
-        description="Manage your segregated escrow accounts and fund balances" 
-    />
-);
-
-export const SpendingRulesPage = () => (
-    <PlaceholderPage 
-        title="Spending Rules" 
-        description="Define fiduciary policies for your escrow accounts" 
-    />
-);
-
-export const ApprovalsPage = () => (
-    <PlaceholderPage 
-        title="Approvals" 
-        description="Review and approve pending spend requests that exceed auto-approve thresholds" 
-    />
-);
-
-export const ApiKeysPage = () => (
-    <PlaceholderPage 
-        title="API Keys" 
-        description="Manage your API keys for live, test, and agent access" 
-    />
-);
-
+// Remaining placeholder pages
 export const WebhooksPage = () => (
     <PlaceholderPage 
         title="Webhooks" 
         description="Configure webhook endpoints for real-time event notifications" 
-    />
-);
-
-export const AuditLogPage = () => (
-    <PlaceholderPage 
-        title="Audit Log" 
-        description="Complete immutable record of all account activity" 
     />
 );
 
