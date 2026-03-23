@@ -1,0 +1,274 @@
+// This is your Prisma schema file for Safe-Spend
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Organizations (users/companies)
+model Organization {
+  id                String   @id @default(uuid())
+  name              String
+  email             String   @unique
+  passwordHash      String   @map("password_hash")
+  stripeCustomerId  String?  @map("stripe_customer_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  apiKeys          ApiKey[]
+  escrowAccounts   EscrowAccount[]
+  spendingPolicies SpendingPolicy[]
+  spendRequests    SpendRequest[]
+  approvals        Approval[]
+  auditEvents      AuditEvent[]
+  webhooks         Webhook[]
+
+  @@map("organizations")
+}
+
+// API Keys
+model ApiKey {
+  id          String    @id @default(uuid())
+  orgId       String    @map("org_id")
+  keyHash     String    @map("key_hash")
+  keyPrefix   String    @map("key_prefix")
+  keyType     String    @map("key_type") // live | test | agent
+  label       String?
+  permissions String    @default("[]")
+  lastUsedAt  DateTime? @map("last_used_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendRequests SpendRequest[]
+
+  @@map("api_keys")
+}
+
+// Escrow Accounts
+model EscrowAccount {
+  id                    String   @id @default(uuid())
+  orgId                 String   @map("org_id")
+  name                  String
+  description           String?
+  balanceCents          Int      @default(0) @map("balance_cents")
+  currency              String   @default("usd")
+  status                String   @default("active") // active | paused | depleted | closed
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  totalFundedCents      Int      @default(0) @map("total_funded_cents")
+  totalSpentCents       Int      @default(0) @map("total_spent_cents")
+  totalDeniedCents      Int      @default(0) @map("total_denied_cents")
+  metadata              String   @default("{}")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendingPolicies SpendingPolicy[]
+  spendRequests    SpendRequest[]
+  auditEvents      AuditEvent[]
+  dailyTracking    DailySpendTracking[]
+  weeklyTracking   WeeklySpendTracking[]
+  monthlyTracking  MonthlySpendTracking[]
+
+  @@map("escrow_accounts")
+}
+
+// Spending Policies
+model SpendingPolicy {
+  id                      String   @id @default(uuid())
+  escrowId                String   @map("escrow_id")
+  orgId                   String   @map("org_id")
+  name                    String
+  isActive                Boolean  @default(true) @map("is_active")
+  
+  // Amount limits
+  perTransactionLimitCents Int?    @map("per_transaction_limit_cents")
+  dailyLimitCents          Int?    @map("daily_limit_cents")
+  weeklyLimitCents         Int?    @map("weekly_limit_cents")
+  monthlyLimitCents        Int?    @map("monthly_limit_cents")
+  
+  // Vendor controls (stored as JSON strings)
+  allowedVendors    String  @default("[]") @map("allowed_vendors")
+  blockedVendors    String  @default("[]") @map("blocked_vendors")
+  vendorMatchMode   String  @default("exact") @map("vendor_match_mode") // exact | contains | regex
+  
+  // Category controls
+  allowedCategories String  @default("[]") @map("allowed_categories")
+  blockedCategories String  @default("[]") @map("blocked_categories")
+  
+  // Time controls
+  activeDays        String  @default("[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"]") @map("active_days")
+  activeHoursStart  String? @map("active_hours_start")
+  activeHoursEnd    String? @map("active_hours_end")
+  activeTimezone    String  @default("America/Denver") @map("active_timezone")
+  
+  // Approval controls
+  autoApproveUnderCents   Int?   @map("auto_approve_under_cents")
+  requireHumanAboveCents  Int?   @map("require_human_above_cents")
+  approvalTimeoutMinutes  Int    @default(60) @map("approval_timeout_minutes")
+  
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization   Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount  EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  spendRequests  SpendRequest[] @relation("DenialRule")
+
+  @@map("spending_policies")
+}
+
+// Spend Requests
+model SpendRequest {
+  id             String   @id @default(uuid())
+  escrowId       String   @map("escrow_id")
+  orgId          String   @map("org_id")
+  apiKeyId       String?  @map("api_key_id")
+  
+  // Request details
+  amountCents    Int      @map("amount_cents")
+  currency       String   @default("usd")
+  vendor         String
+  category       String?
+  description    String?
+  idempotencyKey String?  @unique @map("idempotency_key")
+  
+  // Resolution
+  status         String   @default("pending") // pending | approved | denied | expired | cancelled
+  resolvedAt     DateTime? @map("resolved_at")
+  resolvedBy     String?  @map("resolved_by")
+  denialReason   String?  @map("denial_reason")
+  denialRuleId   String?  @map("denial_rule_id")
+  
+  // Rule evaluation snapshot (stored as JSON string)
+  rulesEvaluated    String @default("[]") @map("rules_evaluated")
+  balanceBeforeCents Int?  @map("balance_before_cents")
+  balanceAfterCents  Int?  @map("balance_after_cents")
+  
+  // Stripe fields
+  stripeTransferId  String? @map("stripe_transfer_id")
+  stripePaymentId   String? @map("stripe_payment_id")
+  
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization  Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount EscrowAccount   @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  apiKey        ApiKey?         @relation(fields: [apiKeyId], references: [id])
+  denialRule    SpendingPolicy? @relation("DenialRule", fields: [denialRuleId], references: [id])
+  approvals     Approval[]
+
+  @@map("spend_requests")
+}
+
+// Approvals
+model Approval {
+  id              String    @id @default(uuid())
+  spendRequestId  String    @map("spend_request_id")
+  orgId           String    @map("org_id")
+  status          String    @default("pending") // pending | approved | denied | expired
+  requestedAt     DateTime  @default(now()) @map("requested_at")
+  expiresAt       DateTime? @map("expires_at")
+  decidedBy       String?   @map("decided_by")
+  decidedAt       DateTime? @map("decided_at")
+  decisionNote    String?   @map("decision_note")
+  notificationSent Boolean  @default(false) @map("notification_sent")
+
+  // Relations
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendRequest  SpendRequest @relation(fields: [spendRequestId], references: [id], onDelete: Cascade)
+
+  @@map("approvals")
+}
+
+// Audit Events
+model AuditEvent {
+  id         String   @id @default(uuid())
+  orgId      String   @map("org_id")
+  escrowId   String?  @map("escrow_id")
+  eventType  String   @map("event_type")
+  actorType  String   @map("actor_type") // human | agent | system
+  actorId    String?  @map("actor_id")
+  details    String   // JSON string
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount EscrowAccount? @relation(fields: [escrowId], references: [id])
+
+  @@map("audit_events")
+}
+
+// Webhooks
+model Webhook {
+  id              String    @id @default(uuid())
+  orgId           String    @map("org_id")
+  url             String
+  events          String    @default("[]") // JSON string array
+  secret          String
+  isActive        Boolean   @default(true) @map("is_active")
+  lastTriggeredAt DateTime? @map("last_triggered_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("webhooks")
+}
+
+// Daily Spend Tracking
+model DailySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  date            DateTime
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, date])
+  @@map("daily_spend_tracking")
+}
+
+// Weekly Spend Tracking
+model WeeklySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  weekStart       DateTime @map("week_start")
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, weekStart])
+  @@map("weekly_spend_tracking")
+}
+
+// Monthly Spend Tracking
+model MonthlySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  monthStart      DateTime @map("month_start")
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, monthStart])
+  @@map("monthly_spend_tracking")
+}

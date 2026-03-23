@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
+const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -24,6 +26,8 @@ export const AuthProvider = ({ children }) => {
             try {
                 setToken(storedToken);
                 setUser(JSON.parse(storedUser));
+                // Verify token is still valid
+                verifyToken(storedToken);
             } catch (error) {
                 console.error('Error parsing stored user:', error);
                 localStorage.removeItem('ss_token');
@@ -33,46 +37,97 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
-        // This will be replaced with actual API call when backend is ready
-        // For now, simulate a successful login
-        const mockToken = `jwt_${btoa(email)}_${Date.now()}`;
-        const mockUser = {
-            id: `org_${Math.random().toString(36).substring(2, 14)}`,
-            email: email,
-            name: email.split('@')[0],
-            createdAt: new Date().toISOString()
-        };
+    const verifyToken = async (authToken) => {
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                // Token is invalid, clear session
+                logout();
+            }
+        } catch (error) {
+            console.error('Token verification failed:', error);
+        }
+    };
 
-        // Store in localStorage
-        localStorage.setItem('ss_token', mockToken);
-        localStorage.setItem('ss_user', JSON.stringify(mockUser));
-        
-        setToken(mockToken);
-        setUser(mockUser);
-        
-        return { success: true, user: mockUser };
+    const login = async (email, password) => {
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                throw new Error('Invalid response from server');
+            }
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Login failed');
+            }
+            
+            const authToken = data.token;
+            const userData = data.organization;
+            
+            // Store in localStorage
+            localStorage.setItem('ss_token', authToken);
+            localStorage.setItem('ss_user', JSON.stringify(userData));
+            
+            setToken(authToken);
+            setUser(userData);
+            
+            return { success: true, user: userData };
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
     };
 
     const signup = async (email, password, name) => {
-        // This will be replaced with actual API call when backend is ready
-        // For now, simulate a successful signup
-        const mockToken = `jwt_${btoa(email)}_${Date.now()}`;
-        const mockUser = {
-            id: `org_${Math.random().toString(36).substring(2, 14)}`,
-            email: email,
-            name: name || email.split('@')[0],
-            createdAt: new Date().toISOString()
-        };
-
-        // Store in localStorage
-        localStorage.setItem('ss_token', mockToken);
-        localStorage.setItem('ss_user', JSON.stringify(mockUser));
-        
-        setToken(mockToken);
-        setUser(mockUser);
-        
-        return { success: true, user: mockUser };
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password, name: name || email.split('@')[0] })
+            });
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                throw new Error('Invalid response from server');
+            }
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Signup failed');
+            }
+            
+            const authToken = data.token;
+            const userData = data.organization;
+            
+            // Store in localStorage
+            localStorage.setItem('ss_token', authToken);
+            localStorage.setItem('ss_user', JSON.stringify(userData));
+            
+            setToken(authToken);
+            setUser(userData);
+            
+            return { success: true, user: userData };
+        } catch (error) {
+            console.error('Signup error:', error);
+            throw error;
+        }
     };
 
     const logout = () => {

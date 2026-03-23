@@ -1,0 +1,26 @@
+{
+  "name": "safe-spend-backend",
+  "version": "1.0.0",
+  "description": "Safe-Spend API - Fiduciary-grade spending control for AI agents",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "stripe": "^14.14.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.10.0"
+  }
+}

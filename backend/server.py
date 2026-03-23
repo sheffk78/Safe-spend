@@ -1,89 +1,127 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+"""
+Safe-Spend Backend - FastAPI Proxy to Node.js
+
+This creates a FastAPI ASGI app that proxies all requests to a Node.js backend
+running on an internal port.
+"""
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
+import subprocess
+import threading
+import time
+import atexit
+import httpx
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 
+# Internal Node.js port (uvicorn uses 8001 externally)
+NODE_INTERNAL_PORT = 8002
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+# Start Node.js server on internal port
+def start_node_server():
+    env = os.environ.copy()
+    env['PORT'] = str(NODE_INTERNAL_PORT)
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+    process = subprocess.Popen(
+        ['node', 'src/server.js'],
+        cwd='/app/backend',
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
+    )
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    # Log output in background
+    def log_output():
+        for line in iter(process.stdout.readline, b''):
+            print(f"[Node] {line.decode().rstrip()}", flush=True)
     
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+    thread = threading.Thread(target=log_output, daemon=True)
+    thread.start()
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    # Cleanup on exit
+    def cleanup():
+        process.terminate()
+        process.wait()
     
-    return status_checks
+    atexit.register(cleanup)
+    
+    return process
 
-# Include the router in the main app
-app.include_router(api_router)
+# Start Node.js
+print(f"Starting Node.js backend on internal port {NODE_INTERNAL_PORT}...", flush=True)
+node_process = start_node_server()
+time.sleep(2)  # Give Node time to start
 
+# Create FastAPI app
+app = FastAPI(title="Safe-Spend API")
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# HTTP client for proxying
+http_client = httpx.AsyncClient(timeout=30.0)
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+async def shutdown():
+    await http_client.aclose()
+    node_process.terminate()
+    node_process.wait()
+
+# Proxy all /api requests to Node.js
+@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+async def proxy_api(request: Request, path: str):
+    try:
+        # Build target URL
+        target_url = f"http://127.0.0.1:{NODE_INTERNAL_PORT}/api/{path}"
+        if request.query_params:
+            target_url += f"?{request.query_params}"
+        
+        # Get request body
+        body = await request.body()
+        
+        # Forward headers (excluding hop-by-hop headers)
+        headers = {}
+        for key, value in request.headers.items():
+            if key.lower() not in ['host', 'content-length', 'transfer-encoding', 'connection']:
+                headers[key] = value
+        
+        # Make request to Node.js
+        response = await http_client.request(
+            method=request.method,
+            url=target_url,
+            content=body,
+            headers=headers,
+        )
+        
+        # Return response
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers={k: v for k, v in response.headers.items() 
+                    if k.lower() not in ['content-length', 'content-encoding', 'transfer-encoding', 'connection']},
+            media_type=response.headers.get('content-type', 'application/json')
+        )
+    
+    except httpx.ConnectError:
+        return Response(
+            content='{"error": "Backend service unavailable"}',
+            status_code=503,
+            media_type="application/json"
+        )
+    except Exception as e:
+        print(f"Proxy error: {e}", flush=True)
+        return Response(
+            content=f'{{"error": "Proxy error: {str(e)}"}}',
+            status_code=500,
+            media_type="application/json"
+        )
+
+# Root redirect
+@app.get("/")
+async def root():
+    return {"message": "Safe-Spend API", "docs": "/docs"}
