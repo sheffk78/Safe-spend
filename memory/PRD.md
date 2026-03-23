@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 02 Complete - Backend Core API
+**Current Phase:** Prompt 03 Complete - Rules Engine
 **Last Updated:** January 2026
 
 ---
@@ -45,159 +45,104 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 ## What's Been Implemented
 
 ### Prompt 01 - Landing Page + Dashboard Shell (Completed)
-- Landing page with all sections (hero, problem, how-it-works, policy card, pricing, etc.)
+- Landing page with all sections
 - Dashboard shell with sidebar navigation
-- Mock auth flow (replaced by real auth in Prompt 02)
 - Official Safe-Spend logo integration
 
 ### Prompt 02 - Backend Core API (Completed)
+- Database schema with 9+ tables
+- Auth system (JWT + API keys)
+- All CRUD endpoints for escrow accounts, policies, spend requests, etc.
 
-#### Database Schema (9+ tables)
-- [x] Organizations - users/companies with prefixed IDs (org_)
-- [x] API Keys - with sk_live_, sk_test_, sk_agent_ prefixes
-- [x] Escrow Accounts - with esc_ prefix and balance tracking
-- [x] Spending Policies - fiduciary rules (placeholder for rules engine)
-- [x] Spend Requests - with spr_ prefix and full audit trail
-- [x] Approvals - human approval workflow
-- [x] Audit Events - immutable event log with evt_ prefix
-- [x] Webhooks - with whk_ prefix
-- [x] Spend Tracking - daily/weekly/monthly aggregations
+### Prompt 03 - Rules Engine (Completed)
 
-#### Authentication System
-- [x] POST /api/v1/auth/signup - create organization
-- [x] POST /api/v1/auth/login - JWT authentication
-- [x] GET /api/v1/auth/me - get profile
+#### 13-Step Spend Validation Cascade
+Every spend request passes through these checks in exact order:
 
-#### API Key System
-- [x] POST /api/v1/api-keys - create key (sk_live_, sk_test_, sk_agent_)
-- [x] GET /api/v1/api-keys - list keys
-- [x] DELETE /api/v1/api-keys/:id - revoke key
-- [x] Proper key hashing (SHA-256)
+1. **KEY_VALIDATION** - Validates API key or JWT token
+2. **ESCROW_ACCOUNT_CHECK** - Verifies escrow exists and is active
+3. **IDEMPOTENCY_CHECK** - Returns existing result for duplicate keys
+4. **BALANCE_CHECK** - Ensures sufficient funds
+5. **PER_TRANSACTION_LIMIT** - Enforces per-tx amount cap
+6. **DAILY_CAP_CHECK** - Enforces daily spending limit
+7. **WEEKLY_CAP_CHECK** - Enforces weekly spending limit
+8. **MONTHLY_CAP_CHECK** - Enforces monthly spending limit
+9. **VENDOR_CHECK** - Validates against allowlist/blocklist
+10. **CATEGORY_CHECK** - Validates category against restrictions
+11. **TIME_WINDOW_CHECK** - Enforces active days/hours
+12. **APPROVAL_THRESHOLD_CHECK** - Determines if human approval needed
+13. **EXECUTE** - Final step, spend is executed
 
-#### Escrow Accounts
-- [x] POST /api/v1/escrow-accounts - create
-- [x] GET /api/v1/escrow-accounts - list
-- [x] GET /api/v1/escrow-accounts/:id - get details
-- [x] GET /api/v1/escrow-accounts/:id/balance - get balance
-- [x] POST /api/v1/escrow-accounts/:id/fund - fund (placeholder)
-- [x] POST /api/v1/escrow-accounts/:id/pause - pause spending
-- [x] POST /api/v1/escrow-accounts/:id/resume - resume spending
-- [x] POST /api/v1/escrow-accounts/:id/close - close account
+#### Outcomes
+- **approved** - All rules pass, within auto-approve threshold
+- **denied** - A rule failed (with reason and policy ID)
+- **pending** - Requires human approval (returns approval_id)
+- **replay** - Idempotent request returning existing result
 
-#### Spending Policies
-- [x] CRUD endpoints for policies
-- [x] Policy structure ready for rules engine
+#### Policy Configuration
+```javascript
+{
+  per_transaction_limit_cents: 10000,  // $100 max per tx
+  daily_limit_cents: 25000,            // $250/day
+  weekly_limit_cents: 100000,          // $1000/week
+  monthly_limit_cents: 500000,         // $5000/month
+  allowed_vendors: ["Google Ads", "Meta Ads", "Anthropic"],
+  blocked_vendors: [],
+  vendor_match_mode: "exact",          // exact | contains | regex
+  allowed_categories: ["advertising", "ai_compute"],
+  blocked_categories: ["transfers"],
+  active_days: ["mon", "tue", "wed", "thu", "fri"],
+  active_hours_start: "06:00",
+  active_hours_end: "22:00",
+  active_timezone: "America/Denver",
+  auto_approve_under_cents: 5000,      // Auto-approve < $50
+  require_human_above_cents: 7500      // Require human > $75
+}
+```
 
-#### Spend Requests
-- [x] POST /api/v1/spend - create spend request
-- [x] GET /api/v1/spend - list requests
-- [x] Idempotency key support
-- [x] Balance deduction on approval
-- [x] Denial tracking
-
-#### Other Endpoints
-- [x] Approvals CRUD + approve/deny actions
-- [x] Audit log read endpoints
-- [x] Webhooks CRUD + secret rotation
-
-#### Frontend Integration
-- [x] AuthContext updated to use real backend API
-- [x] Login/signup flows work with backend
-- [x] Protected routes properly redirect
+#### Frontend Updates
+- [x] TransactionsPage - Lists all spend requests with status
+- [x] TransactionDetailPage - Shows complete rule evaluation timeline
+- [x] Pass/fail icons for each rule step
+- [x] Denial reasons with policy references
+- [x] Balance impact visualization
 
 ---
 
 ## Prioritized Backlog
 
 ### P0 - Critical (Next Prompts)
-1. **Rules Engine (Prompt 03)** - The 13-step spend validation cascade
-2. **Dashboard Functionality (Prompt 04)** - Wire up dashboard pages to API
+1. **Dashboard Functionality (Prompt 04)** - Wire remaining pages to API
+2. **Stripe Integration** - Real funding and disbursement
 
 ### P1 - High Priority
-3. **Stripe Integration** - Real funding and disbursement
-4. **Webhook Delivery** - Send events to registered endpoints
-5. **Documentation Page** - API reference, integration guides
+3. **Webhook Delivery** - Send events to registered endpoints
+4. **Documentation Page** - API reference, integration guides
+5. **SDK Generation** - Python, TypeScript SDKs
 
 ### P2 - Medium Priority
-6. **Testing Suite** - Comprehensive API tests
-7. **SDK Generation** - Python, TypeScript SDKs
-8. **MCP Server** - Model Context Protocol integration
+6. **MCP Server** - Model Context Protocol integration
+7. **Expiring Approvals** - Auto-expire pending approvals
+8. **Rate Limiting** - API request limits
 
 ---
 
 ## Architecture Summary
 
-### API Routes
-```
-/api/v1/auth/signup          POST   Create organization
-/api/v1/auth/login           POST   Authenticate
-/api/v1/auth/me              GET    Get profile
+### Rules Engine Files
+- `/app/backend/src/services/rules-engine.js` - Main 13-step evaluation
+- `/app/backend/src/services/rules-helpers.js` - Vendor matching, time checks
+- `/app/backend/src/routes/spend.js` - POST /v1/spend endpoint
 
-/api/v1/escrow-accounts      GET    List accounts
-/api/v1/escrow-accounts      POST   Create account
-/api/v1/escrow-accounts/:id  GET    Get account
-/api/v1/escrow-accounts/:id/balance    GET    Get balance
-/api/v1/escrow-accounts/:id/fund       POST   Fund account
-/api/v1/escrow-accounts/:id/pause      POST   Pause account
-/api/v1/escrow-accounts/:id/resume     POST   Resume account
-/api/v1/escrow-accounts/:id/close      POST   Close account
-
-/api/v1/policies             GET    List policies
-/api/v1/policies             POST   Create policy
-/api/v1/policies/:id         GET    Get policy
-/api/v1/policies/:id         PATCH  Update policy
-/api/v1/policies/:id         DELETE Delete policy
-
-/api/v1/spend                GET    List spend requests
-/api/v1/spend                POST   Create spend request
-/api/v1/spend/:id            GET    Get spend request
-/api/v1/spend/:id/cancel     POST   Cancel pending request
-
-/api/v1/approvals            GET    List approvals
-/api/v1/approvals/:id        GET    Get approval
-/api/v1/approvals/:id/approve POST  Approve request
-/api/v1/approvals/:id/deny   POST   Deny request
-
-/api/v1/api-keys             GET    List API keys
-/api/v1/api-keys             POST   Create API key
-/api/v1/api-keys/:id         GET    Get API key
-/api/v1/api-keys/:id         DELETE Revoke API key
-
-/api/v1/webhooks             GET    List webhooks
-/api/v1/webhooks             POST   Create webhook
-/api/v1/webhooks/:id         DELETE Delete webhook
-/api/v1/webhooks/:id/rotate-secret POST Rotate secret
-
-/api/v1/audit                GET    List audit events
-/api/v1/audit/:id            GET    Get audit event
-```
-
-### ID Prefixes
-- org_ - Organizations
-- key_ - API Keys (internal ID)
-- sk_live_, sk_test_, sk_agent_ - API Key values
-- esc_ - Escrow Accounts
-- pol_ - Spending Policies
-- spr_ - Spend Requests
-- apr_ - Approvals
-- evt_ - Audit Events
-- whk_ - Webhooks
-
-### Key Files
-- `/app/backend/server.py` - FastAPI proxy to Node.js
-- `/app/backend/src/server.js` - Node.js Express server
-- `/app/backend/src/routes/*.js` - API route handlers
-- `/app/backend/prisma/schema.prisma` - Database schema
-- `/app/frontend/src/contexts/AuthContext.js` - Auth state
+### Key Frontend Files
+- `/app/frontend/src/pages/dashboard/TransactionsPage.js`
+- `/app/frontend/src/pages/dashboard/TransactionDetailPage.js`
 
 ---
 
-## Next Tasks (Prompt 03 Preview)
-1. Implement 13-step spending rules cascade
-2. Policy evaluation engine
-3. Daily/weekly/monthly limit enforcement
-4. Vendor allowlist/blocklist checking
-5. Category restrictions
-6. Time window enforcement
-7. Auto-approve threshold logic
-8. Human approval queue integration
+## Next Tasks (Prompt 04 Preview)
+1. Escrow Accounts page - create, fund, pause/resume
+2. Spending Rules page - create/edit policies
+3. Approvals page - approve/deny pending requests
+4. API Keys page - create/revoke keys
+5. Dashboard Overview - real data from API
