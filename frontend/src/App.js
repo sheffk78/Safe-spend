@@ -35,6 +35,7 @@ import TransactionsPage from "@/pages/dashboard/TransactionsPage";
 import TransactionDetailPage from "@/pages/dashboard/TransactionDetailPage";
 import EscrowAccountsPage from "@/pages/dashboard/EscrowAccountsPage";
 import SpendingRulesPage from "@/pages/dashboard/SpendingRulesPage";
+import FiduciaryPoliciesPage from "@/pages/dashboard/FiduciaryPoliciesPage";
 import ApprovalsPage from "@/pages/dashboard/ApprovalsPage";
 import ApprovalDetailPage from "@/pages/dashboard/ApprovalDetailPage";
 import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
@@ -107,7 +108,7 @@ function App() {
                     >
                         <Route index element={<DashboardOverview />} />
                         <Route path="accounts" element={<EscrowAccountsPage />} />
-                        <Route path="rules" element={<SpendingRulesPage />} />
+                        <Route path="rules" element={<FiduciaryPoliciesPage />} />
                         <Route path="transactions" element={<TransactionsPage />} />
                         <Route path="transactions/:id" element={<TransactionDetailPage />} />
                         <Route path="approvals" element={<ApprovalsPage />} />

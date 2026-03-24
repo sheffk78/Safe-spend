@@ -5,7 +5,7 @@ import GuidedTour, { useShouldShowTour, TourHelpButton } from '@/components/Guid
 import { 
     LayoutDashboard, 
     Wallet, 
-    Shield, 
+    Scale, 
     ArrowRightLeft, 
     CheckCircle, 
     Key, 
@@ -38,7 +38,7 @@ const ROLE_CONFIG = {
 const navItems = [
     { label: 'Overview', icon: LayoutDashboard, path: '/dashboard' },
     { label: 'Escrow Accounts', icon: Wallet, path: '/dashboard/accounts' },
-    { label: 'Spending Rules', icon: Shield, path: '/dashboard/rules' },
+    { label: 'Fiduciary Policies', icon: Scale, path: '/dashboard/rules' },
     { label: 'Transactions', icon: ArrowRightLeft, path: '/dashboard/transactions' },
     { label: 'Approvals', icon: CheckCircle, path: '/dashboard/approvals' },
     { label: 'Playground', icon: Play, path: '/dashboard/playground' },

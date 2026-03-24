@@ -15,6 +15,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
         const {
             escrow_id,
             name,
+            purpose, // Free-form text for trust mandate purpose
             draft = true, // Default to draft for agent-led setup
             per_transaction_limit_cents,
             daily_limit_cents,
@@ -57,6 +58,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 name,
+                purpose: purpose || null,
                 status,
                 isActive: !draft, // isActive = false for drafts
                 perTransactionLimitCents: per_transaction_limit_cents,
@@ -313,7 +315,7 @@ router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
         
         const updateData = {};
         const allowedFields = [
-            'name', 'is_active', 'status', 'draft',
+            'name', 'purpose', 'is_active', 'status', 'draft',
             'per_transaction_limit_cents', 'daily_limit_cents', 'weekly_limit_cents', 'monthly_limit_cents',
             'allowed_vendors', 'blocked_vendors', 'vendor_match_mode',
             'allowed_categories', 'blocked_categories',
@@ -509,6 +511,7 @@ function formatPolicy(policy) {
         id: policy.id,
         escrow_id: policy.escrowId,
         name: policy.name,
+        purpose: policy.purpose,
         status: policy.status,
         is_active: policy.isActive,
         is_locked: !!policy.lockedAt,

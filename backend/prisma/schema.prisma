@@ -166,12 +166,13 @@ model FundingEvent {
   @@map("funding_events")
 }
 
-// Spending Policies
+// Spending Policies (Fiduciary Policies)
 model SpendingPolicy {
   id                      String   @id @default(uuid())
   escrowId                String   @map("escrow_id")
   orgId                   String   @map("org_id")
   name                    String
+  purpose                 String?  // Free-form text describing the trust mandate purpose
   status                  String   @default("draft") // draft | active | archived
   isActive                Boolean  @default(true) @map("is_active")
   lockedAt                DateTime? @map("locked_at")
