@@ -13,7 +13,8 @@ import {
     Settings,
     LogOut,
     Menu,
-    X
+    X,
+    Play
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -23,6 +24,7 @@ const navItems = [
     { label: 'Spending Rules', icon: Shield, path: '/dashboard/rules' },
     { label: 'Transactions', icon: ArrowRightLeft, path: '/dashboard/transactions' },
     { label: 'Approvals', icon: CheckCircle, path: '/dashboard/approvals' },
+    { label: 'Playground', icon: Play, path: '/dashboard/playground' },
     { label: 'API Keys', icon: Key, path: '/dashboard/keys' },
     { label: 'Webhooks', icon: Webhook, path: '/dashboard/webhooks' },
     { label: 'Audit Log', icon: FileText, path: '/dashboard/audit' },

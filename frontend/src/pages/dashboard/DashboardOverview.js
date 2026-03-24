@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
-import { TrendingUp, TrendingDown, DollarSign, Shield, Clock, Key, ArrowRight, RefreshCw, Wallet } from 'lucide-react';
+import QuickStartModal from '@/components/QuickStartModal';
+import { TrendingUp, TrendingDown, DollarSign, Shield, Clock, Key, ArrowRight, RefreshCw, Wallet, Rocket } from 'lucide-react';
 import {
     listEscrowAccounts,
     listSpendRequests,
@@ -13,6 +14,7 @@ import {
 const DashboardOverview = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showQuickStart, setShowQuickStart] = useState(false);
     const [stats, setStats] = useState({
         totalEscrowed: 0,
         spentToday: 0,
@@ -86,16 +88,37 @@ const DashboardOverview = () => {
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Dashboard</h1>
                     <p className="text-ss-text-secondary mt-1">Overview of your escrow accounts and activity</p>
                 </div>
-                <button
-                    onClick={fetchDashboardData}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
-                    data-testid="refresh-dashboard-btn"
-                >
-                    <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                    Refresh
-                </button>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setShowQuickStart(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-accent/10 border border-ss-accent/50 hover:bg-ss-accent/20 rounded-lg text-ss-accent font-medium transition-all"
+                        data-testid="quickstart-btn"
+                    >
+                        <Rocket size={16} />
+                        Quick Start
+                    </button>
+                    <button
+                        onClick={fetchDashboardData}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                        data-testid="refresh-dashboard-btn"
+                    >
+                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                </div>
             </div>
+
+            {/* Quick Start Modal */}
+            {showQuickStart && (
+                <QuickStartModal
+                    onClose={() => setShowQuickStart(false)}
+                    onSuccess={() => {
+                        setShowQuickStart(false);
+                        fetchDashboardData();
+                    }}
+                />
+            )}
 
             {/* Error */}
             {error && (

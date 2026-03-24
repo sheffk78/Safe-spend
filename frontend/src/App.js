@@ -33,6 +33,7 @@ import ApprovalDetailPage from "@/pages/dashboard/ApprovalDetailPage";
 import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
 import AuditLogPage from "@/pages/dashboard/AuditLogPage";
 import WebhooksPage from "@/pages/dashboard/WebhooksPage";
+import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
                         <Route path="transactions/:id" element={<TransactionDetailPage />} />
                         <Route path="approvals" element={<ApprovalsPage />} />
                         <Route path="approvals/:id" element={<ApprovalDetailPage />} />
+                        <Route path="playground" element={<PlaygroundPage />} />
                         <Route path="keys" element={<ApiKeysPage />} />
                         <Route path="webhooks" element={<WebhooksPage />} />
                         <Route path="audit" element={<AuditLogPage />} />

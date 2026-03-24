@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Policy Builder Wizard Complete
+**Current Phase:** Prompt 13 Complete - API Playground & Quick Start Templates
 **Last Updated:** March 24, 2026
 
 ---
@@ -260,6 +260,9 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 7. ~~Terms of Service (Prompt 10)~~ ✅ COMPLETE
 8. ~~Privacy Policy (Prompt 11)~~ ✅ COMPLETE
 9. ~~Trust Law Explainer (Prompt 12)~~ ✅ COMPLETE
+10. ~~API Playground (Prompt 13)~~ ✅ COMPLETE
+11. ~~Quick Start Templates~~ ✅ COMPLETE
+12. ~~Policy Builder Wizard~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
 9. **SDK Generation** - Python, TypeScript SDKs
@@ -409,3 +412,68 @@ An interactive step-by-step wizard that guides users through creating spending p
 
 #### Access
 - Dashboard → Spending Rules → "Policy Wizard" button
+
+
+---
+
+### Prompt 13 - API Playground (Completed - March 24, 2026)
+
+#### Overview
+An interactive API testing environment for developers to simulate spend requests and explore the rules engine without writing code.
+
+#### Features
+1. **Request Builder** with form fields for all spend request parameters
+2. **Quick Scenarios** - Pre-built test cases:
+   - Happy Path (Should pass all policies)
+   - Vendor Not Allowed (Tests vendor allowlist)
+   - Over Daily Cap (Tests spending limits)
+   - Requires Human Approval (Tests approval thresholds)
+3. **Response Panel** - Shows API response with status badges and key fields
+4. **Rules Timeline** - Visual step-by-step view of rules evaluation
+5. **Code Snippets** - Auto-generated code in cURL, Python, and TypeScript
+6. **Test/Live Mode Indicator** - Shows which mode API key is in
+
+#### UI Components
+- `PlaygroundPage.js` - Main playground page
+- `ModeIndicator` - Test/Live mode badge
+- `CodeSnippet` - Copyable code blocks with syntax highlighting
+- `RulesTimeline` - Visual rules evaluation display
+- `SCENARIO_PRESETS` - Pre-defined test scenarios
+
+#### Files Created/Modified
+- `/app/frontend/src/pages/dashboard/PlaygroundPage.js` (NEW)
+- `/app/frontend/src/layouts/DashboardLayout.js` (Added Playground nav)
+- `/app/frontend/src/App.js` (Added route)
+
+#### Access
+- Dashboard → Playground (sidebar navigation)
+
+---
+
+### Quick Start Templates (Completed - March 24, 2026)
+
+#### Overview
+One-click creation of pre-configured escrow accounts with matching spending policies. Creates both resources in a single flow.
+
+#### Templates Available
+1. **Marketing Budget** ($5K budget, $100/tx, auto-approve under $50)
+   - For marketing agents doing ad spend and AI compute
+2. **Procurement Tools** ($3K budget, $300/tx, auto-approve under $150)
+   - For SaaS subscriptions and developer tools
+3. **R&D Sandbox** ($500 budget, $20/tx, auto-approve under $10)
+   - Bounded-loss experimentation for research agents
+4. **DevOps Infrastructure** ($10K budget, $500/tx, auto-approve under $250)
+   - Cloud infrastructure and monitoring tools
+
+#### Flow
+1. Select template
+2. Review configuration summary
+3. Create escrow + policy in one click
+4. Success screen with links to Playground and Escrow page
+
+#### Files Created/Modified
+- `/app/frontend/src/components/QuickStartModal.js` (NEW)
+- `/app/frontend/src/pages/dashboard/DashboardOverview.js` (Added Quick Start button)
+
+#### Access
+- Dashboard → Quick Start button (top right header)
