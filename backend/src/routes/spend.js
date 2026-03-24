@@ -7,6 +7,7 @@ const { getDateBoundaries } = require('../services/rules-helpers');
 const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
 const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('../services/security-alerts');
 const { sendApprovalNotification } = require('../services/approval-notification-service');
+const { extractAAVClaims } = require('../services/aav-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -16,7 +17,7 @@ const denialTracker = new Map();
 
 /**
  * POST /v1/spend
- * Create a spend request - runs the full 13-step rules engine
+ * Create a spend request - runs the full 14-step rules engine (including AAV check)
  */
 router.post('/', requireAuth, async (req, res) => {
     const startTime = Date.now();
@@ -30,8 +31,20 @@ router.post('/', requireAuth, async (req, res) => {
             category,
             description,
             idempotency_key,
+            aav_agent_id,      // AAV agent identifier
+            aav_grant_id,      // AAV grant identifier
             metadata = {}
         } = req.body;
+        
+        // Extract AAV claims from headers or body
+        const aavClaims = extractAAVClaims(req);
+        
+        // If body has AAV fields but headers didn't, use body values
+        if (!aavClaims.agent_id && aav_agent_id) {
+            aavClaims.agent_id = aav_agent_id;
+            aavClaims.grant_id = aav_grant_id;
+            aavClaims.source = 'body';
+        }
         
         // Check for injection attempts in input fields
         const fieldsToCheck = { vendor, category, description };
@@ -155,7 +168,8 @@ router.post('/', requireAuth, async (req, res) => {
                 idempotencyKey: idempotency_key
             },
             currentTime,
-            existingRequest
+            existingRequest,
+            aavClaims  // AAV claims for agent authorization
         };
         
         // Run the 13-step rules engine
@@ -182,7 +196,11 @@ router.post('/', requireAuth, async (req, res) => {
                 denialRuleId: result.denialRuleId,
                 rulesEvaluated: result.rulesEvaluated,
                 balanceBeforeCents: escrowAccount.balanceCents,
-                metadata
+                metadata,
+                // AAV fields
+                aavAgentId: aavClaims?.agent_id,
+                aavGrantId: aavClaims?.grant_id,
+                aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
             });
             
             // Track consecutive denials for runaway detection
@@ -261,7 +279,11 @@ router.post('/', requireAuth, async (req, res) => {
                     status: 'pending',
                     rulesEvaluated: JSON.stringify(result.rulesEvaluated),
                     balanceBeforeCents: escrowAccount.balanceCents,
-                    metadata: JSON.stringify(metadata)
+                    metadata: JSON.stringify(metadata),
+                    // AAV fields
+                    aavAgentId: aavClaims?.agent_id || null,
+                    aavGrantId: aavClaims?.grant_id || null,
+                    aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
                 }
             });
             
@@ -380,7 +402,11 @@ router.post('/', requireAuth, async (req, res) => {
                         rulesEvaluated: JSON.stringify(result.rulesEvaluated),
                         balanceBeforeCents: actualBalanceBefore,
                         balanceAfterCents: actualBalanceAfter,
-                        metadata: JSON.stringify(metadata)
+                        metadata: JSON.stringify(metadata),
+                        // AAV fields
+                        aavAgentId: aavClaims?.agent_id || null,
+                        aavGrantId: aavClaims?.grant_id || null,
+                        aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
                     }
                 });
                 
@@ -616,7 +642,11 @@ async function createDeniedSpendRequest(data) {
             denialRuleId: data.denialRuleId,
             rulesEvaluated: JSON.stringify(data.rulesEvaluated || []),
             balanceBeforeCents: data.balanceBeforeCents,
-            metadata: JSON.stringify(data.metadata || {})
+            metadata: JSON.stringify(data.metadata || {}),
+            // AAV fields
+            aavAgentId: data.aavAgentId || null,
+            aavGrantId: data.aavGrantId || null,
+            aavVerificationStatus: data.aavVerificationStatus || null
         }
     });
 }
@@ -673,6 +703,10 @@ function formatSpendRequest(sr) {
         rules_evaluated: parseJson(sr.rulesEvaluated, []),
         balance_before_cents: sr.balanceBeforeCents,
         balance_after_cents: sr.balanceAfterCents,
+        // AAV fields
+        aav_agent_id: sr.aavAgentId,
+        aav_grant_id: sr.aavGrantId,
+        aav_verification_status: sr.aavVerificationStatus,
         metadata: parseJson(sr.metadata, {}),
         created_at: sr.createdAt
     };

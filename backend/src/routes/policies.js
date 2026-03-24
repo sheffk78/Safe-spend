@@ -33,11 +33,26 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             auto_approve_under_cents,
             require_human_above_cents,
             approval_timeout_minutes = 60,
-            metadata = {}
+            metadata = {},
+            // AAV fields
+            aav_enabled = false,
+            authorized_agent_ids = [],
+            aav_grant_ids = [],
+            aav_enforcement_mode = null  // null = inherit from escrow
         } = req.body;
         
         if (!escrow_id || !name) {
             return res.status(400).json({ error: 'escrow_id and name are required' });
+        }
+        
+        // Validate AAV enforcement mode if provided
+        if (aav_enforcement_mode !== null) {
+            const validModes = ['none', 'warn', 'strict'];
+            if (!validModes.includes(aav_enforcement_mode)) {
+                return res.status(400).json({ 
+                    error: `Invalid aav_enforcement_mode. Must be one of: ${validModes.join(', ')}` 
+                });
+            }
         }
         
         // Verify escrow account exists and belongs to org
@@ -77,7 +92,12 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 autoApproveUnderCents: auto_approve_under_cents,
                 requireHumanAboveCents: require_human_above_cents,
                 approvalTimeoutMinutes: approval_timeout_minutes,
-                metadata: JSON.stringify(metadata)
+                metadata: JSON.stringify(metadata),
+                // AAV fields
+                aavEnabled: aav_enabled,
+                authorizedAgentIds: JSON.stringify(authorized_agent_ids),
+                aavGrantIds: JSON.stringify(aav_grant_ids),
+                aavEnforcementMode: aav_enforcement_mode
             }
         });
         
@@ -321,7 +341,9 @@ router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
             'allowed_categories', 'blocked_categories',
             'active_days', 'active_hours_start', 'active_hours_end', 'active_timezone',
             'auto_approve_under_cents', 'require_human_above_cents', 'approval_timeout_minutes',
-            'metadata'
+            'metadata',
+            // AAV fields
+            'aav_enabled', 'authorized_agent_ids', 'aav_grant_ids', 'aav_enforcement_mode'
         ];
         
         // Map snake_case to camelCase
@@ -342,7 +364,12 @@ router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
             'active_timezone': 'activeTimezone',
             'auto_approve_under_cents': 'autoApproveUnderCents',
             'require_human_above_cents': 'requireHumanAboveCents',
-            'approval_timeout_minutes': 'approvalTimeoutMinutes'
+            'approval_timeout_minutes': 'approvalTimeoutMinutes',
+            // AAV field mappings
+            'aav_enabled': 'aavEnabled',
+            'authorized_agent_ids': 'authorizedAgentIds',
+            'aav_grant_ids': 'aavGrantIds',
+            'aav_enforcement_mode': 'aavEnforcementMode'
         };
         
         for (const field of allowedFields) {
@@ -351,7 +378,7 @@ router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
                 let value = req.body[field];
                 
                 // Handle JSON fields
-                if (['allowedVendors', 'blockedVendors', 'allowedCategories', 'blockedCategories', 'activeDays'].includes(dbField)) {
+                if (['allowedVendors', 'blockedVendors', 'allowedCategories', 'blockedCategories', 'activeDays', 'authorizedAgentIds', 'aavGrantIds'].includes(dbField)) {
                     value = JSON.stringify(value);
                 }
                 if (dbField === 'metadata') {
@@ -533,6 +560,11 @@ function formatPolicy(policy) {
         auto_approve_under_cents: policy.autoApproveUnderCents,
         require_human_above_cents: policy.requireHumanAboveCents,
         approval_timeout_minutes: policy.approvalTimeoutMinutes,
+        // AAV fields
+        aav_enabled: policy.aavEnabled,
+        authorized_agent_ids: JSON.parse(policy.authorizedAgentIds || '[]'),
+        aav_grant_ids: JSON.parse(policy.aavGrantIds || '[]'),
+        aav_enforcement_mode: policy.aavEnforcementMode,
         metadata: JSON.parse(policy.metadata || '{}'),
         created_at: policy.createdAt,
         updated_at: policy.updatedAt

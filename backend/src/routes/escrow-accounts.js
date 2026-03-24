@@ -16,10 +16,28 @@ const prisma = new PrismaClient();
  */
 router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
     try {
-        const { name, description, currency = 'usd', metadata = {} } = req.body;
+        const { 
+            name, 
+            description, 
+            currency = 'usd', 
+            metadata = {},
+            // AAV fields
+            aav_enabled = false,
+            authorized_agent_ids = [],
+            aav_grant_ids = [],
+            aav_enforcement_mode = 'none'
+        } = req.body;
         
         if (!name) {
             return res.status(400).json({ error: 'Name is required' });
+        }
+        
+        // Validate AAV enforcement mode
+        const validModes = ['none', 'warn', 'strict'];
+        if (!validModes.includes(aav_enforcement_mode)) {
+            return res.status(400).json({ 
+                error: `Invalid aav_enforcement_mode. Must be one of: ${validModes.join(', ')}` 
+            });
         }
         
         const escrowId = generateId('escrowAccount');
@@ -30,7 +48,12 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 name,
                 description,
                 currency,
-                metadata: JSON.stringify(metadata)
+                metadata: JSON.stringify(metadata),
+                // AAV fields
+                aavEnabled: aav_enabled,
+                authorizedAgentIds: JSON.stringify(authorized_agent_ids),
+                aavGrantIds: JSON.stringify(aav_grant_ids),
+                aavEnforcementMode: aav_enforcement_mode
             }
         });
         
@@ -43,7 +66,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 eventType: 'escrow.created',
                 actorType: req.authType === 'api_key' ? 'agent' : 'human',
                 actorId: req.authType === 'api_key' ? req.apiKey.id : req.org.id,
-                details: JSON.stringify({ name, currency }),
+                details: JSON.stringify({ name, currency, aav_enabled }),
                 ipAddress: req.ip
             }
         });
@@ -515,6 +538,11 @@ function formatEscrowAccount(escrow) {
         total_funded_cents: escrow.totalFundedCents,
         total_spent_cents: escrow.totalSpentCents,
         total_denied_cents: escrow.totalDeniedCents,
+        // AAV fields
+        aav_enabled: escrow.aavEnabled,
+        authorized_agent_ids: JSON.parse(escrow.authorizedAgentIds || '[]'),
+        aav_grant_ids: JSON.parse(escrow.aavGrantIds || '[]'),
+        aav_enforcement_mode: escrow.aavEnforcementMode,
         metadata: JSON.parse(escrow.metadata || '{}'),
         created_at: escrow.createdAt,
         updated_at: escrow.updatedAt

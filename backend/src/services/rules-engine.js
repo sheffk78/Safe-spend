@@ -1,12 +1,13 @@
 /**
  * Safe-Spend Rules Engine
  * 
- * Implements the 13-step spend validation cascade.
+ * Implements the 14-step spend validation cascade.
  * This is the core IP of Safe-Spend - deterministic, auditable spending control.
  * 
  * Evaluation Order:
  * 1. KEY VALIDATION
  * 2. ESCROW ACCOUNT CHECK
+ * 2.5. AAV AGENT AUTHORIZATION (NEW)
  * 3. IDEMPOTENCY CHECK
  * 4. BALANCE CHECK
  * 5. PER-TRANSACTION LIMIT
@@ -21,6 +22,11 @@
  */
 
 const { matchVendor, isWithinTimeWindow, getDateBoundaries } = require('./rules-helpers');
+const { 
+    extractAAVClaims, 
+    checkAgentAuthorization, 
+    getEffectiveEnforcementMode 
+} = require('./aav-service');
 
 /**
  * Rule result structure
@@ -59,7 +65,7 @@ const { matchVendor, isWithinTimeWindow, getDateBoundaries } = require('./rules-
  */
 
 /**
- * Main evaluation function - runs all 13 steps
+ * Main evaluation function - runs all 14 steps
  * @param {EvaluationContext} context - All data needed for evaluation
  * @returns {EvaluationResult}
  */
@@ -78,6 +84,13 @@ function evaluateSpendRequest(context) {
     rulesEvaluated.push(escrowResult);
     if (!escrowResult.passed) {
         return createDenialResult(rulesEvaluated, escrowResult.reason, escrowResult.rule_id);
+    }
+    
+    // Step 2.5: AAV AGENT AUTHORIZATION
+    const aavResult = checkAAVAuthorization(context);
+    rulesEvaluated.push(aavResult);
+    if (!aavResult.passed) {
+        return createDenialResult(rulesEvaluated, aavResult.reason, aavResult.rule_id);
     }
     
     // Step 3: IDEMPOTENCY CHECK
@@ -264,6 +277,96 @@ function validateEscrowAccount(context) {
         passed: true,
         reason: 'Escrow account is active',
         metadata: { escrow_id: escrowAccount.id, status: escrowAccount.status }
+    };
+}
+
+/**
+ * Step 2.5: AAV AGENT AUTHORIZATION
+ * Verifies the requesting agent has AAV-issued authority to use this escrow/policy
+ */
+function checkAAVAuthorization(context) {
+    const { escrowAccount, policies, aavClaims } = context;
+    
+    // Check if AAV is enabled at escrow level
+    if (!escrowAccount.aavEnabled) {
+        return {
+            rule: 'aav_authorization',
+            passed: true,
+            reason: 'AAV enforcement not enabled for this escrow',
+            metadata: { enforcement_mode: 'none', aav_enabled: false }
+        };
+    }
+    
+    // Get enforcement mode (escrow-level or policy-level override)
+    const enforcementMode = getEffectiveEnforcementMode(escrowAccount, policies);
+    
+    if (enforcementMode === 'none') {
+        return {
+            rule: 'aav_authorization',
+            passed: true,
+            reason: 'AAV enforcement mode is none',
+            metadata: { enforcement_mode: 'none' }
+        };
+    }
+    
+    // Extract agent identity from AAV claims
+    const agentId = aavClaims?.agent_id;
+    const grantId = aavClaims?.grant_id;
+    const verified = aavClaims?.verified || false;
+    
+    // Check authorization
+    const authResult = checkAgentAuthorization(
+        agentId, 
+        grantId, 
+        escrowAccount, 
+        policies
+    );
+    
+    if (!authResult.authorized) {
+        if (enforcementMode === 'warn') {
+            // Log but allow (for gradual rollout)
+            return {
+                rule: 'aav_authorization',
+                passed: true,
+                reason: 'Agent not authorized (warning mode - allowed)',
+                metadata: { 
+                    enforcement_mode: 'warn',
+                    agent_id: agentId,
+                    grant_id: grantId,
+                    authorized: false,
+                    verification_status: verified ? 'verified' : 'unverified',
+                    warning: authResult.reason
+                }
+            };
+        }
+        
+        // Strict mode - deny
+        return {
+            rule: 'aav_authorization',
+            passed: false,
+            reason: authResult.reason,
+            metadata: {
+                enforcement_mode: 'strict',
+                agent_id: agentId,
+                grant_id: grantId,
+                authorized_agents: authResult.authorizedAgents || [],
+                authorized_grants: authResult.authorizedGrants || []
+            }
+        };
+    }
+    
+    return {
+        rule: 'aav_authorization',
+        passed: true,
+        reason: authResult.reason,
+        metadata: {
+            enforcement_mode: enforcementMode,
+            agent_id: agentId,
+            grant_id: grantId,
+            matched_on: authResult.matchedOn,
+            policy_id: authResult.policyId,
+            verification_status: verified ? 'verified' : 'unverified'
+        }
     };
 }
 

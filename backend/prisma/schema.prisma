@@ -51,6 +51,7 @@ model Organization {
   webhooks             Webhook[]
   members              OrgMember[]
   notificationSettings NotificationSettings?
+  aavConfiguration     AAVConfiguration?
 
   @@map("organizations")
 }
@@ -93,6 +94,32 @@ model NotificationSettings {
   @@map("notification_settings")
 }
 
+// AAV (Agent Authority Vault) Configuration
+model AAVConfiguration {
+  id                     String    @id @default(uuid())
+  orgId                  String    @unique @map("org_id")
+  
+  // AAV Connection
+  aavEndpoint            String?   @map("aav_endpoint")           // AAV API endpoint
+  aavPublicKey           String?   @map("aav_public_key")         // For JWT/signature verification
+  aavApiKey              String?   @map("aav_api_key")            // For AAV API calls (encrypted)
+  
+  // Default behavior
+  defaultEnforcementMode String    @default("none") @map("default_enforcement_mode") // none | warn | strict
+  
+  // Status
+  isConfigured           Boolean   @default(false) @map("is_configured")
+  lastVerifiedAt         DateTime? @map("last_verified_at")
+  
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("aav_configurations")
+}
+
 // API Keys
 model ApiKey {
   id          String    @id @default(uuid())
@@ -130,6 +157,12 @@ model EscrowAccount {
   metadata              String   @default("{}")
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
+  
+  // AAV Integration
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array of AAV agent IDs
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array of AAV grant IDs
+  aavEnforcementMode    String   @default("none") @map("aav_enforcement_mode") // none | warn | strict
 
   // Relations
   organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -204,6 +237,12 @@ model SpendingPolicy {
   requireHumanAboveCents  Int?   @map("require_human_above_cents")
   approvalTimeoutMinutes  Int    @default(60) @map("approval_timeout_minutes")
   
+  // AAV Integration (overrides escrow-level if set)
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array
+  aavEnforcementMode    String?  @map("aav_enforcement_mode")                 // null = inherit from escrow
+  
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -246,6 +285,11 @@ model SpendRequest {
   // Stripe fields
   stripeTransferId  String? @map("stripe_transfer_id")
   stripePaymentId   String? @map("stripe_payment_id")
+  
+  // AAV Integration (captured at request time)
+  aavAgentId            String?  @map("aav_agent_id")           // Agent ID from AAV claim
+  aavGrantId            String?  @map("aav_grant_id")           // Grant ID used for authorization
+  aavVerificationStatus String?  @map("aav_verification_status") // verified | unverified | bypassed
   
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")

@@ -385,6 +385,12 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Status Badges */}
+                    {policy.aav_enabled && (
+                        <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400 flex items-center gap-1.5">
+                            <Shield size={12} />
+                            AAV
+                        </span>
+                    )}
                     {isLocked && (
                         <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs font-medium text-emerald-400 flex items-center gap-1.5">
                             <Lock size={12} />
@@ -667,7 +673,12 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
         active_hours_end: policy?.active_hours_end || '',
         active_timezone: policy?.active_timezone || 'America/Denver',
         auto_approve_under: policy?.auto_approve_under_cents ? (policy.auto_approve_under_cents / 100).toString() : '',
-        require_human_above: policy?.require_human_above_cents ? (policy.require_human_above_cents / 100).toString() : ''
+        require_human_above: policy?.require_human_above_cents ? (policy.require_human_above_cents / 100).toString() : '',
+        // AAV fields
+        aav_enabled: policy?.aav_enabled || false,
+        authorized_agent_ids: policy?.authorized_agent_ids?.join(', ') || '',
+        aav_grant_ids: policy?.aav_grant_ids?.join(', ') || '',
+        aav_enforcement_mode: policy?.aav_enforcement_mode || ''
     });
 
     const steps = [
@@ -718,7 +729,12 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                 active_hours_end: formData.active_hours_end || null,
                 active_timezone: formData.active_timezone,
                 auto_approve_under_cents: formData.auto_approve_under ? dollarsToCents(formData.auto_approve_under) : null,
-                require_human_above_cents: formData.require_human_above ? dollarsToCents(formData.require_human_above) : null
+                require_human_above_cents: formData.require_human_above ? dollarsToCents(formData.require_human_above) : null,
+                // AAV fields
+                aav_enabled: formData.aav_enabled,
+                authorized_agent_ids: parseList(formData.authorized_agent_ids),
+                aav_grant_ids: parseList(formData.aav_grant_ids),
+                aav_enforcement_mode: formData.aav_enforcement_mode || null
             };
 
             if (isEditing) {
@@ -1291,6 +1307,75 @@ const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
                 </div>
             </div>
         </div>
+
+        {/* AAV Agent Authorization */}
+        <div className="space-y-3">
+            <h4 className="text-sm font-medium text-ss-text flex items-center gap-2">
+                <Shield size={14} className="text-ss-accent" />
+                Agent Authorization (AAV Integration)
+            </h4>
+            <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p className="text-xs text-blue-400">
+                    Restrict this policy to specific AI agents verified through Agent Authority Vault (AAV). 
+                    When enabled, only agents with matching IDs can spend under this mandate.
+                </p>
+            </div>
+            <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={formData.aav_enabled}
+                        onChange={(e) => onChange('aav_enabled', e.target.checked)}
+                        className="sr-only peer"
+                        data-testid="wizard-aav-enabled"
+                    />
+                    <div className="w-11 h-6 bg-ss-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ss-accent"></div>
+                </label>
+                <span className="text-sm text-ss-text">Enable AAV agent verification</span>
+            </div>
+            
+            {formData.aav_enabled && (
+                <div className="space-y-3 pt-2">
+                    <div>
+                        <label className="block text-xs text-ss-text-secondary mb-1.5">Authorized Agent IDs</label>
+                        <input
+                            type="text"
+                            value={formData.authorized_agent_ids}
+                            onChange={(e) => onChange('authorized_agent_ids', e.target.value)}
+                            placeholder="agent_marketing_bot, agent_procurement"
+                            className="w-full px-4 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm placeholder-ss-text-tertiary"
+                            data-testid="wizard-agent-ids"
+                        />
+                        <p className="text-xs text-ss-text-tertiary mt-1">Comma-separated list of AAV agent identifiers</p>
+                    </div>
+                    <div>
+                        <label className="block text-xs text-ss-text-secondary mb-1.5">AAV Grant IDs (Optional)</label>
+                        <input
+                            type="text"
+                            value={formData.aav_grant_ids}
+                            onChange={(e) => onChange('aav_grant_ids', e.target.value)}
+                            placeholder="grant_marketing_q1, grant_ops_2026"
+                            className="w-full px-4 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm placeholder-ss-text-tertiary"
+                            data-testid="wizard-grant-ids"
+                        />
+                        <p className="text-xs text-ss-text-tertiary mt-1">Time-bound grants from AAV (alternative to agent IDs)</p>
+                    </div>
+                    <div>
+                        <label className="block text-xs text-ss-text-secondary mb-1.5">Enforcement Mode</label>
+                        <select
+                            value={formData.aav_enforcement_mode}
+                            onChange={(e) => onChange('aav_enforcement_mode', e.target.value)}
+                            className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm"
+                            data-testid="wizard-aav-mode"
+                        >
+                            <option value="">Inherit from escrow</option>
+                            <option value="warn">Warn (log but allow)</option>
+                            <option value="strict">Strict (deny unauthorized)</option>
+                        </select>
+                    </div>
+                </div>
+            )}
+        </div>
     </div>
 );
 
@@ -1415,6 +1500,39 @@ const Step4Review = ({ formData, escrowAccounts }) => {
                             </p>
                         )}
                     </div>
+
+                    {/* AAV Agent Authorization */}
+                    {formData.aav_enabled && (
+                        <div>
+                            <h4 className="text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider mb-2">
+                                Agent Authorization (AAV)
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs">
+                                    AAV Enabled
+                                </span>
+                                {formData.aav_enforcement_mode && (
+                                    <span className={`px-2.5 py-1 rounded-lg text-xs ${
+                                        formData.aav_enforcement_mode === 'strict' 
+                                            ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+                                            : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                                    }`}>
+                                        Mode: {formData.aav_enforcement_mode}
+                                    </span>
+                                )}
+                            </div>
+                            {formData.authorized_agent_ids && (
+                                <p className="text-xs text-ss-text-secondary mt-2">
+                                    <span className="text-ss-accent">Agents:</span> {formData.authorized_agent_ids}
+                                </p>
+                            )}
+                            {formData.aav_grant_ids && (
+                                <p className="text-xs text-ss-text-secondary mt-1">
+                                    <span className="text-ss-accent">Grants:</span> {formData.aav_grant_ids}
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
