@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
+import PolicyBuilderWizard from '@/components/PolicyBuilderWizard';
 import { 
     Shield, 
     Plus, 
@@ -14,7 +15,8 @@ import {
     DollarSign,
     Users,
     Tag,
-    BookOpen
+    BookOpen,
+    Wand2
 } from 'lucide-react';
 import {
     listPolicies,
@@ -54,6 +56,7 @@ const SpendingRulesPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showWizard, setShowWizard] = useState(false);
     const [editingPolicy, setEditingPolicy] = useState(null);
     const [expandedPolicy, setExpandedPolicy] = useState(null);
 
@@ -138,6 +141,14 @@ const SpendingRulesPage = () => {
                         Refresh
                     </button>
                     <button
+                        onClick={() => setShowWizard(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-ss-accent/50 hover:bg-ss-accent/10 rounded-lg text-ss-accent font-medium transition-all"
+                        data-testid="wizard-btn"
+                    >
+                        <Wand2 size={16} />
+                        Policy Wizard
+                    </button>
+                    <button
                         onClick={() => {
                             setEditingPolicy(null);
                             setShowModal(true);
@@ -216,6 +227,18 @@ const SpendingRulesPage = () => {
                     onSuccess={() => {
                         setShowModal(false);
                         setEditingPolicy(null);
+                        fetchData();
+                    }}
+                />
+            )}
+
+            {/* Policy Builder Wizard */}
+            {showWizard && (
+                <PolicyBuilderWizard
+                    escrowAccounts={escrowAccounts}
+                    onClose={() => setShowWizard(false)}
+                    onSuccess={() => {
+                        setShowWizard(false);
                         fetchData();
                     }}
                 />

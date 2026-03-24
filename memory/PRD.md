@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 12 Complete - Trust Law Explainer & Governance Patterns
+**Current Phase:** Policy Builder Wizard Complete
 **Last Updated:** March 24, 2026
 
 ---
@@ -365,3 +365,47 @@ src/middleware/error-handler.js # Global error handling
 - `/app/frontend/src/App.js` (Added route)
 - `/app/frontend/src/pages/dashboard/SpendingRulesPage.js` (Added link)
 - `/app/frontend/src/pages/dashboard/AuditLogPage.js` (Added link)
+
+
+---
+
+### Policy Builder Wizard (Completed - March 24, 2026)
+
+#### Overview
+An interactive step-by-step wizard that guides users through creating spending policies using trust law concepts as guardrails. Provides pre-built governance patterns with sensible defaults.
+
+#### Steps
+1. **Pattern Selection** - Choose from 4 governance patterns:
+   - Marketing Agent (Purpose-restricted trust for ads and AI compute)
+   - Procurement Agent (Vendor-restricted trust with approval thresholds)
+   - R&D Sandbox (Small-corpus trust with bounded-loss exploration)
+   - Custom Policy (Build from scratch)
+
+2. **Basics** - Name the policy, link to escrow account (trust account), set activation
+
+3. **Limits** - Configure per-transaction, daily, weekly, and monthly caps
+
+4. **Controls** - Set vendor allowlists/blocklists, category controls, and time windows
+
+5. **Approval** - Define auto-approve thresholds and human oversight requirements
+
+6. **Review** - Summary of all settings before creation
+
+#### Trust Law Integration
+- Each step includes Trust Law Callouts explaining the fiduciary concepts
+- Pattern selection shows trust law equivalent descriptions
+- Contextual links to `/docs/trust-law` throughout the wizard
+- Pre-fills sensible defaults based on selected governance pattern
+
+#### UI Components
+- `PolicyBuilderWizard.js` - Main wizard component
+- `TrustLawCallout` - Styled callout for trust law guidance
+- `StepIndicator` - Visual progress through 6 steps
+- `PatternSelectionStep`, `BasicsStep`, `LimitsStep`, `ControlsStep`, `ApprovalStep`, `ReviewStep`
+
+#### Files Created/Modified
+- `/app/frontend/src/components/PolicyBuilderWizard.js` (NEW - ~900 lines)
+- `/app/frontend/src/pages/dashboard/SpendingRulesPage.js` (Added wizard button and modal)
+
+#### Access
+- Dashboard → Spending Rules → "Policy Wizard" button
