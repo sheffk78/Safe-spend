@@ -28,7 +28,9 @@ import {
     ExternalLink,
     TrendingUp,
     Activity,
-    Eye
+    Eye,
+    Bot,
+    Key
 } from 'lucide-react';
 import {
     listPolicies,
@@ -150,7 +152,8 @@ const FiduciaryPoliciesPage = () => {
         total: policies.length,
         active: policies.filter(p => p.status === 'active' && p.is_locked).length,
         drafts: policies.filter(p => p.status === 'draft').length,
-        archived: policies.filter(p => p.status === 'archived').length
+        archived: policies.filter(p => p.status === 'archived').length,
+        aavRestricted: policies.filter(p => p.aav_enabled && (p.authorized_agent_ids?.length > 0 || p.aav_grant_ids?.length > 0)).length
     };
 
     return (
@@ -195,7 +198,7 @@ const FiduciaryPoliciesPage = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <StatsCard 
                     icon={Scale} 
                     label="Total Policies" 
@@ -216,6 +219,13 @@ const FiduciaryPoliciesPage = () => {
                     value={stats.drafts} 
                     color="text-amber-400" 
                     bg="bg-amber-500/10" 
+                />
+                <StatsCard 
+                    icon={Shield} 
+                    label="AAV Restricted" 
+                    value={stats.aavRestricted} 
+                    color="text-blue-400" 
+                    bg="bg-blue-500/10" 
                 />
                 <StatsCard 
                     icon={Eye} 
@@ -341,6 +351,12 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
     const isLocked = policy.is_locked;
     const isArchived = policy.status === 'archived';
     
+    // Calculate AAV status
+    const hasAgentIds = policy.authorized_agent_ids?.length > 0;
+    const hasGrantIds = policy.aav_grant_ids?.length > 0;
+    const isAAVRestricted = policy.aav_enabled && (hasAgentIds || hasGrantIds);
+    const agentCount = (policy.authorized_agent_ids?.length || 0) + (policy.aav_grant_ids?.length || 0);
+    
     return (
         <div className={`bg-ss-surface rounded-xl border overflow-hidden transition-all ${
             isDraft ? 'border-amber-500/50' : 
@@ -384,11 +400,21 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    {/* Status Badges */}
-                    {policy.aav_enabled && (
-                        <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400 flex items-center gap-1.5">
+                    {/* AAV Status Badges */}
+                    {isAAVRestricted ? (
+                        <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
                             <Shield size={12} />
-                            AAV
+                            {agentCount} Agent{agentCount !== 1 ? 's' : ''}
+                        </span>
+                    ) : policy.aav_enabled ? (
+                        <span className="px-2.5 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-400 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
+                            <Shield size={12} />
+                            AAV (No IDs)
+                        </span>
+                    ) : (
+                        <span className="px-2.5 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-500 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
+                            <Key size={12} />
+                            Any Key
                         </span>
                     )}
                     {isLocked && (
@@ -529,6 +555,66 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                         {policy.active_hours_start && policy.active_hours_end && (
                             <div className="text-xs text-ss-text-tertiary mt-1">
                                 Hours: {policy.active_hours_start} - {policy.active_hours_end} ({policy.active_timezone || 'UTC'})
+                            </div>
+                        )}
+                    </div>
+
+                    {/* AAV Agent Authorization Section */}
+                    <div className="p-3 bg-ss-surface rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Shield size={14} className="text-ss-text-tertiary" />
+                            <span className="text-xs font-medium text-ss-text-secondary">Agent Authorization</span>
+                        </div>
+                        {isAAVRestricted ? (
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded text-xs font-medium">
+                                        AAV Restricted
+                                    </span>
+                                    {policy.aav_enforcement_mode && (
+                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                            policy.aav_enforcement_mode === 'strict' 
+                                                ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+                                                : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                                        }`}>
+                                            {policy.aav_enforcement_mode === 'strict' ? 'Strict' : 'Warn'}
+                                        </span>
+                                    )}
+                                </div>
+                                {hasAgentIds && (
+                                    <div>
+                                        <span className="text-xs text-ss-text-tertiary">Authorized Agents: </span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {policy.authorized_agent_ids.map((id, i) => (
+                                                <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-xs flex items-center gap-1">
+                                                    <Bot size={10} />
+                                                    {id}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {hasGrantIds && (
+                                    <div>
+                                        <span className="text-xs text-ss-text-tertiary">Grant IDs: </span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {policy.aav_grant_ids.map((id, i) => (
+                                                <span key={i} className="px-2 py-0.5 bg-purple-500/10 text-purple-400 rounded text-xs">
+                                                    {id}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : policy.aav_enabled ? (
+                            <div className="text-xs text-amber-400">
+                                AAV enabled but no agent IDs configured - all agents can spend
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 text-xs text-ss-text-tertiary">
+                                <Key size={12} />
+                                Any agent with a valid API key can spend under this policy
                             </div>
                         )}
                     </div>

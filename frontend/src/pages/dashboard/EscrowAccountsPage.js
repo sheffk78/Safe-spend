@@ -15,7 +15,11 @@ import {
     History,
     ExternalLink,
     CheckCircle,
-    AlertTriangle
+    AlertTriangle,
+    Shield,
+    Bot,
+    Key,
+    Info
 } from 'lucide-react';
 import {
     listEscrowAccounts,
@@ -243,6 +247,7 @@ const EscrowAccountsPage = () => {
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Balance</th>
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Funded</th>
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Spent</th>
+                                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Agent Access</th>
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Status</th>
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider">Created</th>
                                     <th className="px-4 py-3 text-left text-[11px] font-semibold text-ss-text-tertiary uppercase tracking-wider"></th>
@@ -269,6 +274,19 @@ const EscrowAccountsPage = () => {
                                         </td>
                                         <td className="px-4 py-3 text-sm font-mono text-ss-text-secondary">
                                             {formatCents(account.total_spent_cents)}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {account.aav_enabled && (account.authorized_agent_ids?.length > 0 || account.aav_grant_ids?.length > 0) ? (
+                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400" data-testid={`aav-indicator-${account.id}`}>
+                                                    <Shield size={12} />
+                                                    {(account.authorized_agent_ids?.length || 0) + (account.aav_grant_ids?.length || 0)} Agent{((account.authorized_agent_ids?.length || 0) + (account.aav_grant_ids?.length || 0)) !== 1 ? 's' : ''}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-400" data-testid={`aav-indicator-${account.id}`}>
+                                                    <Key size={12} />
+                                                    Any Key
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-3">
                                             <StatusBadge status={account.status} />
@@ -407,6 +425,9 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [initialFunding, setInitialFunding] = useState('');
+    const [aavEnabled, setAavEnabled] = useState(false);
+    const [aavEnforcementMode, setAavEnforcementMode] = useState('warn');
+    const [agentIdsInput, setAgentIdsInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -416,7 +437,19 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
         setError(null);
 
         try {
-            const account = await createEscrowAccount({ name, description });
+            // Parse agent IDs from comma-separated input
+            const authorizedAgentIds = agentIdsInput
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id.length > 0);
+
+            const account = await createEscrowAccount({ 
+                name, 
+                description,
+                aav_enabled: aavEnabled,
+                aav_enforcement_mode: aavEnabled ? aavEnforcementMode : undefined,
+                authorized_agent_ids: aavEnabled && authorizedAgentIds.length > 0 ? authorizedAgentIds : undefined
+            });
             
             // Fund if initial amount provided
             if (initialFunding && parseFloat(initialFunding) > 0) {
@@ -433,14 +466,14 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="create-account-modal">
-            <div className="bg-ss-code border border-[rgba(255,255,255,0.1)] rounded-xl w-full max-w-md">
+            <div className="bg-ss-code border border-[rgba(255,255,255,0.1)] rounded-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
                     <h2 className="font-heading text-lg font-semibold text-ss-text">New Escrow Account</h2>
                     <button onClick={onClose} className="text-ss-text-secondary hover:text-ss-text">
                         <X size={20} />
                     </button>
                 </div>
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
                     {error && (
                         <div className="p-3 bg-[rgba(239,68,68,0.1)] border border-ss-error/30 rounded-lg text-ss-error text-sm">
                             {error}
@@ -492,6 +525,91 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                         </div>
                         <p className="text-xs text-ss-text-tertiary mt-1">Leave empty to create without initial funding</p>
                     </div>
+
+                    {/* AAV Configuration Section */}
+                    <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 mt-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <Shield size={16} className="text-blue-400" />
+                                <span className="text-sm font-medium text-ss-text">Agent Authorization</span>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={aavEnabled}
+                                    onChange={(e) => setAavEnabled(e.target.checked)}
+                                    className="sr-only peer"
+                                    data-testid="aav-toggle"
+                                />
+                                <div 
+                                    onClick={() => setAavEnabled(!aavEnabled)}
+                                    className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
+                                    data-testid="aav-toggle-visual"
+                                ></div>
+                            </label>
+                        </div>
+                        
+                        {aavEnabled && (
+                            <div className="space-y-3 pl-6 border-l-2 border-blue-500/30">
+                                <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                                    <div className="flex items-start gap-2">
+                                        <Info size={14} className="text-blue-400 mt-0.5" />
+                                        <p className="text-xs text-blue-300">
+                                            When enabled, only agents with matching IDs can spend from this account. Leave empty to allow any agent initially.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-xs font-medium text-ss-text-secondary mb-1.5">
+                                        Enforcement Mode
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setAavEnforcementMode('warn')}
+                                            className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                                aavEnforcementMode === 'warn'
+                                                    ? 'bg-amber-500/20 border border-amber-500/50 text-amber-400'
+                                                    : 'bg-ss-elevated border border-[rgba(255,255,255,0.1)] text-ss-text-secondary hover:text-ss-text'
+                                            }`}
+                                            data-testid="aav-mode-warn"
+                                        >
+                                            Warn (Log Only)
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setAavEnforcementMode('strict')}
+                                            className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                                aavEnforcementMode === 'strict'
+                                                    ? 'bg-red-500/20 border border-red-500/50 text-red-400'
+                                                    : 'bg-ss-elevated border border-[rgba(255,255,255,0.1)] text-ss-text-secondary hover:text-ss-text'
+                                            }`}
+                                            data-testid="aav-mode-strict"
+                                        >
+                                            Strict (Block)
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-xs font-medium text-ss-text-secondary mb-1.5">
+                                        Authorized Agent IDs
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={agentIdsInput}
+                                        onChange={(e) => setAgentIdsInput(e.target.value)}
+                                        placeholder="agent-1, agent-2, marketing-bot"
+                                        className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-blue-500"
+                                        data-testid="authorized-agents-input"
+                                    />
+                                    <p className="text-[11px] text-ss-text-tertiary mt-1">Comma-separated list of agent identifiers</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex gap-3 pt-2">
                         <button
                             type="button"
