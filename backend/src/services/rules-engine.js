@@ -770,12 +770,25 @@ function checkVendor(context) {
 
 /**
  * Step 10: CATEGORY CHECK
+ * Now filters to only applicable policies based on agent identity
  */
 function checkCategory(context) {
-    const { policies, request } = context;
+    const { policies, request, aavClaims } = context;
     const category = request.category;
     
-    for (const policy of policies) {
+    // Get only policies that apply to this agent
+    const applicablePolicies = getApplicablePolicies(policies, aavClaims);
+    
+    if (applicablePolicies.length === 0) {
+        return {
+            rule: 'category_check',
+            passed: true,
+            reason: 'No applicable policies with category restrictions',
+            metadata: { category }
+        };
+    }
+    
+    for (const policy of applicablePolicies) {
         const allowedCategories = parseJsonField(policy.allowedCategories, []);
         const blockedCategories = parseJsonField(policy.blockedCategories, []);
         
@@ -837,7 +850,7 @@ function checkCategory(context) {
         rule: 'category_check',
         passed: true,
         reason: 'Category is allowed',
-        metadata: { category }
+        metadata: { category, policies_checked: applicablePolicies.map(p => p.name) }
     };
 }
 

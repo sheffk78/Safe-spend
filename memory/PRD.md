@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Pre-Launch Audit Complete - Ready for Public Launch
+**Current Phase:** Integration Testing Complete - Ready for Production
 **Last Updated:** March 24, 2026
 
 ---
@@ -1482,3 +1482,70 @@ Implemented the delegation-first pattern where agents draft spending configurati
 4. Agent uses `sk_agent_...` key to spend (bounded by locked rules)
 5. Owner can unlock for edits if needed (with audit trail)
 
+
+
+
+---
+
+### Cross-Product Integration Testing (Completed - March 24, 2026)
+
+#### Overview
+Comprehensive integration testing to validate all product components work together in complex, realistic scenarios.
+
+#### Bug Fix: Multi-Policy Agent Filtering
+**Issue:** When multiple policies were applied to a single escrow account, the rules engine incorrectly evaluated spend requests against ALL policies, instead of only policies applicable to the specific agent making the request.
+
+**Root Cause:** The `checkCategory` function in `rules-engine.js` was not filtering policies by agent identity (it used `context.policies` directly instead of calling `getApplicablePolicies`).
+
+**Fix Applied:** Updated `checkCategory` to use `getApplicablePolicies(policies, aavClaims)` just like `checkVendor` already does.
+
+**Files Modified:**
+- `/app/backend/src/services/rules-engine.js` - Added agent filtering to category check
+
+#### Test Suite 1: Multi-Policy / Multi-Agent (4/4 PASSED)
+Tests that distinct policies are correctly applied to their respective agents:
+- Marketing agent → Marketing category: APPROVED ✅
+- Marketing agent → Infrastructure category: DENIED ✅
+- DevOps agent → Infrastructure category: APPROVED ✅
+- DevOps agent → Marketing category: DENIED ✅
+
+**Test File:** `/app/backend/tests/test_multi_policy_agent.py`
+
+#### Test Suite 2: SDK + LangChain + AAV Integration (4/4 PASSED)
+End-to-end integration validating the complete product stack:
+
+1. **SDK Basic Operations:** ✅
+   - Balance check
+   - Spend creation (approved)
+   - Balance verification after spend
+   - List spend requests
+   - Category restriction enforcement
+
+2. **SDK Error Handling:** ✅
+   - Invalid amount validation
+   - Non-existent escrow handling
+   - Per-transaction limit enforcement
+
+3. **LangChain Integration:** ✅
+   - Toolkit creation with 4 tools
+   - Balance tool functionality
+   - Spend tool functionality
+   - List tool functionality
+
+4. **AAV Claims Flow:** ✅
+   - Authorized agent spend approval
+   - AAV rule metadata in response
+   - Warn mode allows unauthorized through
+
+**Test File:** `/app/backend/tests/test_sdk_langchain_aav_integration.py`
+
+#### Key Validation Points
+1. Rules engine correctly filters policies per agent identity
+2. Python SDK properly handles API responses and errors
+3. LangChain tools integrate seamlessly with SDK
+4. AAV claims flow through spend requests correctly
+5. Enforcement modes (warn/strict) behave as designed
+
+#### Remaining Work
+- **AAV UI (Phase 2):** Frontend forms for configuring agent IDs and AAV settings
+- **Rate Limiting Extension:** Add rate limits to non-spend sensitive endpoints
