@@ -272,14 +272,16 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 19. ~~Analytics Dashboard~~ ✅ COMPLETE
 20. ~~PostgreSQL Migration~~ ✅ COMPLETE (Ready to deploy)
 
-### P1 - High Priority (Future)
-1. **Email Notifications** - Alert on pending approvals
+### P1 - High Priority (Completed)
+1. ~~**Role-Based Access Control (RBAC)**~~ ✅ COMPLETE
+2. ~~**Email Notifications for Pending Approvals**~~ ✅ COMPLETE (Backend infrastructure ready, Postmark integrated)
 
 ### P2 - Medium Priority (Completed)
 - ~~Analytics Dashboard~~ ✅
 - ~~PostgreSQL Migration~~ ✅
 
 ### P3 - Future Enhancements
+1. **CSV/PDF Export** - Export data for governance reviews
 2. **Real-time WebSocket notifications**
 3. **Multi-currency support**
 4. **Advanced reporting exports**
@@ -287,8 +289,79 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 ---
 
 ## Next Tasks
-1. Email notifications for pending approvals
+1. CSV/PDF export for governance reviews and auditability
 2. Production deployment (use PostgreSQL schema)
+
+---
+
+### Role-Based Access Control (RBAC) (Completed - March 24, 2026)
+
+#### Overview
+Team management system enabling organization owners to invite members with different roles, separating financial governance from technical development.
+
+#### Roles
+| Role | Level | Permissions |
+|------|-------|-------------|
+| Owner | 100 | Full access: fund_escrow, create/modify/lock_policy, approve_spend, create_api_key, view_data, manage_org, invite_members |
+| Finance Admin | 80 | Financial ops: fund_escrow, create/modify/lock_policy, approve_spend, create_api_key, view_data |
+| Developer | 50 | Development: create_api_key, view_data |
+| Read Only | 10 | Viewing only: view_data |
+
+#### Backend API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/team` | GET | List organization members |
+| `/v1/team/roles` | GET | List available roles with permissions |
+| `/v1/team/my-role` | GET | Get current user's role |
+| `/v1/team/invite` | POST | Invite new member (owner only) |
+| `/v1/team/invite/:token` | GET | Get invite details |
+| `/v1/team/accept-invite` | POST | Accept invitation |
+| `/v1/team/:id` | PATCH | Update member role (owner only) |
+| `/v1/team/:id` | DELETE | Remove member (owner only) |
+
+#### Frontend Components
+- **Team Management Page** (`/dashboard/team`) - List members, change roles, remove
+- **Invite Modal** - Email input, role selection, success with invite URL
+- **Role Dropdown** - Change member roles (owner only)
+- **Role Badge** - Shows current user's role in sidebar
+- **Invite Accept Page** (`/invite/:token`) - Accept invitation flow
+- **Approval Action Page** (`/approval-action`) - One-click email approval confirmation
+
+#### Database Schema
+```prisma
+model OrgMember {
+  id              String    @id
+  orgId           String
+  email           String
+  role            String    // owner | finance_admin | developer | read_only
+  status          String    // active | pending | removed
+  invitedBy       String?
+  inviteToken     String?   @unique
+  inviteExpiresAt DateTime?
+  joinedAt        DateTime?
+}
+
+model NotificationSettings {
+  id                  String  @id
+  orgId               String  @unique
+  emailEnabled        Boolean @default(true)
+  emailRecipientsMode String  // finance_and_owner | all_members | custom
+  slackEnabled        Boolean @default(false)
+  slackWebhookUrl     String?
+}
+```
+
+#### Files Created
+- `/app/backend/src/routes/team.js` - Team management routes
+- `/app/backend/src/services/rbac-service.js` - RBAC service
+- `/app/backend/src/services/approval-notification-service.js` - Email notifications
+- `/app/frontend/src/pages/dashboard/TeamPage.js` - Team Management UI
+- `/app/frontend/src/pages/InviteAcceptPage.js` - Invite acceptance page
+- `/app/frontend/src/pages/ApprovalActionPage.js` - Email approval confirmation
+
+#### Test Results
+- Backend: 21/21 tests passed (100%)
+- Frontend: All UI elements verified working
 
 ---
 
