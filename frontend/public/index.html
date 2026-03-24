@@ -23,6 +23,15 @@
         -->
         <title>Safe-Spend | Agentic Trust</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
+        
+        <!-- Google Analytics (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3T9Y9FNHE"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-G3T9Y9FNHE');
+        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -89,9 +98,12 @@
                     }),
                     (e.__SV = 1));
             })(document, window.posthog || []);
-            posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
+            posthog.init("phc_XlCgizMZIVEwoKJUAQXSBR87FLFpqOkg3JJj45HVRkd", {
                 api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well,
+                person_profiles: "identified_only",
+                autocapture: true,              // Enable autocapture for clicks
+                capture_pageview: true,         // Capture pageviews
+                capture_pageleave: true,        // Capture page leaves
                 session_recording: {
                     recordCrossOriginIframes: true,
                     capturePerformance: false,
