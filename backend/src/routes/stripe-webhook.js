@@ -8,6 +8,7 @@
 const express = require('express');
 const stripeLib = require('../lib/stripe');
 const stripeService = require('../services/stripe-service');
+const subscriptionService = require('../services/subscription-service');
 
 const router = express.Router();
 
@@ -33,12 +34,22 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     // Handle the event
     try {
         switch (event.type) {
+            // ========== ESCROW FUNDING EVENTS ==========
             case 'checkout.session.completed': {
                 const session = event.data.object;
-                console.log(`Processing checkout.session.completed: ${session.id}`);
+                console.log(`Processing checkout.session.completed: ${session.id}, mode: ${session.mode}`);
                 
-                // Only process payment sessions (not setup sessions)
-                if (session.mode === 'payment' && session.payment_status === 'paid') {
+                // Handle subscription checkout
+                if (session.mode === 'subscription') {
+                    const result = await subscriptionService.processSubscriptionCheckout(session);
+                    if (result.success) {
+                        console.log(`Subscription activated: ${session.subscription} for plan ${result.plan}`);
+                    } else {
+                        console.error(`Failed to process subscription checkout: ${result.error}`);
+                    }
+                }
+                // Handle payment (escrow funding) checkout
+                else if (session.mode === 'payment' && session.payment_status === 'paid') {
                     const result = await stripeService.processCompletedCheckout(session);
                     if (result.success) {
                         console.log(`Funding processed successfully for escrow ${session.metadata?.escrow_id}`);
@@ -73,6 +84,44 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
                 const charge = event.data.object;
                 console.log(`Charge refunded: ${charge.id}`);
                 // Could update funding_events here if needed
+                break;
+            }
+
+            // ========== SUBSCRIPTION EVENTS ==========
+            case 'customer.subscription.updated': {
+                const subscription = event.data.object;
+                console.log(`Subscription updated: ${subscription.id}, status: ${subscription.status}`);
+                const result = await subscriptionService.processSubscriptionUpdated(subscription);
+                if (!result.success) {
+                    console.error(`Failed to process subscription update: ${result.error}`);
+                }
+                break;
+            }
+
+            case 'customer.subscription.deleted': {
+                const subscription = event.data.object;
+                console.log(`Subscription deleted/canceled: ${subscription.id}`);
+                const result = await subscriptionService.processSubscriptionDeleted(subscription);
+                if (!result.success) {
+                    console.error(`Failed to process subscription deletion: ${result.error}`);
+                }
+                break;
+            }
+
+            case 'invoice.paid': {
+                const invoice = event.data.object;
+                console.log(`Invoice paid: ${invoice.id}`);
+                // Invoice paid confirms ongoing subscription - no action needed
+                break;
+            }
+
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object;
+                console.log(`Invoice payment failed: ${invoice.id}`);
+                const result = await subscriptionService.processInvoicePaymentFailed(invoice);
+                if (!result.success) {
+                    console.error(`Failed to process payment failure: ${result.error}`);
+                }
                 break;
             }
 

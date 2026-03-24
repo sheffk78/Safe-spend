@@ -151,8 +151,19 @@ async function listCustomerPaymentIntents(customerId, limit = 10) {
     });
 }
 
+/**
+ * Get the raw Stripe client for advanced operations
+ */
+function getStripeClient() {
+    if (!stripe) {
+        throw new Error('Stripe is not configured');
+    }
+    return stripe;
+}
+
 module.exports = {
     stripe,
+    getStripeClient,
     isStripeConfigured,
     createStripeCustomer,
     createCheckoutSession,

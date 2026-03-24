@@ -15,7 +15,8 @@ import {
     LogOut,
     Menu,
     X,
-    Play
+    Play,
+    CreditCard
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -29,6 +30,7 @@ const navItems = [
     { label: 'API Keys', icon: Key, path: '/dashboard/keys' },
     { label: 'Webhooks', icon: Webhook, path: '/dashboard/webhooks' },
     { label: 'Audit Log', icon: FileText, path: '/dashboard/audit' },
+    { label: 'Pricing & Plans', icon: CreditCard, path: '/dashboard/pricing' },
     { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
 ];
 

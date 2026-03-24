@@ -1103,3 +1103,50 @@ Validated Safe-Spend's alignment with trust-grade fiduciary positioning.
 #### Test Report Location
 `/app/test_reports/governance_legal_ux_report.md`
 
+
+
+---
+
+### Stripe Subscription Integration (Completed - March 24, 2026)
+
+#### Overview
+Full Stripe subscription billing integration for Safe-Spend pricing plans.
+
+#### Plans
+
+| Plan | Price | Escrow Accounts | Monthly Volume | Transaction Fee |
+|------|-------|-----------------|----------------|-----------------|
+| Sandbox | Free | 1 (test only) | N/A | None |
+| Builder | $29/mo | 1 (live) | $5,000 | 0.5% |
+| Scale | $149/mo | Unlimited | Unlimited | 0.3% |
+
+#### Stripe Products (Live)
+- Builder: `prod_UCv94c7pk1HpBJ` / `price_1TEVJj2lZzmsSFmdUsGS3Zff`
+- Scale: `prod_UCv9EFpe5xNOgR` / `price_1TEVJi2lZzmsSFmdHUD67iN2`
+
+#### API Endpoints
+- `GET /api/v1/subscription` - Get current subscription status
+- `GET /api/v1/subscription/plans` - List available plans (public)
+- `GET /api/v1/subscription/limits` - Check plan entitlements
+- `POST /api/v1/subscription/checkout` - Create Stripe checkout session
+- `POST /api/v1/subscription/portal` - Open Stripe billing portal
+
+#### Webhook Events Handled
+- `checkout.session.completed` (subscription mode) - Activate plan
+- `customer.subscription.updated` - Handle plan changes
+- `customer.subscription.deleted` - Revert to Sandbox
+- `invoice.payment_failed` - Mark as past_due
+
+#### Frontend
+- `/dashboard/pricing` - Plan selection and upgrade page
+- Shows current plan status
+- Stripe Checkout redirect for upgrades
+- Manage Billing button (Stripe Portal)
+
+#### Database Fields Added (Organization)
+- `stripeSubscriptionId` - Active subscription ID
+- `planStatus` - active/past_due/canceled/trialing
+- `planPeriodEnd` - Subscription period end date
+- `monthlyEscrowVolumeCents` - Track usage
+- `monthlyVolumeResetAt` - Reset date for volume tracking
+

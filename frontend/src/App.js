@@ -38,6 +38,7 @@ import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
 import AuditLogPage from "@/pages/dashboard/AuditLogPage";
 import WebhooksPage from "@/pages/dashboard/WebhooksPage";
 import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
+import PricingPage from "@/pages/dashboard/PricingPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 
 // Admin
@@ -107,6 +108,7 @@ function App() {
                         <Route path="keys" element={<ApiKeysPage />} />
                         <Route path="webhooks" element={<WebhooksPage />} />
                         <Route path="audit" element={<AuditLogPage />} />
+                        <Route path="pricing" element={<PricingPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                     </Route>
 
