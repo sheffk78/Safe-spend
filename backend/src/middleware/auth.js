@@ -318,6 +318,130 @@ async function canModifyPolicy(req, res, next) {
     }
 }
 
+/**
+ * RBAC Middleware - Check if user has required permission for the action
+ * Must be used after requireOrgAuth
+ */
+const rbacService = require('../services/rbac-service');
+
+function requirePermission(permission) {
+    return async (req, res, next) => {
+        try {
+            // API key auth bypasses RBAC (handled by requireOwnerKey and restrictAgentKeys)
+            if (req.authType === 'api_key') {
+                return next();
+            }
+            
+            // JWT auth - check user's role
+            if (!req.org || !req.userEmail) {
+                return res.status(401).json({
+                    error: 'unauthorized',
+                    message: 'Authentication required',
+                    request_id: req.requestId,
+                });
+            }
+            
+            const role = await rbacService.getUserRole(req.org.id, req.userEmail);
+            
+            if (!role) {
+                return res.status(403).json({
+                    error: 'forbidden',
+                    message: 'You are not a member of this organization',
+                    request_id: req.requestId,
+                });
+            }
+            
+            req.userRole = role;
+            
+            if (!rbacService.hasPermission(role, permission)) {
+                return res.status(403).json({
+                    error: 'forbidden',
+                    message: `Your role (${role}) does not have permission to perform this action`,
+                    required_permission: permission,
+                    request_id: req.requestId,
+                });
+            }
+            
+            next();
+        } catch (error) {
+            logger.error({ error: error.message }, 'Error in requirePermission middleware');
+            return res.status(500).json({
+                error: 'internal_server_error',
+                request_id: req.requestId,
+            });
+        }
+    };
+}
+
+/**
+ * Middleware to check if user is org owner
+ */
+async function requireOrgOwner(req, res, next) {
+    try {
+        if (req.authType === 'api_key') {
+            return res.status(403).json({
+                error: 'forbidden',
+                message: 'This action requires org owner authentication, not API key',
+                request_id: req.requestId,
+            });
+        }
+        
+        const role = await rbacService.getUserRole(req.org.id, req.userEmail);
+        
+        if (role !== 'owner') {
+            return res.status(403).json({
+                error: 'forbidden',
+                message: 'Only the organization owner can perform this action',
+                request_id: req.requestId,
+            });
+        }
+        
+        req.userRole = role;
+        next();
+    } catch (error) {
+        logger.error({ error: error.message }, 'Error in requireOrgOwner middleware');
+        return res.status(500).json({
+            error: 'internal_server_error',
+            request_id: req.requestId,
+        });
+    }
+}
+
+/**
+ * Middleware to check if user can approve (finance_admin or owner)
+ */
+async function requireApprover(req, res, next) {
+    try {
+        if (req.authType === 'api_key') {
+            return res.status(403).json({
+                error: 'forbidden',
+                message: 'Approvals require human authentication, not API key',
+                request_id: req.requestId,
+            });
+        }
+        
+        const role = await rbacService.getUserRole(req.org.id, req.userEmail);
+        
+        if (!['owner', 'finance_admin'].includes(role)) {
+            return res.status(403).json({
+                error: 'forbidden',
+                message: 'Only owners and finance admins can approve or deny spends',
+                your_role: role,
+                request_id: req.requestId,
+            });
+        }
+        
+        req.userRole = role;
+        next();
+    } catch (error) {
+        logger.error({ error: error.message }, 'Error in requireApprover middleware');
+        return res.status(500).json({
+            error: 'internal_server_error',
+            request_id: req.requestId,
+        });
+    }
+}
+
 module.exports = {
     requireAuth,
     requireOrgAuth,
@@ -325,6 +449,9 @@ module.exports = {
     restrictAgentKeys,
     requireOwnerKey,
     canModifyPolicy,
+    requirePermission,
+    requireOrgOwner,
+    requireApprover,
     timingSafeEqual,
     prisma
 };

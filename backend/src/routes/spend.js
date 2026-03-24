@@ -6,6 +6,7 @@ const { evaluateSpendRequest } = require('../services/rules-engine');
 const { getDateBoundaries } = require('../services/rules-helpers');
 const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
 const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('../services/security-alerts');
+const { sendApprovalNotification } = require('../services/approval-notification-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -301,6 +302,11 @@ router.post('/', requireAuth, async (req, res) => {
                 pendingRequest,
                 escrowAccount
             ));
+            
+            // Send email notification to approvers (async, fire-and-forget)
+            sendApprovalNotification(approval).catch(err => {
+                console.error('Failed to send approval notification:', err.message);
+            });
             
             return res.status(202).json({
                 ...formatSpendRequest(pendingRequest),

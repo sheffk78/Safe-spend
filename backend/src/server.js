@@ -24,6 +24,7 @@ const webhooksRoutes = require('./routes/webhooks');
 const apiKeysRoutes = require('./routes/api-keys');
 const stripeWebhookRoutes = require('./routes/stripe-webhook');
 const subscriptionRoutes = require('./routes/subscription');
+const teamRoutes = require('./routes/team');
 
 // Admin Routes
 const adminAuthRoutes = require('./routes/admin-auth');
@@ -133,6 +134,7 @@ app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/webhooks', webhooksRoutes);
 app.use('/api/v1/api-keys', apiKeysRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
+app.use('/api/v1/team', teamRoutes);
 
 // ============================================
 // Admin Routes (Separate auth system)

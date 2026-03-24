@@ -1,12 +1,16 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
-const { requireOrgAuth } = require('../middleware/auth');
+const { requireOrgAuth, requireApprover } = require('../middleware/auth');
 const { 
     queueWebhooks, 
     buildSpendEventData, 
     buildApprovalEventData 
 } = require('../services/webhook-service');
+const { 
+    verifyActionToken, 
+    sendApprovalNotification 
+} = require('../services/approval-notification-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -92,7 +96,7 @@ router.get('/:id', requireOrgAuth, async (req, res) => {
  * - Creates audit events
  * - Triggers webhooks
  */
-router.post('/:id/approve', requireOrgAuth, async (req, res) => {
+router.post('/:id/approve', requireOrgAuth, requireApprover, async (req, res) => {
     try {
         const { note } = req.body;
         
@@ -323,7 +327,7 @@ router.post('/:id/approve', requireOrgAuth, async (req, res) => {
  * 
  * Does NOT deduct from escrow balance
  */
-router.post('/:id/deny', requireOrgAuth, async (req, res) => {
+router.post('/:id/deny', requireOrgAuth, requireApprover, async (req, res) => {
     try {
         const { reason = 'human_denied', note } = req.body;
         
@@ -614,5 +618,213 @@ function formatApprovalResponse(approval, spendRequest, escrow) {
         resolved_by: spendRequest.resolvedBy
     };
 }
+
+/**
+ * GET /v1/approvals/action
+ * One-click approve/deny from email link
+ * 
+ * This endpoint verifies the signed token and shows a confirmation page,
+ * then processes the action on POST (to prevent link scanner issues)
+ */
+router.get('/action', async (req, res) => {
+    try {
+        const { token } = req.query;
+        
+        if (!token) {
+            return res.status(400).json({ error: 'Token is required' });
+        }
+        
+        const result = verifyActionToken(token);
+        
+        if (!result.valid) {
+            return res.status(400).json({ 
+                error: result.error,
+                message: 'The link has expired or is invalid. Please use the dashboard to manage this approval.'
+            });
+        }
+        
+        // Get approval details
+        const approval = await prisma.approval.findUnique({
+            where: { id: result.approvalId },
+            include: {
+                spendRequest: {
+                    include: {
+                        escrowAccount: true
+                    }
+                },
+                organization: {
+                    select: { name: true }
+                }
+            }
+        });
+        
+        if (!approval) {
+            return res.status(404).json({ error: 'Approval not found' });
+        }
+        
+        if (approval.status !== 'pending') {
+            return res.status(400).json({ 
+                error: 'Approval has already been resolved',
+                status: approval.status,
+                resolved_at: approval.resolvedAt
+            });
+        }
+        
+        // Return confirmation page data
+        res.json({
+            action: result.action,
+            approval_id: approval.id,
+            organization: approval.organization.name,
+            amount_cents: approval.spendRequest.amountCents,
+            currency: approval.spendRequest.currency,
+            vendor: approval.spendRequest.vendor,
+            escrow_name: approval.spendRequest.escrowAccount?.name,
+            expires_at: approval.expiresAt,
+            confirm_url: `/api/v1/approvals/action?token=${token}`,
+            dashboard_url: `/dashboard/approvals/${approval.id}`
+        });
+    } catch (error) {
+        console.error('Action verification error:', error);
+        res.status(500).json({ error: 'Failed to verify action' });
+    }
+});
+
+/**
+ * POST /v1/approvals/action
+ * Confirm one-click approve/deny from email link
+ */
+router.post('/action', async (req, res) => {
+    try {
+        const { token } = req.body;
+        
+        if (!token) {
+            return res.status(400).json({ error: 'Token is required' });
+        }
+        
+        const result = verifyActionToken(token);
+        
+        if (!result.valid) {
+            return res.status(400).json({ 
+                error: result.error,
+                message: 'The link has expired or is invalid.'
+            });
+        }
+        
+        // Get approval
+        const approval = await prisma.approval.findUnique({
+            where: { id: result.approvalId },
+            include: {
+                spendRequest: {
+                    include: {
+                        escrowAccount: true
+                    }
+                }
+            }
+        });
+        
+        if (!approval) {
+            return res.status(404).json({ error: 'Approval not found' });
+        }
+        
+        if (approval.status !== 'pending') {
+            return res.status(400).json({ 
+                error: 'Approval has already been resolved',
+                status: approval.status
+            });
+        }
+        
+        // Check expiry
+        if (approval.expiresAt && approval.expiresAt < new Date()) {
+            return res.status(400).json({ error: 'Approval has expired' });
+        }
+        
+        // Process action
+        if (result.action === 'approve') {
+            // Perform the balance deduction and approval
+            const spendRequest = approval.spendRequest;
+            const escrow = spendRequest.escrowAccount;
+            
+            // Verify escrow has sufficient balance
+            if (escrow.balanceCents < spendRequest.amountCents) {
+                return res.status(400).json({ 
+                    error: 'Insufficient escrow balance',
+                    available: escrow.balanceCents,
+                    required: spendRequest.amountCents
+                });
+            }
+            
+            // Update escrow balance
+            const newBalance = escrow.balanceCents - spendRequest.amountCents;
+            await prisma.escrowAccount.update({
+                where: { id: escrow.id },
+                data: {
+                    balanceCents: newBalance,
+                    totalSpentCents: escrow.totalSpentCents + spendRequest.amountCents
+                }
+            });
+            
+            // Update spend request
+            await prisma.spendRequest.update({
+                where: { id: spendRequest.id },
+                data: {
+                    status: 'approved',
+                    balanceAfterCents: newBalance,
+                    resolvedAt: new Date(),
+                    resolvedBy: 'email_action'
+                }
+            });
+            
+            // Update approval
+            await prisma.approval.update({
+                where: { id: approval.id },
+                data: {
+                    status: 'approved',
+                    resolvedAt: new Date(),
+                    resolvedBy: 'email_action',
+                    resolution_note: 'Approved via email one-click action'
+                }
+            });
+            
+            res.json({
+                message: 'Spend approved successfully',
+                status: 'approved',
+                amount_cents: spendRequest.amountCents,
+                new_balance_cents: newBalance
+            });
+        } else if (result.action === 'deny') {
+            // Update spend request
+            await prisma.spendRequest.update({
+                where: { id: approval.spendRequest.id },
+                data: {
+                    status: 'denied',
+                    denialReason: 'human_denied',
+                    resolvedAt: new Date(),
+                    resolvedBy: 'email_action'
+                }
+            });
+            
+            // Update approval
+            await prisma.approval.update({
+                where: { id: approval.id },
+                data: {
+                    status: 'denied',
+                    resolvedAt: new Date(),
+                    resolvedBy: 'email_action',
+                    resolution_note: 'Denied via email one-click action'
+                }
+            });
+            
+            res.json({
+                message: 'Spend denied',
+                status: 'denied'
+            });
+        } else {
+            return res.status(400).json({ error: 'Invalid action' });
+        }
+    } catch (error) {
+        console.error('Action execution error:', error);
+        res.status(500).json({ error: 'Failed to execute action' });
+    }
+});
 
 module.exports = router;

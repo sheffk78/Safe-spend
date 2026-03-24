@@ -42,15 +42,55 @@ model Organization {
   updatedAt              DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  apiKeys          ApiKey[]
-  escrowAccounts   EscrowAccount[]
-  spendingPolicies SpendingPolicy[]
-  spendRequests    SpendRequest[]
-  approvals        Approval[]
-  auditEvents      AuditEvent[]
-  webhooks         Webhook[]
+  apiKeys              ApiKey[]
+  escrowAccounts       EscrowAccount[]
+  spendingPolicies     SpendingPolicy[]
+  spendRequests        SpendRequest[]
+  approvals            Approval[]
+  auditEvents          AuditEvent[]
+  webhooks             Webhook[]
+  members              OrgMember[]
+  notificationSettings NotificationSettings?
 
   @@map("organizations")
+}
+
+// Organization Members (RBAC)
+model OrgMember {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  email     String
+  role      String   @default("developer") // owner | finance_admin | developer | read_only
+  status    String   @default("active") // active | pending | removed
+  invitedBy String?  @map("invited_by")
+  inviteToken String? @unique @map("invite_token")
+  inviteExpiresAt DateTime? @map("invite_expires_at")
+  joinedAt  DateTime? @map("joined_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, email])
+  @@map("org_members")
+}
+
+// Notification Settings
+model NotificationSettings {
+  id                    String   @id @default(uuid())
+  orgId                 String   @unique @map("org_id")
+  emailEnabled          Boolean  @default(true) @map("email_enabled")
+  emailRecipientsMode   String   @default("finance_and_owner") @map("email_recipients_mode") // finance_and_owner | all_members | custom
+  slackEnabled          Boolean  @default(false) @map("slack_enabled")
+  slackWebhookUrl       String?  @map("slack_webhook_url")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("notification_settings")
 }
 
 // API Keys
