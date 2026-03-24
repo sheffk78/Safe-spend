@@ -131,8 +131,7 @@ async function sendApprovalNotification(approval) {
         const spendRequest = await prisma.spendRequest.findUnique({
             where: { id: approval.spendRequestId },
             include: {
-                escrowAccount: true,
-                spendingPolicy: true
+                escrowAccount: true
             }
         });
         

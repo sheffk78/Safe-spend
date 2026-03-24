@@ -423,11 +423,110 @@ router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
 
 /**
  * PUT /v1/policies/:id
- * Full update of a policy (backward compatibility)
+ * Full update of a policy (same logic as PATCH)
  */
 router.put('/:id', requireAuth, requireOwnerKey, async (req, res) => {
-    // Delegate to PATCH
-    return router.handle(req, res, () => {});
+    try {
+        const policy = await prisma.spendingPolicy.findFirst({
+            where: {
+                id: req.params.id,
+                orgId: req.org.id
+            }
+        });
+        
+        if (!policy) {
+            return res.status(404).json({ error: 'Policy not found' });
+        }
+        
+        // Check if policy is locked
+        if (policy.lockedAt) {
+            return res.status(403).json({ 
+                error: 'Policy is locked',
+                message: 'This policy is locked and cannot be modified. Unlock it first using POST /v1/policies/:id/unlock',
+                locked_at: policy.lockedAt,
+                locked_by: policy.lockedBy
+            });
+        }
+        
+        const updateData = {};
+        const allowedFields = [
+            'name', 'purpose', 'is_active', 'status', 'draft',
+            'per_transaction_limit_cents', 'daily_limit_cents', 'weekly_limit_cents', 'monthly_limit_cents',
+            'allowed_vendors', 'blocked_vendors', 'vendor_match_mode',
+            'allowed_categories', 'blocked_categories',
+            'active_days', 'active_hours_start', 'active_hours_end', 'active_timezone',
+            'auto_approve_under_cents', 'require_human_above_cents', 'approval_timeout_minutes',
+            'metadata', 'aav_enabled', 'authorized_agent_ids', 'aav_grant_ids', 'aav_enforcement_mode'
+        ];
+        
+        const fieldMap = {
+            'is_active': 'isActive',
+            'per_transaction_limit_cents': 'perTransactionLimitCents',
+            'daily_limit_cents': 'dailyLimitCents',
+            'weekly_limit_cents': 'weeklyLimitCents',
+            'monthly_limit_cents': 'monthlyLimitCents',
+            'allowed_vendors': 'allowedVendors',
+            'blocked_vendors': 'blockedVendors',
+            'vendor_match_mode': 'vendorMatchMode',
+            'allowed_categories': 'allowedCategories',
+            'blocked_categories': 'blockedCategories',
+            'active_days': 'activeDays',
+            'active_hours_start': 'activeHoursStart',
+            'active_hours_end': 'activeHoursEnd',
+            'active_timezone': 'activeTimezone',
+            'auto_approve_under_cents': 'autoApproveUnderCents',
+            'require_human_above_cents': 'requireHumanAboveCents',
+            'approval_timeout_minutes': 'approvalTimeoutMinutes',
+            'aav_enabled': 'aavEnabled',
+            'authorized_agent_ids': 'authorizedAgentIds',
+            'aav_grant_ids': 'aavGrantIds',
+            'aav_enforcement_mode': 'aavEnforcementMode'
+        };
+        
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                const dbField = fieldMap[field] || field;
+                let value = req.body[field];
+                
+                if (['allowedVendors', 'blockedVendors', 'allowedCategories', 'blockedCategories', 'activeDays', 'authorizedAgentIds', 'aavGrantIds'].includes(dbField)) {
+                    value = JSON.stringify(value);
+                }
+                if (dbField === 'metadata') {
+                    value = JSON.stringify(value);
+                }
+                
+                if (field === 'draft') {
+                    updateData['status'] = value ? 'draft' : 'active';
+                    updateData['isActive'] = !value;
+                } else {
+                    updateData[dbField] = value;
+                }
+            }
+        }
+        
+        const updated = await prisma.spendingPolicy.update({
+            where: { id: policy.id },
+            data: updateData
+        });
+        
+        await prisma.auditEvent.create({
+            data: {
+                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                escrowId: policy.escrowId,
+                eventType: 'policy.updated',
+                actorType: req.authType === 'api_key' ? 'agent' : 'human',
+                actorId: req.apiKey?.id || req.org.id,
+                details: JSON.stringify({ updated_fields: Object.keys(updateData) }),
+                ipAddress: req.ip
+            }
+        });
+        
+        res.json(formatPolicy(updated));
+    } catch (error) {
+        console.error('Update policy error:', error);
+        res.status(500).json({ error: 'Failed to update policy' });
+    }
 });
 
 /**

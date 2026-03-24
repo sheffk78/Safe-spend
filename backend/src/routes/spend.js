@@ -97,24 +97,13 @@ router.post('/', requireAuth, async (req, res) => {
         
         // Escrow account not found
         if (!escrowAccount) {
-            const deniedRequest = await createDeniedSpendRequest({
-                escrowId: escrow_id,
-                orgId: req.org.id,
-                apiKeyId: req.apiKey?.id,
-                amountCents: amount_cents,
-                currency,
-                vendor,
-                category,
-                description,
-                idempotencyKey: idempotency_key,
-                denialReason: 'escrow_not_found',
-                rulesEvaluated: [{ rule: 'escrow_account_check', passed: false, reason: 'Escrow account not found' }],
-                metadata
-            });
-            
+            // Return 404 without creating a spend request record
+            // (can't create record with non-existent escrow_id due to FK constraint)
             return res.status(404).json({
-                ...formatSpendRequest(deniedRequest),
-                error: 'Escrow account not found'
+                status: 'denied',
+                denial_reason: 'escrow_not_found',
+                error: 'Escrow account not found',
+                rules_evaluated: [{ rule: 'escrow_account_check', passed: false, reason: 'Escrow account not found' }]
             });
         }
         

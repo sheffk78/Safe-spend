@@ -162,8 +162,9 @@ router.get('/:id/balance', requireAuth, async (req, res) => {
  * POST /v1/escrow-accounts/:id/fund
  * Fund an escrow account (LEGACY - simulated funding without Stripe)
  * Keep for backwards compatibility with tests
+ * Note: Requires owner key - agent keys cannot fund escrows
  */
-router.post('/:id/fund', requireAuth, async (req, res) => {
+router.post('/:id/fund', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const { amount_cents } = req.body;
         
