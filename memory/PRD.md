@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** P3 Complete - Fiduciary Policy Engine UX Shipped
+**Current Phase:** P4 Complete - AAV Integration Shipped
 **Last Updated:** March 24, 2026
 
 ---
@@ -294,6 +294,69 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 1. PDF Statements (once real CSV usage patterns are observed)
 2. Production deployment (use PostgreSQL schema)
 3. CrewAI integration (if demand observed)
+
+---
+
+### AAV Integration (Completed - March 24, 2026)
+
+#### Overview
+Deep integration with Agent Authority Vault (AAV) to tie Safe-Spend escrows and policies directly to AAV grants. This adds agent-level authorization on top of existing policy-based controls, creating a two-layer security model.
+
+#### Schema Changes
+| Model | New Fields |
+|-------|------------|
+| **EscrowAccount** | `aav_enabled`, `authorized_agent_ids`, `aav_grant_ids`, `aav_enforcement_mode` |
+| **SpendingPolicy** | `aav_enabled`, `authorized_agent_ids`, `aav_grant_ids`, `aav_enforcement_mode` |
+| **SpendRequest** | `aav_agent_id`, `aav_grant_id`, `aav_verification_status` |
+| **AAVConfiguration** (NEW) | Org-level AAV connection settings (endpoint, public key, default mode) |
+
+#### Rules Engine Enhancement
+- **Step 2.5: AAV Agent Authorization** added after escrow validation, before idempotency check
+- Rules cascade is now 14 steps (was 13)
+- Enforcement modes:
+  - `none`: No AAV check performed
+  - `warn`: Log unauthorized but allow (for gradual rollout)
+  - `strict`: Deny unauthorized agents
+
+#### API Endpoints
+- `POST /api/v1/escrow-accounts` - Now accepts AAV fields
+- `POST /api/v1/policies` - Now accepts AAV fields
+- `POST /api/v1/spend` - Extracts AAV claims from headers or body
+- `GET/PUT /api/v1/settings/aav` - AAV configuration management
+
+#### Headers for Agent Identity
+| Header | Purpose |
+|--------|---------|
+| `X-AAV-Agent-Id` | Agent identifier from AAV |
+| `X-AAV-Grant-Id` | Time-bound grant ID from AAV |
+| `X-AAV-Signature` | Optional signature for verification |
+
+#### Frontend Updates
+- Policy wizard Step 3 (Restrictions) now includes "Agent Authorization (AAV Integration)" section
+- Toggle to enable AAV verification
+- Inputs for authorized agent IDs and grant IDs
+- Enforcement mode dropdown
+- Step 4 (Review) shows AAV configuration summary
+
+#### Files Created/Modified
+- `/app/backend/prisma/schema.prisma` - AAV fields added
+- `/app/backend/src/services/aav-service.js` (NEW)
+- `/app/backend/src/services/rules-engine.js` - Step 2.5 added
+- `/app/backend/src/routes/aav-settings.js` (NEW)
+- `/app/backend/src/routes/spend.js` - AAV claims extraction
+- `/app/backend/src/routes/escrow-accounts.js` - AAV fields
+- `/app/backend/src/routes/policies.js` - AAV fields
+- `/app/frontend/src/pages/dashboard/FiduciaryPoliciesPage.js` - AAV UI
+
+#### Design Proposal
+Full design document at `/app/docs/AAV_INTEGRATION_PROPOSAL.md`
+
+#### Test Results
+- Backend: 17/17 tests passed (100%)
+- Frontend: 6/6 tests passed (100%)
+
+#### Note on Mocking
+AAV token/signature verification is MOCKED (accepts any signature >10 chars). Full JWT verification will be implemented when AAV service is available.
 
 ---
 
