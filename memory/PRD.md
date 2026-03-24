@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 16 Complete - Python & TypeScript SDKs
+**Current Phase:** SDKs Complete - Python, TypeScript, MCP Server
 **Last Updated:** March 24, 2026
 
 ---
@@ -268,19 +268,20 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 15. ~~Admin API v1 (Prompt 15)~~ ✅ COMPLETE
 16. ~~Python SDK (Prompt 16)~~ ✅ COMPLETE
 17. ~~TypeScript SDK~~ ✅ COMPLETE
+18. ~~MCP Server~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
-1. **MCP Server Package** - `@safespend/mcp-server`
+1. **Email Notifications** - Alert on pending approvals
 
 ### P2 - Medium Priority
-2. **Email Notifications** - Alert on pending approvals
-3. **Production Deployment** - CI/CD, monitoring
+2. **Production Deployment** - CI/CD, monitoring
+3. **Analytics Dashboard** - Charts in Admin UI
 
 ---
 
 ## Next Tasks
-1. MCP Server implementation
-2. Email notifications for pending approvals
+1. Email notifications for pending approvals
+2. Production deployment setup
 
 ---
 
@@ -833,3 +834,98 @@ cd /app/sdks/typescript && npm install && npm run build
 #### Notes
 - Node.js 18+ required
 - Approval endpoints require org tokens (JWT), not API keys
+
+
+---
+
+### MCP Server (Completed - March 24, 2026)
+
+#### Overview
+A Model Context Protocol (MCP) server that enables AI agents like Claude to interact with Safe-Spend's escrow and spending control APIs through standardized tool interfaces.
+
+#### Package Structure
+```
+/app/sdks/mcp-server/
+├── README.md           # Installation & Claude Desktop config guide
+├── package.json        # NPM package configuration
+├── tsconfig.json       # TypeScript configuration
+├── src/
+│   ├── index.ts        # MCP server with tools, resources, prompts
+│   └── client.ts       # Safe-Spend API client
+└── dist/               # Built ESM output
+```
+
+#### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_escrow_accounts` | List all escrow accounts with balances |
+| `get_escrow_balance` | Get current balance of an escrow account |
+| `create_escrow_account` | Create a new escrow account |
+| `fund_escrow_account` | Add funds to an escrow account |
+| `pause_escrow_account` | Temporarily pause spending |
+| `resume_escrow_account` | Resume spending on a paused account |
+| `list_policies` | List spending policies/rules |
+| `create_spend` | Create a spend request (runs through rules engine) |
+| `list_spend_requests` | List recent spend requests |
+
+#### Available Resources
+
+| Resource | URI | Description |
+|----------|-----|-------------|
+| `escrow-accounts` | `safespend://escrow-accounts` | JSON list of all escrow accounts |
+| `policies` | `safespend://policies` | JSON list of all spending policies |
+
+#### Available Prompts
+
+| Prompt | Description |
+|--------|-------------|
+| `setup_agent_budget` | Guided workflow to set up a budget for an AI agent |
+| `check_spending_status` | Get a summary of current spending status |
+
+#### Claude Desktop Configuration
+
+```json
+{
+  "mcpServers": {
+    "safespend": {
+      "command": "npx",
+      "args": ["@safespend/mcp-server"],
+      "env": {
+        "SAFESPEND_API_KEY": "sk_live_your_key_here"
+      }
+    }
+  }
+}
+```
+
+#### Example Usage with Claude
+
+```
+"Check my Safe-Spend balance"
+→ Claude uses list_escrow_accounts tool
+
+"Create a $500 marketing budget for my AI agent"  
+→ Claude uses create_escrow_account and fund_escrow_account tools
+
+"Spend $25 on OpenAI API credits from escrow esc_abc123"
+→ Claude uses create_spend tool
+```
+
+#### Key Features
+- 9 MCP tools for escrow and spending management
+- 2 resources for context retrieval
+- 2 guided prompts for common workflows
+- Human-readable output formatting
+- Proper error handling with isError flag
+
+#### Installation
+```bash
+npm install -g @safespend/mcp-server
+# Or run with npx:
+npx @safespend/mcp-server
+```
+
+#### Environment Variables
+- `SAFESPEND_API_KEY` (required) - Safe-Spend API key
+- `SAFESPEND_BASE_URL` (optional) - API base URL (default: https://api.safespend.app)
