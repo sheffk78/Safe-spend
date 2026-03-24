@@ -247,6 +247,91 @@ export const getAuditEvent = async (id) => {
     return handleResponse(response);
 };
 
+// ============ Webhooks ============
+export const listWebhooks = async () => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const getWebhook = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${id}`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const createWebhook = async (payload) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload)
+    });
+    return handleResponse(response);
+};
+
+export const updateWebhook = async (id, payload) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${id}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload)
+    });
+    return handleResponse(response);
+};
+
+export const deleteWebhook = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const testWebhook = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${id}/test`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const rotateWebhookSecret = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${id}/rotate-secret`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const listWebhookDeliveries = async (webhookId, filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.limit) params.append('limit', filters.limit);
+    
+    const queryString = params.toString();
+    const response = await fetch(`${API_URL}/api/v1/webhooks/${webhookId}/deliveries${queryString ? `?${queryString}` : ''}`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const triggerWebhookDelivery = async () => {
+    const response = await fetch(`${API_URL}/api/v1/webhooks/deliver-pending`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const expireStaleApprovals = async () => {
+    const response = await fetch(`${API_URL}/api/v1/approvals/expire-stale`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
 // ============ Utility Functions ============
 export const formatCents = (cents) => {
     if (cents === null || cents === undefined) return '$0.00';

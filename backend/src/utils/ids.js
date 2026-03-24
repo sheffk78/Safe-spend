@@ -11,7 +11,9 @@ const ID_PREFIXES = {
     spendRequest: 'spr_',
     approval: 'apr_',
     auditEvent: 'evt_',
-    webhook: 'whk_'
+    webhook: 'whk_',
+    webhookDelivery: 'dlv_',
+    event: 'evt_'
 };
 
 /**

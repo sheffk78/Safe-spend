@@ -20,12 +20,11 @@ import TransactionDetailPage from "@/pages/dashboard/TransactionDetailPage";
 import EscrowAccountsPage from "@/pages/dashboard/EscrowAccountsPage";
 import SpendingRulesPage from "@/pages/dashboard/SpendingRulesPage";
 import ApprovalsPage from "@/pages/dashboard/ApprovalsPage";
+import ApprovalDetailPage from "@/pages/dashboard/ApprovalDetailPage";
 import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
 import AuditLogPage from "@/pages/dashboard/AuditLogPage";
-import {
-    WebhooksPage,
-    SettingsPage
-} from "@/pages/dashboard/PlaceholderPages";
+import WebhooksPage from "@/pages/dashboard/WebhooksPage";
+import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 
 function App() {
     return (
@@ -55,6 +54,7 @@ function App() {
                         <Route path="transactions" element={<TransactionsPage />} />
                         <Route path="transactions/:id" element={<TransactionDetailPage />} />
                         <Route path="approvals" element={<ApprovalsPage />} />
+                        <Route path="approvals/:id" element={<ApprovalDetailPage />} />
                         <Route path="keys" element={<ApiKeysPage />} />
                         <Route path="webhooks" element={<WebhooksPage />} />
                         <Route path="audit" element={<AuditLogPage />} />

@@ -4,6 +4,7 @@ const { generateId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
 const { evaluateSpendRequest } = require('../services/rules-engine');
 const { getDateBoundaries } = require('../services/rules-helpers');
+const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -185,6 +186,13 @@ router.post('/', requireAuth, async (req, res) => {
                 ipAddress: req.ip
             });
             
+            // Trigger webhook for denial
+            await queueWebhooks(req.org.id, 'spend.denied', buildSpendEventData(
+                deniedRequest,
+                escrowAccount,
+                result.rulesEvaluated
+            ));
+            
             return res.status(400).json({
                 ...formatSpendRequest(deniedRequest),
                 error: result.denialReason
@@ -245,6 +253,13 @@ router.post('/', requireAuth, async (req, res) => {
                 },
                 ipAddress: req.ip
             });
+            
+            // Trigger webhook for approval requested
+            await queueWebhooks(req.org.id, 'approval.requested', buildApprovalEventData(
+                approval,
+                pendingRequest,
+                escrowAccount
+            ));
             
             return res.status(202).json({
                 ...formatSpendRequest(pendingRequest),
@@ -354,6 +369,13 @@ router.post('/', requireAuth, async (req, res) => {
             },
             ipAddress: req.ip
         });
+        
+        // Trigger webhook for auto-approved spend
+        await queueWebhooks(req.org.id, 'spend.approved', buildSpendEventData(
+            spendRequest,
+            updatedEscrow,
+            result.rulesEvaluated
+        ));
         
         res.status(201).json({
             ...formatSpendRequest(spendRequest),

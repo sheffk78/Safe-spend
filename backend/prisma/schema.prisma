@@ -223,9 +223,30 @@ model Webhook {
   createdAt       DateTime  @default(now()) @map("created_at")
 
   // Relations
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
 
   @@map("webhooks")
+}
+
+// Webhook Deliveries (for tracking delivery attempts and retries)
+model WebhookDelivery {
+  id            String    @id @default(uuid())
+  webhookId     String    @map("webhook_id")
+  eventId       String    @map("event_id") // evt_XXXXXXXXXXXX
+  eventType     String    @map("event_type")
+  payload       String    // JSON string
+  status        String    @default("pending") // pending | success | failed
+  attemptCount  Int       @default(0) @map("attempt_count")
+  lastAttemptAt DateTime? @map("last_attempt_at")
+  nextAttemptAt DateTime? @map("next_attempt_at")
+  errorMessage  String?   @map("error_message")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_deliveries")
 }
 
 // Daily Spend Tracking

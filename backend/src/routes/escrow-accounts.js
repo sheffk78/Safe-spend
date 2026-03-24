@@ -2,6 +2,7 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
+const { queueWebhooks } = require('../services/webhook-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -186,6 +187,15 @@ router.post('/:id/fund', requireAuth, async (req, res) => {
             }
         });
         
+        // Trigger webhook
+        await queueWebhooks(req.org.id, 'escrow.funded', {
+            escrow_id: escrow.id,
+            org_id: req.org.id,
+            amount_cents,
+            balance_before_cents: escrow.balanceCents,
+            balance_after_cents: updated.balanceCents
+        });
+        
         res.json({
             message: 'Account funded successfully',
             escrow: formatEscrowAccount(updated)
@@ -230,6 +240,13 @@ router.post('/:id/pause', requireAuth, async (req, res) => {
                 details: JSON.stringify({}),
                 ipAddress: req.ip
             }
+        });
+        
+        // Trigger webhook
+        await queueWebhooks(req.org.id, 'escrow.paused', {
+            escrow_id: escrow.id,
+            org_id: req.org.id,
+            balance_cents: updated.balanceCents
         });
         
         res.json(formatEscrowAccount(updated));
@@ -277,6 +294,14 @@ router.post('/:id/resume', requireAuth, async (req, res) => {
             }
         });
         
+        // Trigger webhook
+        await queueWebhooks(req.org.id, 'escrow.resumed', {
+            escrow_id: escrow.id,
+            org_id: req.org.id,
+            balance_cents: updated.balanceCents,
+            new_status: newStatus
+        });
+        
         res.json(formatEscrowAccount(updated));
     } catch (error) {
         console.error('Resume escrow error:', error);
@@ -318,6 +343,13 @@ router.post('/:id/close', requireAuth, async (req, res) => {
                 details: JSON.stringify({ remaining_balance_cents: escrow.balanceCents }),
                 ipAddress: req.ip
             }
+        });
+        
+        // Trigger webhook
+        await queueWebhooks(req.org.id, 'escrow.closed', {
+            escrow_id: escrow.id,
+            org_id: req.org.id,
+            remaining_balance_cents: escrow.balanceCents
         });
         
         res.json(formatEscrowAccount(updated));

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
 import { 
     CheckCircle, 
@@ -7,7 +8,8 @@ import {
     Check,
     Clock,
     DollarSign,
-    AlertCircle
+    AlertCircle,
+    ExternalLink
 } from 'lucide-react';
 import {
     listApprovals,
@@ -281,14 +283,45 @@ const ApprovalCard = ({ approval, escrowName, isPending, isExpired, isProcessing
                                 <X size={16} />
                                 Deny
                             </button>
+                            <Link
+                                to={`/dashboard/approvals/${approval.id}`}
+                                className="flex items-center gap-2 px-4 py-2 bg-ss-elevated hover:bg-[rgba(255,255,255,0.06)] rounded-lg text-ss-text-secondary text-sm transition-all"
+                                data-testid={`view-detail-btn-${approval.id}`}
+                            >
+                                <ExternalLink size={14} />
+                                Details
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* Non-pending actions */}
+                    {!isPending && (
+                        <div className="flex-shrink-0">
+                            <Link
+                                to={`/dashboard/approvals/${approval.id}`}
+                                className="flex items-center gap-2 px-4 py-2 bg-ss-elevated hover:bg-[rgba(255,255,255,0.06)] rounded-lg text-ss-text-secondary text-sm transition-all"
+                                data-testid={`view-detail-btn-${approval.id}`}
+                            >
+                                <ExternalLink size={14} />
+                                View Details
+                            </Link>
                         </div>
                     )}
 
                     {/* Expired warning */}
                     {isPending && isExpired && (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-ss-error/10 rounded-lg text-ss-error text-sm">
-                            <AlertCircle size={16} />
-                            Expired
+                        <div className="flex flex-col gap-2 flex-shrink-0">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-ss-error/10 rounded-lg text-ss-error text-sm">
+                                <AlertCircle size={16} />
+                                Expired
+                            </div>
+                            <Link
+                                to={`/dashboard/approvals/${approval.id}`}
+                                className="flex items-center gap-2 px-4 py-2 bg-ss-elevated hover:bg-[rgba(255,255,255,0.06)] rounded-lg text-ss-text-secondary text-sm transition-all"
+                            >
+                                <ExternalLink size={14} />
+                                Details
+                            </Link>
                         </div>
                     )}
                 </div>
