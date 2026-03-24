@@ -300,39 +300,30 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 #### Overview
 CSV export functionality for governance reviews and compliance audits. Allows owners and finance admins to download spend activity and audit events as CSV files.
 
+#### Hardening Features (Added March 24, 2026)
+- **Rate Limiting**: 10 requests per 5 minutes per org to prevent abuse
+- **Max Date Range**: 90 days maximum to ensure manageable export sizes
+- **Audit Logging**: All exports logged to `auditevents` table with `export.generated` event type
+
 #### Backend Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/v1/exports/summary` | GET | Preview record counts for exports |
+| `/v1/exports/summary` | GET | Preview record counts and config info |
 | `/v1/exports/spend-activity` | GET | Download spend requests as CSV |
 | `/v1/exports/audit-events` | GET | Download audit events as CSV |
 
 #### Filters
-- **Required**: start_date, end_date (ISO 8601 format)
+- **Required**: start_date, end_date (ISO 8601 format, max 90 day range)
 - **Optional**: escrow_id, status (for spend-activity), event_type, actor_type (for audit-events)
 
-#### Permissions
-- Owner: Full export access
-- Finance Admin: Full export access
-- Developer: No export access (403)
-- Read Only: No export access (403)
-
-#### CSV Format
-- ISO 8601 timestamps (YYYY-MM-DDTHH:MM:SSZ)
-- Proper CSV escaping for commas, quotes, newlines
-- Filename format: `safe-spend-{org-slug}-{report-type}-{YYYY-MM-DD}.csv`
-
-#### Frontend Components
-- **Exports Page** (`/dashboard/exports`) - Dedicated page with report type selection, filters, preview
-- **Export CSV Button** on Audit Log page
-- **Export CSV Button** on Transactions page
-
-#### Files Created
-- `/app/backend/src/routes/exports.js` - Export API routes
-- `/app/frontend/src/pages/dashboard/ExportsPage.js` - Exports UI page
+#### PDF Statements Prep
+- **Service**: `/app/backend/src/services/pdf-statement-service.js`
+- **Status**: Code-only prep, `pdf_enabled=false`
+- **Data Shape**: Statement payload defined (period, balances, activity, top_vendors, notable_events)
+- **Config Flags**: Ready to enable when PDF generation is implemented
 
 #### Test Results
-- Backend: 22/22 tests passed (100%)
+- Backend: 22/22 CSV tests + 16/16 hardening tests = 38 total passed (100%)
 - Frontend: All UI elements verified working
 
 ---
