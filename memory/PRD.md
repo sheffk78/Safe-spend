@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 04 Complete - Dashboard Pages
+**Current Phase:** Prompt 05 Complete - Approvals & Webhooks
 **Last Updated:** March 2026
 
 ---
@@ -55,84 +55,77 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 - All CRUD endpoints for escrow accounts, policies, spend requests, etc.
 
 ### Prompt 03 - Rules Engine (Completed)
+- 13-Step Spend Validation Cascade
+- Outcomes: approved, denied, pending, replay
 
-#### 13-Step Spend Validation Cascade
-Every spend request passes through these checks in exact order:
+### Prompt 04 - Dashboard Pages (Completed)
+- Dashboard Overview with real-time stats
+- Escrow Accounts page with CRUD
+- Spending Rules page with policy builder
+- Transactions page and detail view
+- Approvals page with approve/deny
+- API Keys page with management
+- Audit Log page with filters
 
-1. **KEY_VALIDATION** - Validates API key or JWT token
-2. **ESCROW_ACCOUNT_CHECK** - Verifies escrow exists and is active
-3. **IDEMPOTENCY_CHECK** - Returns existing result for duplicate keys
-4. **BALANCE_CHECK** - Ensures sufficient funds
-5. **PER_TRANSACTION_LIMIT** - Enforces per-tx amount cap
-6. **DAILY_CAP_CHECK** - Enforces daily spending limit
-7. **WEEKLY_CAP_CHECK** - Enforces weekly spending limit
-8. **MONTHLY_CAP_CHECK** - Enforces monthly spending limit
-9. **VENDOR_CHECK** - Validates against allowlist/blocklist
-10. **CATEGORY_CHECK** - Validates category against restrictions
-11. **TIME_WINDOW_CHECK** - Enforces active days/hours
-12. **APPROVAL_THRESHOLD_CHECK** - Determines if human approval needed
-13. **EXECUTE** - Final step, spend is executed
+### Prompt 05 - Approvals & Webhooks (Completed - March 2026)
 
-#### Outcomes
-- **approved** - All rules pass, within auto-approve threshold
-- **denied** - A rule failed (with reason and policy ID)
-- **pending** - Requires human approval (returns approval_id)
-- **replay** - Idempotent request returning existing result
+#### Approvals Lifecycle
+- **Auto-expiration system**: `POST /v1/approvals/expire-stale` maintenance endpoint
+- **Time-based expiration**: Approvals expire after `approval_timeout_minutes` (default 60)
+- **Balance deduction on approve**: Full transaction with escrow balance update
+- **Human approval tracking**: `rules_evaluated` includes `human_approval` or `human_denial` steps
+- **Audit trails**: Events logged for `approval.approved`, `approval.denied`, `approval.expired`
 
-### Prompt 04 - Dashboard Pages (Completed - March 2026)
+#### Webhook System
+- **Webhook Registration**: `POST/GET/DELETE /v1/webhooks` with event subscriptions
+- **HMAC-SHA256 Signatures**: `X-SafeSpend-Signature` header for payload verification
+- **Timestamp Protection**: `X-SafeSpend-Timestamp` header prevents replay attacks
+- **Delivery Queue**: `webhook_deliveries` table tracks attempts and status
+- **Retry Logic**: Exponential backoff (2^attempts * 60s, max 1hr), max 10 retries
+- **Maintenance Endpoint**: `POST /v1/webhooks/deliver-pending` triggers delivery
+- **Secret Rotation**: `POST /v1/webhooks/:id/rotate-secret`
+- **Test Endpoint**: `POST /v1/webhooks/:id/test`
 
-#### Implemented Features:
-1. **Dashboard Overview** - Real-time stats from API
-   - Total Escrowed, Total Spent, Active Rules, Pending Approvals
-   - Quick Actions section
-   - Recent Transactions feed
+#### Supported Webhook Events
+- `spend.approved`, `spend.denied`, `spend.expired`
+- `approval.requested`, `approval.approved`, `approval.denied`, `approval.expired`
+- `escrow.funded`, `escrow.paused`, `escrow.resumed`, `escrow.closed`
 
-2. **Escrow Accounts Page** (`/dashboard/accounts`)
-   - List view with summary cards
-   - Create account modal with initial funding option
-   - Fund account modal with balance preview
-   - Action menu: Pause, Resume, Close
+#### Dashboard Updates
+- **Webhooks Page** (`/dashboard/webhooks`)
+  - List webhooks with URL, events, status
+  - Create modal with event category checkboxes
+  - Expand to see Test, Rotate Secret, Deactivate, Delete
+  - Recent Deliveries section
+  
+- **Approval Detail Page** (`/dashboard/approvals/:id`)
+  - Time remaining countdown (HH:MM:SS)
+  - Large Approve/Deny buttons
+  - Spend Request summary (amount, vendor, category)
+  - Escrow Account info with projected balance
+  - Rules Evaluation timeline
+  - Decision info (for completed approvals)
+  - Link to transaction detail
 
-3. **Spending Rules Page** (`/dashboard/rules`)
-   - Policy cards with expandable details
-   - Create/Edit modal with 6 tabs:
-     - Basic Info (name, escrow, active toggle)
-     - Amount Limits (per-tx, daily, weekly, monthly)
-     - Vendor Controls (allowed/blocked, match mode)
-     - Categories (allowed/blocked)
-     - Time Window (days, hours, timezone)
-     - Approval Rules (auto-approve, require-human thresholds)
-   - Toggle active status, delete policy
+---
 
-4. **Transactions Page** (`/dashboard/transactions`)
-   - List view with status badges
-   - Filter by status (pending, approved, denied)
-   - Links to transaction detail page
+## Architecture Summary
 
-5. **Transaction Detail Page** (`/dashboard/transactions/:id`)
-   - Transaction summary (amount, vendor, category)
-   - Balance impact visualization
-   - 12-step rules evaluation timeline with pass/fail indicators
+### Backend Services
+- `/app/backend/src/services/rules-engine.js` - 13-step evaluation
+- `/app/backend/src/services/webhook-service.js` - HMAC signing, delivery queue
 
-6. **Approvals Page** (`/dashboard/approvals`)
-   - Tabs: Pending, Approved, Denied, Expired
-   - Approval cards with request details
-   - Approve button
-   - Deny button with reason dropdown and note field
+### Backend Routes
+- `/app/backend/src/routes/webhooks.js` - Webhook CRUD + delivery
+- `/app/backend/src/routes/approvals.js` - Approval lifecycle
+- `/app/backend/src/routes/escrow-accounts.js` - Escrow management
+- `/app/backend/src/routes/spend.js` - Spend requests
 
-7. **API Keys Page** (`/dashboard/keys`)
-   - Grouped by type: Live, Test, Agent
-   - Create key modal with type selection and permissions
-   - Copy key warning (shown once)
-   - Toggle active/inactive, Revoke
-
-8. **Audit Log Page** (`/dashboard/audit`)
-   - Filterable table with event types
-   - Filter panel: Event Type, Actor Type, Escrow Account
-   - Event detail panel with full JSON
-
-#### API Client Layer
-- `/app/frontend/src/lib/api.js` - Centralized API calls with auth handling
+### Frontend Dashboard
+- `/app/frontend/src/lib/api.js` - API client layer
+- `/app/frontend/src/pages/dashboard/WebhooksPage.js`
+- `/app/frontend/src/pages/dashboard/ApprovalDetailPage.js`
+- `/app/frontend/src/pages/dashboard/ApprovalsPage.js`
 
 ---
 
@@ -140,44 +133,24 @@ Every spend request passes through these checks in exact order:
 
 ### P0 - Critical (Next Prompts)
 1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
-2. **Stripe Integration** - Real funding and disbursement
+2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
+3. **Stripe Integration** - Real funding and disbursement
 
 ### P1 - High Priority
-3. **Webhook Delivery** - Send events to registered endpoints
 4. **Documentation Page** - API reference, integration guides
 5. **SDK Generation** - Python, TypeScript SDKs
 
 ### P2 - Medium Priority
 6. **MCP Server** - Model Context Protocol integration
-7. **Expiring Approvals** - Auto-expire pending approvals
+7. **Email Notifications** - Alert on pending approvals
 8. **Rate Limiting** - API request limits
-
----
-
-## Architecture Summary
-
-### Backend Files
-- `/app/backend/src/services/rules-engine.js` - 13-step evaluation
-- `/app/backend/src/services/rules-helpers.js` - Vendor matching, time checks
-- `/app/backend/src/routes/` - All API endpoints
-
-### Frontend Dashboard Files
-- `/app/frontend/src/lib/api.js` - API client layer
-- `/app/frontend/src/pages/dashboard/DashboardOverview.js`
-- `/app/frontend/src/pages/dashboard/EscrowAccountsPage.js`
-- `/app/frontend/src/pages/dashboard/SpendingRulesPage.js`
-- `/app/frontend/src/pages/dashboard/TransactionsPage.js`
-- `/app/frontend/src/pages/dashboard/TransactionDetailPage.js`
-- `/app/frontend/src/pages/dashboard/ApprovalsPage.js`
-- `/app/frontend/src/pages/dashboard/ApiKeysPage.js`
-- `/app/frontend/src/pages/dashboard/AuditLogPage.js`
 
 ---
 
 ## Testing
 
-### Iteration 4 Results (March 2026)
-- Backend: 100% (31/31 tests passed)
+### Iteration 5 Results (March 2026)
+- Backend: 96% (24/25 tests passed, 1 skipped - no pending approval for deny test)
 - Frontend: 100% (all pages functional)
 - Test credentials: demo@test.com / Test123!
 
@@ -185,5 +158,5 @@ Every spend request passes through these checks in exact order:
 
 ## Next Tasks
 1. Stripe integration for real fiat funding
-2. Webhook delivery system
-3. API documentation page
+2. API documentation page
+3. SDK generation (Python, TypeScript)
