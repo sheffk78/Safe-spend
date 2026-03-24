@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 16 Complete - Python SDK
+**Current Phase:** Prompt 16 Complete - Python & TypeScript SDKs
 **Last Updated:** March 24, 2026
 
 ---
@@ -267,21 +267,20 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 14. ~~Admin Control Plane (Prompt 14)~~ ✅ COMPLETE
 15. ~~Admin API v1 (Prompt 15)~~ ✅ COMPLETE
 16. ~~Python SDK (Prompt 16)~~ ✅ COMPLETE
+17. ~~TypeScript SDK~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
-1. **TypeScript SDK** - TypeScript/JavaScript SDK for Node.js
-2. **MCP Server Package** - `@safespend/mcp-server`
+1. **MCP Server Package** - `@safespend/mcp-server`
 
 ### P2 - Medium Priority
-3. **Email Notifications** - Alert on pending approvals
-4. **Production Deployment** - CI/CD, monitoring
+2. **Email Notifications** - Alert on pending approvals
+3. **Production Deployment** - CI/CD, monitoring
 
 ---
 
 ## Next Tasks
-1. TypeScript SDK generation
-2. MCP Server implementation
-3. Email notifications for pending approvals
+1. MCP Server implementation
+2. Email notifications for pending approvals
 
 ---
 
@@ -746,3 +745,91 @@ cd /app/sdks/python && pip install -e .
 - Approval endpoints require org tokens (JWT), not API keys
 - Designed for human review flows, not agent automation
 
+
+---
+
+### TypeScript SDK (Completed - March 24, 2026)
+
+#### Overview
+A minimal, developer-friendly TypeScript SDK for the Safe-Spend API. Mirrors the Python SDK's interface, making it easy for developers using either language to integrate.
+
+#### Package Structure
+```
+/app/sdks/typescript/
+├── README.md           # Installation & usage guide
+├── package.json        # NPM package configuration
+├── tsconfig.json       # TypeScript configuration
+├── src/
+│   ├── index.ts        # Public API exports
+│   ├── client.ts       # SafeSpendClient class
+│   ├── errors.ts       # Custom exceptions
+│   └── types.ts        # TypeScript interfaces
+└── dist/               # Built output (CJS + ESM + .d.ts)
+```
+
+#### SafeSpendClient Methods
+
+| Category | Methods |
+|----------|---------|
+| Escrow | `listEscrowAccounts()`, `getEscrowAccount()`, `createEscrowAccount()`, `fundEscrowAccount()`, `getEscrowBalance()`, `pauseEscrowAccount()`, `resumeEscrowAccount()`, `closeEscrowAccount()` |
+| Policies | `listPolicies()`, `getPolicy()`, `createPolicy()`, `deletePolicy()` |
+| Spend | `createSpend()`, `listSpendRequests()`, `getSpendRequest()`, `cancelSpendRequest()` |
+| Approvals | `listApprovals()`, `getApproval()`, `approve()`, `deny()` |
+
+#### Error Classes
+- `SafeSpendError` - Base exception
+- `AuthenticationError` - 401 responses
+- `PermissionError` - 403 responses
+- `NotFoundError` - 404 responses
+- `RateLimitError` - 429 responses
+- `ValidationError` - 400 responses (with details)
+- `APIError` - 5xx and other errors
+
+#### Usage Example
+```typescript
+import { SafeSpendClient } from 'safespend';
+
+const client = new SafeSpendClient({
+  apiKey: 'sk_live_...',
+  baseUrl: 'https://api.safespend.app',
+});
+
+// Create and fund an escrow
+const escrow = await client.createEscrowAccount({ name: 'Marketing Budget' });
+await client.fundEscrowAccount(escrow.id, { amount_cents: 100000 });
+
+// Create a policy
+await client.createPolicy({
+  escrow_id: escrow.id,
+  name: 'Marketing Policy',
+  per_transaction_limit_cents: 10000,
+  auto_approve_under_cents: 5000,
+});
+
+// Make a spend request
+const spend = await client.createSpend({
+  escrow_id: escrow.id,
+  amount_cents: 2500,
+  vendor: 'Anthropic',
+  category: 'ai_compute',
+});
+console.log(`Status: ${spend.status}`);
+```
+
+#### Key Features
+- Full TypeScript support with exported interfaces
+- ESM and CommonJS builds
+- Automatic idempotency key generation
+- Clean error mapping from HTTP status codes
+- Uses native `fetch` (Node.js 18+)
+
+#### Installation
+```bash
+npm install safespend
+# Or from source:
+cd /app/sdks/typescript && npm install && npm run build
+```
+
+#### Notes
+- Node.js 18+ required
+- Approval endpoints require org tokens (JWT), not API keys

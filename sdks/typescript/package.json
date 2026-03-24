@@ -1,0 +1,60 @@
+{
+  "name": "safespend",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Safe-Spend API (Agentic Trust)",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "safe-spend",
+    "safespend",
+    "escrow",
+    "ai-agents",
+    "payments",
+    "agentic-trust",
+    "spending-control",
+    "typescript"
+  ],
+  "author": {
+    "name": "Agentic Trust",
+    "email": "support@agentictrust.app"
+  },
+  "license": "Proprietary",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentictrust/safespend-typescript"
+  },
+  "homepage": "https://agentictrust.app",
+  "bugs": {
+    "url": "https://github.com/agentictrust/safespend-typescript/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
