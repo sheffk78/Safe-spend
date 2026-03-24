@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 06 Complete - End-to-End Testing Suite
+**Current Phase:** Prompt 07 Complete - Docs Site (API Reference + Integration Guides)
 **Last Updated:** March 24, 2026
 
 ---
@@ -107,6 +107,26 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
   - Decision info (for completed approvals)
   - Link to transaction detail
 
+### Prompt 07 - Docs Site (Completed - March 24, 2026)
+
+#### Docs Infrastructure
+- **Layout**: `/docs` route with left sidebar navigation + content area
+- **Components**: DocsLayout, DocsSidebar, DocsHeading, DocsText, Callout, CodeBlock, ApiEndpoint
+- **Styling**: Dark theme with emerald accent, consistent with app
+
+#### Docs Pages
+| Route | Page | Description |
+|-------|------|-------------|
+| `/docs` | Overview | What is Safe-Spend, who it's for, key concepts |
+| `/docs/concepts` | Core Concepts | Escrow accounts, policies, rules engine, API keys, webhooks |
+| `/docs/quickstart` | Quickstart | 10-15 min guide from signup to first spend |
+| `/docs/api` | API Reference | All endpoints with examples (Auth, Escrow, Policies, Spend, Approvals, Audit, Webhooks) |
+| `/docs/webhooks` | Webhooks | Events, payloads, HMAC signature verification |
+| `/docs/integrations` | Integrations | cURL, Python, TypeScript, LangChain, CrewAI, OpenAI Assistants, MCP |
+
+#### Dashboard Integration
+- Added "Read the docs" links from API Keys, Spending Rules, and Webhooks pages to relevant docs sections
+
 ---
 
 ## Architecture Summary
@@ -126,6 +146,17 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 - `/app/frontend/src/pages/dashboard/WebhooksPage.js`
 - `/app/frontend/src/pages/dashboard/ApprovalDetailPage.js`
 - `/app/frontend/src/pages/dashboard/ApprovalsPage.js`
+
+### Frontend Docs (NEW - Prompt 07)
+- `/app/frontend/src/layouts/DocsLayout.js` - Docs layout with sidebar
+- `/app/frontend/src/components/docs/DocsComponents.js` - Typography, Callout, ApiEndpoint helpers
+- `/app/frontend/src/components/docs/DocsCodeBlock.js` - Code block with syntax highlighting
+- `/app/frontend/src/pages/docs/DocsOverview.js` - What is Safe-Spend?
+- `/app/frontend/src/pages/docs/DocsConcepts.js` - Core concepts
+- `/app/frontend/src/pages/docs/DocsQuickstart.js` - Quickstart guide
+- `/app/frontend/src/pages/docs/DocsApiReference.js` - Full API reference
+- `/app/frontend/src/pages/docs/DocsWebhooks.js` - Webhooks & signatures
+- `/app/frontend/src/pages/docs/DocsIntegrations.js` - cURL, Python, TypeScript, LangChain, CrewAI, MCP
 
 ---
 
@@ -186,14 +217,14 @@ cd /app/backend && npm test
 1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
 2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
 3. ~~End-to-End Testing (Prompt 06)~~ ✅ COMPLETE
-4. **Stripe Integration** - Real funding and disbursement
+4. ~~Docs Site (Prompt 07)~~ ✅ COMPLETE
+5. **Stripe Integration** - Real funding and disbursement
 
 ### P1 - High Priority
-5. **Documentation Page** - API reference, integration guides
 6. **SDK Generation** - Python, TypeScript SDKs
+7. **MCP Server Package** - `@safespend/mcp-server`
 
 ### P2 - Medium Priority
-7. **MCP Server** - Model Context Protocol integration
 8. **Email Notifications** - Alert on pending approvals
 9. **Rate Limiting** - API request limits
 10. **Production Deployment** - Environment configuration
@@ -201,6 +232,6 @@ cd /app/backend && npm test
 ---
 
 ## Next Tasks
-1. Stripe integration for real fiat funding (Prompt 07 if provided)
-2. API documentation page
-3. SDK generation (Python, TypeScript)
+1. Stripe integration for real fiat funding (Prompt 08 if provided)
+2. SDK generation (Python, TypeScript)
+3. MCP Server implementation

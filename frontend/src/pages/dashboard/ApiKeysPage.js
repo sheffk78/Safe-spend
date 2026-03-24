@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
 import { 
     Key, 
@@ -10,7 +11,8 @@ import {
     AlertTriangle,
     Trash2,
     Power,
-    PowerOff
+    PowerOff,
+    BookOpen
 } from 'lucide-react';
 import {
     listApiKeys,
@@ -87,7 +89,13 @@ const ApiKeysPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">API Keys</h1>
-                    <p className="text-ss-text-secondary mt-1">Manage your API keys for live, test, and agent access</p>
+                    <p className="text-ss-text-secondary mt-1">
+                        Manage your API keys for live, test, and agent access.{' '}
+                        <Link to="/docs/api#auth" className="text-ss-accent hover:underline inline-flex items-center gap-1">
+                            <BookOpen size={14} />
+                            Read the docs
+                        </Link>
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button

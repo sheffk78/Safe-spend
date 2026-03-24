@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
 import { 
     Webhook, 
@@ -15,7 +16,8 @@ import {
     Check,
     Copy,
     AlertTriangle,
-    ExternalLink
+    ExternalLink,
+    BookOpen
 } from 'lucide-react';
 import {
     listWebhooks,
@@ -127,7 +129,13 @@ const WebhooksPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Webhooks</h1>
-                    <p className="text-ss-text-secondary mt-1">Configure webhook endpoints to receive real-time event notifications</p>
+                    <p className="text-ss-text-secondary mt-1">
+                        Configure webhook endpoints to receive real-time event notifications.{' '}
+                        <Link to="/docs/webhooks" className="text-ss-accent hover:underline inline-flex items-center gap-1">
+                            <BookOpen size={14} />
+                            Payloads & signature verification
+                        </Link>
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button

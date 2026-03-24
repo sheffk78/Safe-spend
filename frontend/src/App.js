@@ -8,9 +8,17 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
-import DocsPage from "@/pages/DocsPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
+
+// Docs
+import DocsLayout from "@/layouts/DocsLayout";
+import DocsOverview from "@/pages/docs/DocsOverview";
+import DocsConcepts from "@/pages/docs/DocsConcepts";
+import DocsQuickstart from "@/pages/docs/DocsQuickstart";
+import DocsApiReference from "@/pages/docs/DocsApiReference";
+import DocsWebhooks from "@/pages/docs/DocsWebhooks";
+import DocsIntegrations from "@/pages/docs/DocsIntegrations";
 
 // Dashboard
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -35,9 +43,18 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/docs" element={<DocsPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
+
+                    {/* Docs routes */}
+                    <Route path="/docs" element={<DocsLayout />}>
+                        <Route index element={<DocsOverview />} />
+                        <Route path="concepts" element={<DocsConcepts />} />
+                        <Route path="quickstart" element={<DocsQuickstart />} />
+                        <Route path="api" element={<DocsApiReference />} />
+                        <Route path="webhooks" element={<DocsWebhooks />} />
+                        <Route path="integrations" element={<DocsIntegrations />} />
+                    </Route>
 
                     {/* Protected dashboard routes */}
                     <Route

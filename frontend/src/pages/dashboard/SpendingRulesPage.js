@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
 import { 
     Shield, 
@@ -12,7 +13,8 @@ import {
     Clock,
     DollarSign,
     Users,
-    Tag
+    Tag,
+    BookOpen
 } from 'lucide-react';
 import {
     listPolicies,
@@ -113,7 +115,13 @@ const SpendingRulesPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Spending Rules</h1>
-                    <p className="text-ss-text-secondary mt-1">Define fiduciary policies for your escrow accounts</p>
+                    <p className="text-ss-text-secondary mt-1">
+                        Define fiduciary policies for your escrow accounts.{' '}
+                        <Link to="/docs/api#policies" className="text-ss-accent hover:underline inline-flex items-center gap-1">
+                            <BookOpen size={14} />
+                            Learn how the rules engine works
+                        </Link>
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
