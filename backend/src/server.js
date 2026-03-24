@@ -52,9 +52,12 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 8001;
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Safe-Spend API server running on port ${PORT}`);
-    console.log(`Health check: http://0.0.0.0:${PORT}/api/health`);
-});
+// Only start server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Safe-Spend API server running on port ${PORT}`);
+        console.log(`Health check: http://0.0.0.0:${PORT}/api/health`);
+    });
+}
 
 module.exports = app;

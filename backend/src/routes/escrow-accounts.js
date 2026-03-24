@@ -273,6 +273,11 @@ router.post('/:id/resume', requireAuth, async (req, res) => {
             return res.status(404).json({ error: 'Escrow account not found' });
         }
         
+        // Cannot resume a closed account
+        if (escrow.status === 'closed') {
+            return res.status(400).json({ error: 'Cannot resume a closed account' });
+        }
+        
         const newStatus = escrow.balanceCents > 0 ? 'active' : 'depleted';
         
         const updated = await prisma.escrowAccount.update({

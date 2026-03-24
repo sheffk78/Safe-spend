@@ -48,16 +48,26 @@ async function requireOrgAuth(req, res, next) {
 
 /**
  * Middleware to authenticate with API key
+ * Supports both "Authorization: Bearer sk_xxx" and "X-API-Key: sk_xxx" headers
  */
 async function requireApiKeyAuth(req, res, next) {
     try {
-        const authHeader = req.headers.authorization;
+        let token = null;
         
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Missing or invalid authorization header' });
+        // Check X-API-Key header first (preferred for API keys)
+        if (req.headers['x-api-key']) {
+            token = req.headers['x-api-key'];
+        } else {
+            // Fall back to Authorization: Bearer header
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
         }
         
-        const token = authHeader.substring(7);
+        if (!token) {
+            return res.status(401).json({ error: 'Missing API key. Use X-API-Key header or Authorization: Bearer header.' });
+        }
         
         // Must be an API key
         if (!token.startsWith('sk_')) {
@@ -99,9 +109,15 @@ async function requireApiKeyAuth(req, res, next) {
 
 /**
  * Middleware that accepts either JWT or API key
+ * Supports X-API-Key header, Authorization: Bearer sk_xxx, or Authorization: Bearer <JWT>
  */
 async function requireAuth(req, res, next) {
     try {
+        // Check X-API-Key header first (prioritize API key auth)
+        if (req.headers['x-api-key']) {
+            return requireApiKeyAuth(req, res, next);
+        }
+        
         const authHeader = req.headers.authorization;
         
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
