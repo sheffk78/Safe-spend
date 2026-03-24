@@ -250,11 +250,81 @@ function restrictAgentKeys(allowedEndpoints = []) {
     };
 }
 
+/**
+ * Middleware to block agent keys from write operations on governance endpoints
+ * Agent keys can read policies and escrows but cannot create/update/delete them
+ */
+function requireOwnerKey(req, res, next) {
+    // If authenticated with API key and it's an agent key, block write operations
+    if (req.authType === 'api_key' && req.apiKey.keyType === 'agent') {
+        return res.status(403).json({ 
+            error: 'forbidden',
+            message: 'Agent keys cannot modify governance settings. Use an owner key instead.',
+            request_id: req.requestId,
+        });
+    }
+    next();
+}
+
+/**
+ * Middleware to check if the user can modify a locked policy
+ * Requires policy ID in params
+ */
+async function canModifyPolicy(req, res, next) {
+    try {
+        const policyId = req.params.id;
+        if (!policyId) {
+            return next();
+        }
+
+        const policy = await prisma.spendingPolicy.findUnique({
+            where: { id: policyId }
+        });
+
+        if (!policy) {
+            return res.status(404).json({ 
+                error: 'not_found',
+                message: 'Policy not found',
+                request_id: req.requestId,
+            });
+        }
+
+        // Check ownership
+        if (policy.orgId !== req.org.id) {
+            return res.status(404).json({ 
+                error: 'not_found',
+                message: 'Policy not found',
+                request_id: req.requestId,
+            });
+        }
+
+        // Agent keys can never modify policies (even unlocked ones)
+        if (req.authType === 'api_key' && req.apiKey.keyType === 'agent') {
+            return res.status(403).json({ 
+                error: 'forbidden',
+                message: 'Agent keys cannot modify governance settings. Use an owner key instead.',
+                request_id: req.requestId,
+            });
+        }
+
+        req.policy = policy;
+        next();
+    } catch (error) {
+        logger.error({ error: error.message }, 'Error in canModifyPolicy middleware');
+        return res.status(500).json({ 
+            error: 'internal_server_error',
+            request_id: req.requestId,
+        });
+    }
+}
+
 module.exports = {
     requireAuth,
     requireOrgAuth,
     requireApiKeyAuth,
     restrictAgentKeys,
+    requireOwnerKey,
+    canModifyPolicy,
     timingSafeEqual,
     prisma
 };

@@ -374,6 +374,106 @@ console.log(\`Status: \${result.status}\`);
                 </li>
             </ul>
 
+            {/* Alternative: Agent-Led 80/20 Setup */}
+            <DocsHeading level={2} id="agent-led-setup">Alternative: 80/20 Agent-Led Setup</DocsHeading>
+
+            <Callout type="success" title="Let Your Agent Do the Work">
+                Instead of manually configuring policies, let your agent draft them—you just review and approve.
+            </Callout>
+
+            <DocsText>
+                Safe-Spend supports a <strong className="text-ss-text">delegation-first pattern</strong> where your agent 
+                proposes the spending configuration, and you (the human owner) review and lock it into place. 
+                This "80/20" approach means the agent does 80% of the setup work, and you spend 20% of the time 
+                reviewing the configuration.
+            </DocsText>
+
+            <DocsHeading level={3}>How It Works</DocsHeading>
+
+            <ol className="list-decimal list-inside space-y-3 mb-6 text-ss-text-secondary">
+                <li className="pl-2">
+                    <strong className="text-ss-text">Agent Creates Draft Policy:</strong> Your agent uses an owner key to 
+                    create a policy with <InlineCode>draft: true</InlineCode> and includes a human-readable summary in the metadata.
+                </li>
+                <li className="pl-2">
+                    <strong className="text-ss-text">You Review:</strong> Log into the dashboard, see the draft banner, and 
+                    review the proposed limits, vendors, and time windows.
+                </li>
+                <li className="pl-2">
+                    <strong className="text-ss-text">Lock & Activate:</strong> Click "Approve & Lock" to activate the policy. 
+                    Once locked, neither you nor the agent can modify it without explicitly unlocking first.
+                </li>
+                <li className="pl-2">
+                    <strong className="text-ss-text">Agent Spends:</strong> With the policy active, your agent uses an 
+                    <InlineCode>sk_agent_...</InlineCode> key to make spend requests—bounded by the rules you approved.
+                </li>
+            </ol>
+
+            <DocsHeading level={3}>Example: Agent Creates Draft Policy</DocsHeading>
+
+            <CodeBlock 
+                language="json"
+                code={`// POST /v1/policies (with owner key)
+{
+  "escrow_id": "esc_marketing_q1",
+  "name": "Marketing Daily Budget",
+  "draft": true,
+  "per_transaction_limit_cents": 20000,
+  "daily_limit_cents": 50000,
+  "allowed_vendors": ["Google Ads", "Meta", "LinkedIn"],
+  "active_days": ["mon", "tue", "wed", "thu", "fri"],
+  "active_hours_start": "09:00",
+  "active_hours_end": "17:00",
+  "active_timezone": "America/New_York",
+  "metadata": {
+    "summary": "Marketing agent can spend up to $200 per transaction and $500 per day on Google Ads, Meta, and LinkedIn during business hours (9am-5pm ET, weekdays)."
+  }
+}`}
+            />
+
+            <DocsText>
+                The agent provides a clear, human-readable summary in the <InlineCode>metadata.summary</InlineCode> field. 
+                This summary appears prominently in the dashboard when you review the draft.
+            </DocsText>
+
+            <DocsHeading level={3}>Lock the Policy</DocsHeading>
+
+            <CodeBlock 
+                language="bash"
+                code={`# Human owner locks the policy after review
+curl -X POST https://api.safespend.app/v1/policies/pol_xxx/lock \\
+  -H "Authorization: Bearer sk_live_owner_key..."`}
+            />
+
+            <DocsText>
+                Response:
+            </DocsText>
+
+            <CodeBlock 
+                language="json"
+                code={`{
+  "message": "Policy locked and activated",
+  "policy": {
+    "id": "pol_xxx",
+    "name": "Marketing Daily Budget",
+    "status": "active",
+    "is_locked": true,
+    "locked_at": "2026-03-24T10:30:00Z",
+    "locked_by": "org_abc123"
+  }
+}`}
+            />
+
+            <Callout type="warning" title="Agent Key Permissions">
+                <strong>Agent keys</strong> (<InlineCode>sk_agent_...</InlineCode>) can only:
+                <ul className="list-disc list-inside mt-2">
+                    <li>Make spend requests (<InlineCode>POST /v1/spend</InlineCode>)</li>
+                    <li>Check balances (<InlineCode>GET /v1/escrow-accounts/:id</InlineCode>)</li>
+                    <li>Read policies and escrows (read-only)</li>
+                </ul>
+                They <strong>cannot</strong> create, modify, or delete policies or escrow accounts. Use an owner key for governance operations.
+            </Callout>
+
             {/* Next Steps */}
             <DocsHeading level={2} id="next-steps">Next Steps</DocsHeading>
 

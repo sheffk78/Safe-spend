@@ -16,7 +16,11 @@ import {
     Users,
     Tag,
     BookOpen,
-    Wand2
+    Wand2,
+    Lock,
+    Unlock,
+    FileText,
+    AlertCircle
 } from 'lucide-react';
 import {
     listPolicies,
@@ -24,6 +28,8 @@ import {
     createPolicy,
     updatePolicy,
     deletePolicy,
+    lockPolicy,
+    unlockPolicy,
     formatCents,
     dollarsToCents
 } from '@/lib/api';
@@ -102,6 +108,30 @@ const SpendingRulesPage = () => {
         }
     };
 
+    const handleLock = async (policy) => {
+        if (!window.confirm(`Lock and activate policy "${policy.name}"?\n\nOnce locked:\n• The policy will be enforced for spend requests\n• It cannot be modified until unlocked\n• An audit trail entry will be created`)) {
+            return;
+        }
+        try {
+            await lockPolicy(policy.id);
+            fetchData();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleUnlock = async (policy) => {
+        if (!window.confirm(`Unlock policy "${policy.name}" for editing?\n\nThis will:\n• Allow modifications to the policy\n• Create an audit trail entry\n• The policy will remain active until you deactivate it`)) {
+            return;
+        }
+        try {
+            await unlockPolicy(policy.id);
+            fetchData();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     const openEditModal = (policy) => {
         setEditingPolicy(policy);
         setShowModal(true);
@@ -169,6 +199,23 @@ const SpendingRulesPage = () => {
                 </div>
             )}
 
+            {/* Draft Policies Alert */}
+            {!loading && policies.filter(p => p.status === 'draft').length > 0 && (
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg" data-testid="draft-alert">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <h3 className="font-medium text-amber-400">
+                                {policies.filter(p => p.status === 'draft').length} draft {policies.filter(p => p.status === 'draft').length === 1 ? 'policy' : 'policies'} pending review
+                            </h3>
+                            <p className="text-sm text-amber-400/70 mt-1">
+                                Your agent has configured policies that need your approval. Review each draft and click "Approve & Lock" to activate them.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Loading */}
             {loading && (
                 <div className="flex items-center justify-center py-12">
@@ -210,6 +257,9 @@ const SpendingRulesPage = () => {
                             onEdit={() => openEditModal(policy)}
                             onDelete={() => handleDelete(policy.id)}
                             onToggleActive={() => handleToggleActive(policy)}
+                            onLock={() => handleLock(policy)}
+                            onUnlock={() => handleUnlock(policy)}
+                            onRefresh={fetchData}
                         />
                     ))}
                 </div>
@@ -248,14 +298,49 @@ const SpendingRulesPage = () => {
 };
 
 // Policy Card Component
-const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDelete, onToggleActive }) => {
+const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDelete, onToggleActive, onLock, onUnlock, onRefresh }) => {
+    const isDraft = policy.status === 'draft';
+    const isLocked = policy.is_locked;
+    const isArchived = policy.status === 'archived';
+    const agentSummary = policy.metadata?.summary;
+    
     return (
-        <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden" data-testid={`policy-card-${policy.id}`}>
+        <div className={`bg-ss-surface rounded-xl border overflow-hidden ${
+            isDraft ? 'border-amber-500/50' : 
+            isLocked ? 'border-emerald-500/30' : 
+            'border-[rgba(255,255,255,0.06)]'
+        }`} data-testid={`policy-card-${policy.id}`}>
+            {/* Draft Banner */}
+            {isDraft && (
+                <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2">
+                    <FileText size={14} className="text-amber-400" />
+                    <span className="text-xs font-medium text-amber-400">DRAFT - Review and lock to activate</span>
+                </div>
+            )}
+            
+            {/* Agent Summary (if present) */}
+            {agentSummary && isDraft && (
+                <div className="bg-slate-800/50 border-b border-slate-700 px-4 py-3">
+                    <p className="text-sm text-slate-300 italic">"{agentSummary}"</p>
+                    <p className="text-xs text-slate-500 mt-1">— Agent-provided summary</p>
+                </div>
+            )}
+            
             {/* Header */}
             <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center flex-shrink-0">
-                        <Shield className="w-5 h-5 text-ss-accent" />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isDraft ? 'bg-amber-500/10' : 
+                        isLocked ? 'bg-emerald-500/10' : 
+                        'bg-ss-accent/10'
+                    }`}>
+                        {isLocked ? (
+                            <Lock className="w-5 h-5 text-emerald-400" />
+                        ) : isDraft ? (
+                            <FileText className="w-5 h-5 text-amber-400" />
+                        ) : (
+                            <Shield className="w-5 h-5 text-ss-accent" />
+                        )}
                     </div>
                     <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-ss-text truncate">{policy.name}</h3>
@@ -265,7 +350,26 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <StatusBadge status={policy.is_active ? 'active' : 'paused'} />
+                    {/* Status Badges */}
+                    {isLocked && (
+                        <span className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-xs font-medium text-emerald-400 flex items-center gap-1">
+                            <Lock size={12} />
+                            Locked
+                        </span>
+                    )}
+                    {isDraft && (
+                        <span className="px-2 py-1 bg-amber-500/10 border border-amber-500/30 rounded text-xs font-medium text-amber-400">
+                            Draft
+                        </span>
+                    )}
+                    {isArchived && (
+                        <span className="px-2 py-1 bg-slate-500/10 border border-slate-500/30 rounded text-xs font-medium text-slate-400">
+                            Archived
+                        </span>
+                    )}
+                    {!isDraft && !isArchived && (
+                        <StatusBadge status={policy.is_active ? 'active' : 'paused'} />
+                    )}
                     <button
                         onClick={onToggleExpand}
                         className="p-2 hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
@@ -406,34 +510,68 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
 
                     {/* Actions */}
                     <div className="flex items-center justify-between pt-2 border-t border-[rgba(255,255,255,0.06)]">
-                        <button
-                            onClick={onToggleActive}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                                policy.is_active 
-                                    ? 'bg-ss-warning/10 text-ss-warning hover:bg-ss-warning/20' 
-                                    : 'bg-ss-accent/10 text-ss-accent hover:bg-ss-accent/20'
-                            }`}
-                            data-testid={`toggle-active-${policy.id}`}
-                        >
-                            {policy.is_active ? 'Deactivate' : 'Activate'}
-                        </button>
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={onEdit}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-ss-surface hover:bg-ss-elevated rounded-lg text-ss-text-secondary text-xs transition-all"
-                                data-testid={`edit-btn-${policy.id}`}
-                            >
-                                <Pencil size={12} />
-                                Edit
-                            </button>
-                            <button
-                                onClick={onDelete}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-ss-error/10 hover:bg-ss-error/20 rounded-lg text-ss-error text-xs transition-all"
-                                data-testid={`delete-btn-${policy.id}`}
-                            >
-                                <Trash2 size={12} />
-                                Delete
-                            </button>
+                            {/* Lock/Unlock Button */}
+                            {isDraft && (
+                                <button
+                                    onClick={onLock}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-medium transition-all"
+                                    data-testid={`lock-btn-${policy.id}`}
+                                >
+                                    <Lock size={12} />
+                                    Approve & Lock
+                                </button>
+                            )}
+                            {isLocked && (
+                                <button
+                                    onClick={onUnlock}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-400 text-xs font-medium transition-all"
+                                    data-testid={`unlock-btn-${policy.id}`}
+                                >
+                                    <Unlock size={12} />
+                                    Unlock for Editing
+                                </button>
+                            )}
+                            {!isDraft && !isLocked && (
+                                <button
+                                    onClick={onToggleActive}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                        policy.is_active 
+                                            ? 'bg-ss-warning/10 text-ss-warning hover:bg-ss-warning/20' 
+                                            : 'bg-ss-accent/10 text-ss-accent hover:bg-ss-accent/20'
+                                    }`}
+                                    data-testid={`toggle-active-${policy.id}`}
+                                >
+                                    {policy.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {!isLocked && (
+                                <>
+                                    <button
+                                        onClick={onEdit}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-ss-surface hover:bg-ss-elevated rounded-lg text-ss-text-secondary text-xs transition-all"
+                                        data-testid={`edit-btn-${policy.id}`}
+                                    >
+                                        <Pencil size={12} />
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={onDelete}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-ss-error/10 hover:bg-ss-error/20 rounded-lg text-ss-error text-xs transition-all"
+                                        data-testid={`delete-btn-${policy.id}`}
+                                    >
+                                        <Trash2 size={12} />
+                                        Delete
+                                    </button>
+                                </>
+                            )}
+                            {isLocked && (
+                                <span className="text-xs text-slate-500">
+                                    Unlock to edit or delete
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

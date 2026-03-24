@@ -1,24 +1,21 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
-const { requireAuth, restrictAgentKeys } = require('../middleware/auth');
+const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Agent keys should not be able to manage policies
-// Only allow agent keys to access balance and spend endpoints
-router.use(restrictAgentKeys(['/v1/spend', '/v1/escrow-accounts/*/balance']));
-
 /**
  * POST /v1/policies
- * Create a new spending policy
+ * Create a new spending policy (draft by default)
  */
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const {
             escrow_id,
             name,
+            draft = true, // Default to draft for agent-led setup
             per_transaction_limit_cents,
             daily_limit_cents,
             weekly_limit_cents,
@@ -52,12 +49,16 @@ router.post('/', requireAuth, async (req, res) => {
         }
         
         const policyId = generateId('spendingPolicy');
+        const status = draft ? 'draft' : 'active';
+        
         const policy = await prisma.spendingPolicy.create({
             data: {
                 id: policyId,
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 name,
+                status,
+                isActive: !draft, // isActive = false for drafts
                 perTransactionLimitCents: per_transaction_limit_cents,
                 dailyLimitCents: daily_limit_cents,
                 weeklyLimitCents: weekly_limit_cents,
@@ -85,9 +86,13 @@ router.post('/', requireAuth, async (req, res) => {
                 orgId: req.org.id,
                 escrowId: escrow_id,
                 eventType: 'policy.created',
-                actorType: 'human',
-                actorId: req.org.id,
-                details: JSON.stringify({ policy_name: name }),
+                actorType: req.authType === 'api_key' ? 'agent' : 'human',
+                actorId: req.apiKey?.id || req.org.id,
+                details: JSON.stringify({ 
+                    policy_name: name, 
+                    status,
+                    created_as_draft: draft
+                }),
                 ipAddress: req.ip
             }
         });
@@ -105,10 +110,11 @@ router.post('/', requireAuth, async (req, res) => {
  */
 router.get('/', requireAuth, async (req, res) => {
     try {
-        const { escrow_id } = req.query;
+        const { escrow_id, status } = req.query;
         
         const where = { orgId: req.org.id };
         if (escrow_id) where.escrowId = escrow_id;
+        if (status) where.status = status;
         
         const policies = await prisma.spendingPolicy.findMany({
             where,
@@ -150,10 +156,10 @@ router.get('/:id', requireAuth, async (req, res) => {
 });
 
 /**
- * PATCH /v1/policies/:id
- * Update a policy
+ * POST /v1/policies/:id/lock
+ * Lock (activate) a draft policy - makes it enforceable and prevents agent modification
  */
-router.patch('/:id', requireAuth, async (req, res) => {
+router.post('/:id/lock', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const policy = await prisma.spendingPolicy.findFirst({
             where: {
@@ -166,9 +172,148 @@ router.patch('/:id', requireAuth, async (req, res) => {
             return res.status(404).json({ error: 'Policy not found' });
         }
         
+        if (policy.status === 'active' && policy.lockedAt) {
+            return res.status(400).json({ 
+                error: 'Policy is already locked',
+                locked_at: policy.lockedAt,
+                locked_by: policy.lockedBy
+            });
+        }
+        
+        const updated = await prisma.spendingPolicy.update({
+            where: { id: policy.id },
+            data: {
+                status: 'active',
+                isActive: true,
+                lockedAt: new Date(),
+                lockedBy: req.org.id
+            }
+        });
+        
+        // Audit event
+        await prisma.auditEvent.create({
+            data: {
+                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                escrowId: policy.escrowId,
+                eventType: 'policy.locked',
+                actorType: 'human',
+                actorId: req.org.id,
+                details: JSON.stringify({ 
+                    policy_name: policy.name,
+                    previous_status: policy.status
+                }),
+                ipAddress: req.ip
+            }
+        });
+        
+        res.json({
+            message: 'Policy locked and activated',
+            policy: formatPolicy(updated)
+        });
+    } catch (error) {
+        console.error('Lock policy error:', error);
+        res.status(500).json({ error: 'Failed to lock policy' });
+    }
+});
+
+/**
+ * POST /v1/policies/:id/unlock
+ * Unlock a policy for editing (requires confirmation)
+ */
+router.post('/:id/unlock', requireAuth, requireOwnerKey, async (req, res) => {
+    try {
+        const { confirm } = req.body;
+        
+        if (!confirm) {
+            return res.status(400).json({ 
+                error: 'Confirmation required',
+                message: 'Include { "confirm": true } to unlock this policy. This will allow modifications.',
+            });
+        }
+        
+        const policy = await prisma.spendingPolicy.findFirst({
+            where: {
+                id: req.params.id,
+                orgId: req.org.id
+            }
+        });
+        
+        if (!policy) {
+            return res.status(404).json({ error: 'Policy not found' });
+        }
+        
+        if (!policy.lockedAt) {
+            return res.status(400).json({ error: 'Policy is not locked' });
+        }
+        
+        const updated = await prisma.spendingPolicy.update({
+            where: { id: policy.id },
+            data: {
+                lockedAt: null,
+                lockedBy: null
+                // Keep status as 'active' - policy is still enforced, just editable
+            }
+        });
+        
+        // Audit event
+        await prisma.auditEvent.create({
+            data: {
+                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                escrowId: policy.escrowId,
+                eventType: 'policy.unlocked',
+                actorType: 'human',
+                actorId: req.org.id,
+                details: JSON.stringify({ 
+                    policy_name: policy.name,
+                    was_locked_at: policy.lockedAt,
+                    was_locked_by: policy.lockedBy
+                }),
+                ipAddress: req.ip
+            }
+        });
+        
+        res.json({
+            message: 'Policy unlocked for editing',
+            policy: formatPolicy(updated)
+        });
+    } catch (error) {
+        console.error('Unlock policy error:', error);
+        res.status(500).json({ error: 'Failed to unlock policy' });
+    }
+});
+
+/**
+ * PATCH /v1/policies/:id
+ * Update a policy
+ */
+router.patch('/:id', requireAuth, requireOwnerKey, async (req, res) => {
+    try {
+        const policy = await prisma.spendingPolicy.findFirst({
+            where: {
+                id: req.params.id,
+                orgId: req.org.id
+            }
+        });
+        
+        if (!policy) {
+            return res.status(404).json({ error: 'Policy not found' });
+        }
+        
+        // Check if policy is locked
+        if (policy.lockedAt) {
+            return res.status(403).json({ 
+                error: 'Policy is locked',
+                message: 'This policy is locked and cannot be modified. Unlock it first using POST /v1/policies/:id/unlock',
+                locked_at: policy.lockedAt,
+                locked_by: policy.lockedBy
+            });
+        }
+        
         const updateData = {};
         const allowedFields = [
-            'name', 'is_active',
+            'name', 'is_active', 'status', 'draft',
             'per_transaction_limit_cents', 'daily_limit_cents', 'weekly_limit_cents', 'monthly_limit_cents',
             'allowed_vendors', 'blocked_vendors', 'vendor_match_mode',
             'allowed_categories', 'blocked_categories',
@@ -201,7 +346,23 @@ router.patch('/:id', requireAuth, async (req, res) => {
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 const dbField = fieldMap[field] || field;
-                updateData[dbField] = req.body[field];
+                let value = req.body[field];
+                
+                // Handle JSON fields
+                if (['allowedVendors', 'blockedVendors', 'allowedCategories', 'blockedCategories', 'activeDays'].includes(dbField)) {
+                    value = JSON.stringify(value);
+                }
+                if (dbField === 'metadata') {
+                    value = JSON.stringify(value);
+                }
+                
+                // Handle draft -> status conversion
+                if (field === 'draft') {
+                    updateData['status'] = value ? 'draft' : 'active';
+                    updateData['isActive'] = !value;
+                } else {
+                    updateData[dbField] = value;
+                }
             }
         }
         
@@ -217,8 +378,8 @@ router.patch('/:id', requireAuth, async (req, res) => {
                 orgId: req.org.id,
                 escrowId: policy.escrowId,
                 eventType: 'policy.updated',
-                actorType: 'human',
-                actorId: req.org.id,
+                actorType: req.authType === 'api_key' ? 'agent' : 'human',
+                actorId: req.apiKey?.id || req.org.id,
                 details: JSON.stringify({ updated_fields: Object.keys(updateData) }),
                 ipAddress: req.ip
             }
@@ -232,10 +393,19 @@ router.patch('/:id', requireAuth, async (req, res) => {
 });
 
 /**
+ * PUT /v1/policies/:id
+ * Full update of a policy (backward compatibility)
+ */
+router.put('/:id', requireAuth, requireOwnerKey, async (req, res) => {
+    // Delegate to PATCH
+    return router.handle(req, res, () => {});
+});
+
+/**
  * DELETE /v1/policies/:id
  * Delete a policy
  */
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const policy = await prisma.spendingPolicy.findFirst({
             where: {
@@ -246,6 +416,15 @@ router.delete('/:id', requireAuth, async (req, res) => {
         
         if (!policy) {
             return res.status(404).json({ error: 'Policy not found' });
+        }
+        
+        // Check if policy is locked
+        if (policy.lockedAt) {
+            return res.status(403).json({ 
+                error: 'Policy is locked',
+                message: 'This policy is locked and cannot be deleted. Unlock it first.',
+                locked_at: policy.lockedAt
+            });
         }
         
         await prisma.spendingPolicy.delete({
@@ -274,6 +453,55 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 /**
+ * POST /v1/policies/:id/archive
+ * Archive a policy (soft delete - keeps for audit trail)
+ */
+router.post('/:id/archive', requireAuth, requireOwnerKey, async (req, res) => {
+    try {
+        const policy = await prisma.spendingPolicy.findFirst({
+            where: {
+                id: req.params.id,
+                orgId: req.org.id
+            }
+        });
+        
+        if (!policy) {
+            return res.status(404).json({ error: 'Policy not found' });
+        }
+        
+        const updated = await prisma.spendingPolicy.update({
+            where: { id: policy.id },
+            data: {
+                status: 'archived',
+                isActive: false
+            }
+        });
+        
+        // Audit event
+        await prisma.auditEvent.create({
+            data: {
+                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                escrowId: policy.escrowId,
+                eventType: 'policy.archived',
+                actorType: 'human',
+                actorId: req.org.id,
+                details: JSON.stringify({ policy_name: policy.name }),
+                ipAddress: req.ip
+            }
+        });
+        
+        res.json({
+            message: 'Policy archived',
+            policy: formatPolicy(updated)
+        });
+    } catch (error) {
+        console.error('Archive policy error:', error);
+        res.status(500).json({ error: 'Failed to archive policy' });
+    }
+});
+
+/**
  * Format policy for API response
  */
 function formatPolicy(policy) {
@@ -281,7 +509,11 @@ function formatPolicy(policy) {
         id: policy.id,
         escrow_id: policy.escrowId,
         name: policy.name,
+        status: policy.status,
         is_active: policy.isActive,
+        is_locked: !!policy.lockedAt,
+        locked_at: policy.lockedAt,
+        locked_by: policy.lockedBy,
         per_transaction_limit_cents: policy.perTransactionLimitCents,
         daily_limit_cents: policy.dailyLimitCents,
         weekly_limit_cents: policy.weeklyLimitCents,

@@ -1150,3 +1150,61 @@ Full Stripe subscription billing integration for Safe-Spend pricing plans.
 - `monthlyEscrowVolumeCents` - Track usage
 - `monthlyVolumeResetAt` - Reset date for volume tracking
 
+
+
+---
+
+### 80/20 Agent-Led Setup Pattern (Completed - March 24, 2026)
+
+#### Overview
+Implemented the delegation-first pattern where agents draft spending configurations and human owners review and lock them.
+
+#### Backend Changes
+
+**Policy Status System:**
+- Added `status` field: draft | active | archived
+- Added `is_locked`, `locked_at`, `locked_by` fields for lock tracking
+- Policies created with `draft: true` are not enforced until locked
+
+**New API Endpoints:**
+- `POST /api/v1/policies/:id/lock` - Lock and activate a draft policy
+- `POST /api/v1/policies/:id/unlock` - Unlock policy for editing (requires confirmation)
+- `POST /api/v1/policies/:id/archive` - Soft-delete a policy
+
+**Agent Key Permissions:**
+- Agent keys (`sk_agent_...`) can only:
+  - Make spend requests (`POST /v1/spend`)
+  - Check balances (read escrow accounts)
+  - Read policies and escrows (read-only)
+- Agent keys CANNOT create/modify/delete policies or escrows (403 Forbidden)
+- Owner keys required for all governance operations
+
+#### Frontend Changes
+
+**Spending Rules Page:**
+- Draft banner alerts when drafts exist
+- Draft/Locked/Archived status badges on policy cards
+- Agent-provided summary displayed from `metadata.summary`
+- "Approve & Lock" button for draft policies
+- "Unlock for Editing" button for locked policies
+- Locked policies cannot be edited/deleted until unlocked
+
+#### Documentation Updates
+
+**Quickstart Page:**
+- New "80/20 Agent-Led Setup" section
+- Step-by-step guide for agent-led configuration
+- Code examples for creating draft policies
+- Agent key permissions callout
+
+**Landing Page:**
+- "80/20 Setup" callout in How It Works section
+- Pricing section subtitle about agent-ready setup
+
+#### Workflow
+1. Agent creates policy with `draft: true` and `metadata.summary`
+2. Owner reviews draft in dashboard (sees summary)
+3. Owner clicks "Approve & Lock" → policy activated
+4. Agent uses `sk_agent_...` key to spend (bounded by locked rules)
+5. Owner can unlock for edits if needed (with audit trail)
+

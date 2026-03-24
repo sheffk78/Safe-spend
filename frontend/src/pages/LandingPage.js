@@ -275,6 +275,11 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                 <p className="text-ss-text-secondary text-sm leading-relaxed">
                                     Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, time-windowed authority, and approval cascades.
                                 </p>
+                                <div className="mt-4 p-3 bg-ss-accent/10 rounded-lg border border-ss-accent/20">
+                                    <p className="text-xs text-ss-accent">
+                                        <strong>80/20 Setup:</strong> Let your agent draft policies—you just review and approve.
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Step 3 */}
@@ -390,6 +395,9 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
                             Simple pricing. No surprises.
                         </h2>
+                        <p className="text-ss-text-secondary max-w-xl mx-auto">
+                            All plans include agent-ready setup—let your AI draft policies while you review and approve.
+                        </p>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">

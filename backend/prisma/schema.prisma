@@ -132,7 +132,10 @@ model SpendingPolicy {
   escrowId                String   @map("escrow_id")
   orgId                   String   @map("org_id")
   name                    String
+  status                  String   @default("draft") // draft | active | archived
   isActive                Boolean  @default(true) @map("is_active")
+  lockedAt                DateTime? @map("locked_at")
+  lockedBy                String?  @map("locked_by")
   
   // Amount limits
   perTransactionLimitCents Int?    @map("per_transaction_limit_cents")

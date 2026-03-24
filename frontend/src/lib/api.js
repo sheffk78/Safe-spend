@@ -157,6 +157,31 @@ export const deletePolicy = async (id) => {
     return handleResponse(response);
 };
 
+export const lockPolicy = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/policies/${id}/lock`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const unlockPolicy = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/policies/${id}/unlock`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ confirm: true })
+    });
+    return handleResponse(response);
+};
+
+export const archivePolicy = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/policies/${id}/archive`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
 // ============ Spend Requests / Transactions ============
 export const listSpendRequests = async (filters = {}) => {
     const params = new URLSearchParams();

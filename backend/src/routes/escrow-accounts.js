@@ -1,7 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 const { queueWebhooks } = require('../services/webhook-service');
 const stripeService = require('../services/stripe-service');
 const { isStripeConfigured } = require('../lib/stripe');
@@ -12,8 +12,9 @@ const prisma = new PrismaClient();
 /**
  * POST /v1/escrow-accounts
  * Create a new escrow account
+ * Note: Owner keys can create escrows; agent keys cannot
  */
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const { name, description, currency = 'usd', metadata = {} } = req.body;
         
@@ -313,7 +314,7 @@ router.get('/:id/funding-history', requireAuth, async (req, res) => {
  * POST /v1/escrow-accounts/:id/pause
  * Pause spending on an escrow account
  */
-router.post('/:id/pause', requireAuth, async (req, res) => {
+router.post('/:id/pause', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const escrow = await prisma.escrowAccount.findFirst({
             where: {
@@ -363,7 +364,7 @@ router.post('/:id/pause', requireAuth, async (req, res) => {
  * POST /v1/escrow-accounts/:id/resume
  * Resume spending on an escrow account
  */
-router.post('/:id/resume', requireAuth, async (req, res) => {
+router.post('/:id/resume', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const escrow = await prisma.escrowAccount.findFirst({
             where: {
@@ -421,7 +422,7 @@ router.post('/:id/resume', requireAuth, async (req, res) => {
  * POST /v1/escrow-accounts/:id/close
  * Close an escrow account with optional Stripe refund
  */
-router.post('/:id/close', requireAuth, async (req, res) => {
+router.post('/:id/close', requireAuth, requireOwnerKey, async (req, res) => {
     try {
         const escrow = await prisma.escrowAccount.findFirst({
             where: {
