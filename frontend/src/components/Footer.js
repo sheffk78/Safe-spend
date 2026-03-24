@@ -42,11 +42,6 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
-                                <a href="https://status.agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-text text-sm transition-colors" data-testid="footer-link-status">
-                                    Status
-                                </a>
-                            </li>
-                            <li>
                                 <a href="https://github.com/agentictrust" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-text text-sm transition-colors" data-testid="footer-link-github">
                                     GitHub
                                 </a>
