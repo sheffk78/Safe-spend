@@ -1547,5 +1547,50 @@ End-to-end integration validating the complete product stack:
 5. Enforcement modes (warn/strict) behave as designed
 
 #### Remaining Work
-- **AAV UI (Phase 2):** Frontend forms for configuring agent IDs and AAV settings
 - **Rate Limiting Extension:** Add rate limits to non-spend sensitive endpoints
+
+---
+
+### AAV UI v1 Implementation (Completed - March 24, 2026)
+
+#### Overview
+Implemented minimal AAV UI allowing users to configure and view agent authorization restrictions on escrow accounts and policies.
+
+#### Features Implemented
+
+**1. Escrow Accounts Page Enhancements**
+- Added "Agent Access" column in the accounts table
+- AAV indicator badges showing:
+  - `"X Agents"` (blue) - AAV restricted with authorized agent count
+  - `"Any Key"` (gray) - Open access for any agent with valid key
+
+**2. Create Escrow Account Modal**
+- Agent Authorization toggle with Shield icon
+- When enabled, shows:
+  - Info message explaining AAV behavior
+  - Enforcement Mode buttons (Warn/Strict)
+  - Authorized Agent IDs input (comma-separated)
+- Modal scrolling enabled for smaller viewports
+
+**3. Fiduciary Policies Page Enhancements**
+- Added "AAV Restricted" stats card showing count of policies with agent restrictions
+- Policy cards display AAV badge in header:
+  - `"X Agents"` (blue) - AAV restricted with count
+  - `"AAV (No IDs)"` (gray) - AAV enabled but no agents configured
+  - `"Any Key"` (gray) - No AAV restrictions
+
+**4. Expanded Policy View**
+- Added "Agent Authorization" section showing:
+  - AAV Restricted badge with enforcement mode
+  - List of authorized agent IDs (with Bot icon)
+  - List of grant IDs (if configured)
+  - Message for non-AAV policies ("Any agent with a valid API key can spend")
+
+#### Files Modified
+- `/app/frontend/src/pages/dashboard/EscrowAccountsPage.js` - Added AAV fields to create modal, AAV column in table
+- `/app/frontend/src/pages/dashboard/FiduciaryPoliciesPage.js` - Added AAV stats card, badges in policy cards, expanded AAV section
+
+#### Testing
+- All 5 AAV UI features verified working (100% pass rate)
+- Test report: `/app/test_reports/iteration_20.json`
+
