@@ -70,8 +70,25 @@ app.use(cors({
     credentials: true
 }));
 
-// Body parsing
-app.use(express.json({ limit: '1mb' }));
+// Body parsing with error handling
+app.use(express.json({ 
+    limit: '1mb',
+    verify: (req, res, buf, encoding) => {
+        // Store raw body for signature verification if needed
+        req.rawBody = buf;
+    }
+}));
+
+// JSON parsing error handler
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({
+            error: 'invalid_json',
+            message: 'Request body contains invalid JSON'
+        });
+    }
+    next(err);
+});
 
 // Global rate limiter (applied to all routes except health)
 app.use(globalRateLimiter);

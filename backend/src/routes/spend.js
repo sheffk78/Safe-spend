@@ -2,6 +2,7 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
+const { spendRateLimiter } = require('../middleware/rate-limit');
 const { evaluateSpendRequest } = require('../services/rules-engine');
 const { getDateBoundaries } = require('../services/rules-helpers');
 const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
@@ -18,8 +19,9 @@ const denialTracker = new Map();
 /**
  * POST /v1/spend
  * Create a spend request - runs the full 14-step rules engine (including AAV check)
+ * Rate limited to 60 requests per minute per API key/org
  */
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
     const startTime = Date.now();
     
     try {
@@ -67,15 +69,58 @@ router.post('/', requireAuth, async (req, res) => {
         }
         
         // Validate required fields
-        if (!escrow_id || !amount_cents || !vendor) {
+        if (!escrow_id || amount_cents === undefined || !vendor) {
             return res.status(400).json({ 
                 error: 'escrow_id, amount_cents, and vendor are required' 
             });
         }
         
-        if (amount_cents <= 0) {
+        // Validate amount_cents type and range
+        const amountCentsNum = Number(amount_cents);
+        if (isNaN(amountCentsNum)) {
+            return res.status(400).json({ 
+                error: 'amount_cents must be a number',
+                received_type: typeof amount_cents
+            });
+        }
+        
+        if (amountCentsNum <= 0) {
             return res.status(400).json({ error: 'amount_cents must be positive' });
         }
+        
+        // Prevent integer overflow - max $10 billion
+        const MAX_AMOUNT_CENTS = 1000000000000; // 10 billion cents = $10B
+        if (amountCentsNum > MAX_AMOUNT_CENTS) {
+            return res.status(400).json({ 
+                error: 'amount_cents exceeds maximum allowed value',
+                max_allowed: MAX_AMOUNT_CENTS,
+                max_dollars: '$10,000,000,000'
+            });
+        }
+        
+        // Validate field lengths to prevent abuse
+        const MAX_STRING_LENGTH = 500;
+        if (vendor && vendor.length > MAX_STRING_LENGTH) {
+            return res.status(400).json({ 
+                error: 'vendor name too long',
+                max_length: MAX_STRING_LENGTH
+            });
+        }
+        if (category && category.length > MAX_STRING_LENGTH) {
+            return res.status(400).json({ 
+                error: 'category too long',
+                max_length: MAX_STRING_LENGTH
+            });
+        }
+        if (description && description.length > 2000) {
+            return res.status(400).json({ 
+                error: 'description too long',
+                max_length: 2000
+            });
+        }
+        
+        // Use validated number
+        const validatedAmountCents = Math.floor(amountCentsNum);
         
         // Build context for rules engine
         const currentTime = new Date();
@@ -149,7 +194,7 @@ router.post('/', requireAuth, async (req, res) => {
             weeklyTracking,
             monthlyTracking,
             request: {
-                amountCents: amount_cents,
+                amountCents: validatedAmountCents,
                 currency,
                 vendor,
                 category,
@@ -175,7 +220,7 @@ router.post('/', requireAuth, async (req, res) => {
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 apiKeyId: req.apiKey?.id,
-                amountCents: amount_cents,
+                amountCents: validatedAmountCents,
                 currency,
                 vendor,
                 category,

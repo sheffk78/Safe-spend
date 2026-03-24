@@ -74,15 +74,16 @@ const authRateLimiter = rateLimit({
 /**
  * Spend rate limiter - 60 requests per minute per API key
  * Prevents agents from hammering the rules engine
+ * NOTE: Always enabled (including dev/test) for chaos testing
  */
 const spendRateLimiter = rateLimit({
     windowMs: config.rateLimits.spend.windowMs,
     max: config.rateLimits.spend.max,
     standardHeaders: true,
     legacyHeaders: false,
-    // Use default IP key generator - in production, should use API key prefix
+    keyGenerator: apiKeyKeyGenerator,
     handler: rateLimitHandler,
-    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    skip: () => process.env.NODE_ENV === 'test', // Only skip in automated tests
     validate: { xForwardedForHeader: false },
 });
 
