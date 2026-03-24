@@ -1,0 +1,10 @@
+# Railway Configuration for Frontend
+# https://docs.railway.app/deploy/config-as-code
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "frontend/Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30

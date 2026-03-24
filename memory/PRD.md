@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Integration Testing Complete - Ready for Production
+**Current Phase:** Ready for External Deployment
 **Last Updated:** March 24, 2026
 
 ---
@@ -1594,3 +1594,57 @@ Implemented minimal AAV UI allowing users to configure and view agent authorizat
 - All 5 AAV UI features verified working (100% pass rate)
 - Test report: `/app/test_reports/iteration_20.json`
 
+
+
+---
+
+### External Deployment Preparation (Completed - March 24, 2026)
+
+#### Overview
+Prepared the codebase for deployment on PostgreSQL-compatible platforms (Railway, Render, Fly.io, DigitalOcean, AWS).
+
+#### Changes Made
+
+**1. Database Configuration**
+- Updated Prisma schema from SQLite to PostgreSQL provider
+- Database URL now reads from `DATABASE_URL` environment variable
+
+**2. Docker Configuration**
+- `/app/backend/Dockerfile` - Multi-stage Node.js build with Prisma
+- `/app/frontend/Dockerfile` - React build with nginx serving
+- `/app/docker-compose.yml` - Full stack with PostgreSQL, backend, frontend
+
+**3. Platform-Specific Configuration**
+- `/app/render.yaml` - Render blueprint for one-click deploy
+- `/app/backend/railway.toml` - Railway config for backend
+- `/app/frontend/railway.toml` - Railway config for frontend
+- `/app/Procfile` - Heroku-compatible process file
+
+**4. Documentation**
+- `/app/DEPLOYMENT.md` - Comprehensive deployment guide covering:
+  - Docker Compose (self-hosted)
+  - Railway (recommended)
+  - Render
+  - Fly.io
+  - DigitalOcean App Platform
+  - AWS ECS + RDS
+- `/app/README.md` - Updated with quick start and deployment links
+- `/app/.env.example` - Environment variable template
+
+#### Deployment Options Summary
+
+| Platform | Difficulty | Best For |
+|----------|-----------|----------|
+| Railway | Easy | Quick MVP deployment |
+| Render | Easy | Free tier available |
+| Fly.io | Medium | Global edge deployment |
+| DigitalOcean | Medium | Predictable pricing |
+| AWS | Hard | Enterprise scale |
+| Docker Compose | Medium | Self-hosted/VPS |
+
+#### Next Steps for User
+1. Use "Save to GitHub" to export the code
+2. Choose a deployment platform
+3. Follow the guide in DEPLOYMENT.md
+4. Configure environment variables
+5. Deploy!

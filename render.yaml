@@ -1,0 +1,61 @@
+# Render Blueprint
+# https://render.com/docs/blueprint-spec
+
+databases:
+  - name: safespend-db
+    databaseName: safespend
+    user: safespend
+    plan: free # or starter, standard, etc.
+
+services:
+  # Backend API
+  - type: web
+    name: safespend-api
+    runtime: node
+    plan: free # or starter, standard, etc.
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma migrate deploy && node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: safespend-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8001
+      - key: CORS_ORIGINS
+        sync: false # Set manually after frontend deploy
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: POSTMARK_API_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      - key: ALERT_EMAIL
+        sync: false
+
+  # Frontend Static Site
+  - type: web
+    name: safespend-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        sync: false # Set to backend URL after deploy

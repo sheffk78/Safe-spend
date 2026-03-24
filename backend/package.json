@@ -6,12 +6,19 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
+    "db:migrate:deploy": "npx prisma migrate deploy",
+    "db:studio": "npx prisma studio",
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
     "test:watch": "cross-env NODE_ENV=test jest --runInBand --watch",
     "test:verbose": "cross-env NODE_ENV=test jest --runInBand --verbose --detectOpenHandles --forceExit"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
