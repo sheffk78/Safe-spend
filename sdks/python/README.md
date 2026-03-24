@@ -248,6 +248,105 @@ result = client._request(
 - **Issues**: [GitHub Issues](https://github.com/agentictrust/safespend-python/issues)
 - **Email**: support@agentictrust.app
 
+## Framework Integrations
+
+### LangChain Integration
+
+Safe-Spend provides native LangChain tools for building AI agents with governed spending capabilities.
+
+#### Installation
+
+```bash
+pip install safespend[langchain]
+```
+
+#### Quick Start
+
+```python
+from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
+from safespend import SafeSpendClient
+from safespend.integrations import create_safespend_toolkit
+
+# Initialize clients
+client = SafeSpendClient(
+    api_key="sk_agent_...",
+    base_url="https://api.safespend.app"
+)
+
+# Create toolkit with default escrow
+tools = create_safespend_toolkit(
+    client=client,
+    default_escrow_id="esc_123"
+)
+
+# Initialize LangChain agent
+llm = ChatOpenAI(model="gpt-4")
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# Agent can now make governed purchases
+result = agent.run("Buy $25 worth of OpenAI API credits for AI compute")
+```
+
+#### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `safe_spend_request` | Create a governed spend request from an escrow account |
+| `safe_spend_check_balance` | Check the current balance of an escrow account |
+| `safe_spend_list_requests` | List recent spend requests with optional status filter |
+| `safe_spend_get_request` | Get details of a specific spend request |
+
+#### Individual Tool Usage
+
+```python
+from safespend import SafeSpendClient
+from safespend.integrations import SafeSpendTool, SafeSpendCheckBalanceTool
+
+client = SafeSpendClient(api_key="sk_agent_...")
+
+# Create spend tool for a specific escrow
+spend_tool = SafeSpendTool(client=client, escrow_id="esc_123")
+
+# Use directly
+result = spend_tool._run(
+    amount_cents=2500,
+    vendor="OpenAI",
+    category="ai_compute",
+    description="GPT-4 API credits"
+)
+print(result)
+# {'status': 'approved', 'spend_id': 'spr_xyz', 'amount_dollars': '$25.00', ...}
+
+# Check balance
+balance_tool = SafeSpendCheckBalanceTool(client=client, default_escrow_id="esc_123")
+balance = balance_tool._run()
+print(balance)
+# {'balance_dollars': '$475.00', 'status': 'active', ...}
+```
+
+#### Agent Workflow Example
+
+```python
+# Agent checks budget before making a purchase
+agent_prompt = """
+You are an AI assistant with a budget for purchasing AI services.
+Before making any purchase:
+1. Check your available balance
+2. If sufficient, make the purchase
+3. Report the result
+
+Task: Purchase $50 of Anthropic API credits for AI inference.
+"""
+
+result = agent.run(agent_prompt)
+```
+
 ## License
 
 Proprietary. See LICENSE file for details.

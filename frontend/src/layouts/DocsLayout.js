@@ -9,7 +9,8 @@ import {
     ChevronRight,
     ArrowLeft,
     ExternalLink,
-    Scale
+    Scale,
+    Package
 } from 'lucide-react';
 
 const navigation = [
@@ -30,6 +31,15 @@ const navigation = [
         title: 'Quickstart',
         items: [
             { name: 'Create your first escrow', href: '/docs/quickstart', icon: Rocket },
+        ]
+    },
+    {
+        title: 'SDKs & Integrations',
+        items: [
+            { name: 'Python SDK', href: '/docs/sdks#python-sdk', icon: Package },
+            { name: 'TypeScript SDK', href: '/docs/sdks#typescript-sdk', icon: Package },
+            { name: 'LangChain', href: '/docs/sdks#langchain', icon: Puzzle },
+            { name: 'MCP Server', href: '/docs/sdks#mcp-server', icon: Puzzle },
         ]
     },
     {

@@ -39,6 +39,11 @@ dev = [
     "mypy>=1.0",
     "types-requests>=2.28",
 ]
+langchain = [
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "pydantic>=2.0",
+]
 
 [project.urls]
 Homepage = "https://agentictrust.app"
