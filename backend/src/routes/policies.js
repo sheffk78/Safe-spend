@@ -1,10 +1,14 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, restrictAgentKeys } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Agent keys should not be able to manage policies
+// Only allow agent keys to access balance and spend endpoints
+router.use(restrictAgentKeys(['/v1/spend', '/v1/escrow-accounts/*/balance']));
 
 /**
  * POST /v1/policies

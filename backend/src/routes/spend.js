@@ -268,119 +268,173 @@ router.post('/', requireAuth, async (req, res) => {
             });
         }
         
-        // Handle approved - execute the spend
-        const balanceBefore = escrowAccount.balanceCents;
-        const balanceAfter = balanceBefore - amount_cents;
+        // Handle approved - execute the spend with OPTIMISTIC LOCKING
+        // to prevent race conditions in concurrent spend requests
         
-        // Use a transaction for atomicity
-        const [updatedEscrow, spendRequest] = await prisma.$transaction([
-            // Deduct from balance
-            prisma.escrowAccount.update({
-                where: { id: escrow_id },
-                data: {
-                    balanceCents: balanceAfter,
-                    totalSpentCents: escrowAccount.totalSpentCents + amount_cents,
-                    status: balanceAfter <= 0 ? 'depleted' : 'active'
+        // Use interactive transaction with conditional update for atomicity
+        // This prevents race conditions where two concurrent requests both pass balance check
+        // SQLite approach: Use conditional update that checks balance in the WHERE clause
+        try {
+            const transactionResult = await prisma.$transaction(async (tx) => {
+                // Atomic conditional update - only succeeds if balance is sufficient
+                // This is the key to preventing race conditions in SQLite
+                // Note: Using actual table/column names from schema @@map directives
+                const updateResult = await tx.$executeRaw`
+                    UPDATE escrow_accounts 
+                    SET balance_cents = balance_cents - ${amount_cents},
+                        total_spent_cents = total_spent_cents + ${amount_cents},
+                        status = CASE WHEN balance_cents - ${amount_cents} <= 0 THEN 'depleted' ELSE status END,
+                        updated_at = ${new Date().toISOString()}
+                    WHERE id = ${escrow_id} 
+                      AND balance_cents >= ${amount_cents}
+                      AND status = 'active'
+                `;
+                
+                // If no rows updated, the balance check failed (race condition caught)
+                if (updateResult === 0) {
+                    // Re-fetch to determine why it failed
+                    const currentEscrow = await tx.escrowAccount.findUnique({
+                        where: { id: escrow_id }
+                    });
+                    
+                    if (!currentEscrow || currentEscrow.status !== 'active') {
+                        throw new Error('ACCOUNT_NOT_ACTIVE');
+                    }
+                    if (currentEscrow.balanceCents < amount_cents) {
+                        throw new Error('INSUFFICIENT_BALANCE');
+                    }
+                    throw new Error('UPDATE_FAILED');
                 }
-            }),
-            // Create spend request
-            prisma.spendRequest.create({
-                data: {
-                    id: generateId('spendRequest'),
-                    escrowId: escrow_id,
-                    orgId: req.org.id,
-                    apiKeyId: req.apiKey?.id,
-                    amountCents: amount_cents,
-                    currency,
+                
+                // Fetch the updated escrow account
+                const updatedEscrow = await tx.escrowAccount.findUnique({
+                    where: { id: escrow_id }
+                });
+                
+                const actualBalanceAfter = updatedEscrow.balanceCents;
+                const actualBalanceBefore = actualBalanceAfter + amount_cents;
+                
+                // Create spend request
+                const spendRequest = await tx.spendRequest.create({
+                    data: {
+                        id: generateId('spendRequest'),
+                        escrowId: escrow_id,
+                        orgId: req.org.id,
+                        apiKeyId: req.apiKey?.id,
+                        amountCents: amount_cents,
+                        currency,
+                        vendor,
+                        category,
+                        description,
+                        idempotencyKey: idempotency_key,
+                        status: 'approved',
+                        resolvedAt: new Date(),
+                        resolvedBy: req.authType === 'api_key' ? 'system:auto_approved' : 'human:' + req.org.id,
+                        rulesEvaluated: JSON.stringify(result.rulesEvaluated),
+                        balanceBeforeCents: actualBalanceBefore,
+                        balanceAfterCents: actualBalanceAfter,
+                        metadata: JSON.stringify(metadata)
+                    }
+                });
+                
+                return { updatedEscrow, spendRequest, actualBalanceAfter };
+            });
+            
+            const { updatedEscrow, spendRequest, actualBalanceAfter } = transactionResult;
+        
+            // Update spend tracking (outside transaction for performance)
+            await Promise.all([
+                prisma.dailySpendTracking.upsert({
+                    where: { escrowId_date: { escrowId: escrow_id, date: today } },
+                    update: {
+                        totalSpentCents: { increment: amount_cents },
+                        transactionCount: { increment: 1 }
+                    },
+                    create: {
+                        escrowId: escrow_id,
+                        date: today,
+                        totalSpentCents: amount_cents,
+                        transactionCount: 1
+                    }
+                }),
+                prisma.weeklySpendTracking.upsert({
+                    where: { escrowId_weekStart: { escrowId: escrow_id, weekStart } },
+                    update: {
+                        totalSpentCents: { increment: amount_cents },
+                        transactionCount: { increment: 1 }
+                    },
+                    create: {
+                        escrowId: escrow_id,
+                        weekStart,
+                        totalSpentCents: amount_cents,
+                        transactionCount: 1
+                    }
+                }),
+                prisma.monthlySpendTracking.upsert({
+                    where: { escrowId_monthStart: { escrowId: escrow_id, monthStart } },
+                    update: {
+                        totalSpentCents: { increment: amount_cents },
+                        transactionCount: { increment: 1 }
+                    },
+                    create: {
+                        escrowId: escrow_id,
+                        monthStart,
+                        totalSpentCents: amount_cents,
+                        transactionCount: 1
+                    }
+                })
+            ]);
+        
+            // Audit event
+            await createAuditEvent({
+                orgId: req.org.id,
+                escrowId: escrow_id,
+                eventType: 'spend.approved',
+                actorType: req.authType === 'api_key' ? 'agent' : 'human',
+                actorId: req.apiKey?.id || req.org.id,
+                details: {
+                    spend_request_id: spendRequest.id,
+                    amount_cents,
                     vendor,
                     category,
-                    description,
-                    idempotencyKey: idempotency_key,
-                    status: 'approved',
-                    resolvedAt: new Date(),
-                    resolvedBy: req.authType === 'api_key' ? 'system:auto_approved' : 'human:' + req.org.id,
-                    rulesEvaluated: JSON.stringify(result.rulesEvaluated),
-                    balanceBeforeCents: balanceBefore,
-                    balanceAfterCents: balanceAfter,
-                    metadata: JSON.stringify(metadata)
-                }
-            })
-        ]);
-        
-        // Update spend tracking (outside transaction for performance)
-        await Promise.all([
-            prisma.dailySpendTracking.upsert({
-                where: { escrowId_date: { escrowId: escrow_id, date: today } },
-                update: {
-                    totalSpentCents: { increment: amount_cents },
-                    transactionCount: { increment: 1 }
+                    balance_before: escrowAccount.balanceCents,
+                    balance_after: actualBalanceAfter,
+                    rules_evaluated: result.rulesEvaluated,
+                    evaluation_time_ms: Date.now() - startTime
                 },
-                create: {
-                    escrowId: escrow_id,
-                    date: today,
-                    totalSpentCents: amount_cents,
-                    transactionCount: 1
-                }
-            }),
-            prisma.weeklySpendTracking.upsert({
-                where: { escrowId_weekStart: { escrowId: escrow_id, weekStart } },
-                update: {
-                    totalSpentCents: { increment: amount_cents },
-                    transactionCount: { increment: 1 }
-                },
-                create: {
-                    escrowId: escrow_id,
-                    weekStart,
-                    totalSpentCents: amount_cents,
-                    transactionCount: 1
-                }
-            }),
-            prisma.monthlySpendTracking.upsert({
-                where: { escrowId_monthStart: { escrowId: escrow_id, monthStart } },
-                update: {
-                    totalSpentCents: { increment: amount_cents },
-                    transactionCount: { increment: 1 }
-                },
-                create: {
-                    escrowId: escrow_id,
-                    monthStart,
-                    totalSpentCents: amount_cents,
-                    transactionCount: 1
-                }
-            })
-        ]);
+                ipAddress: req.ip
+            });
         
-        // Audit event
-        await createAuditEvent({
-            orgId: req.org.id,
-            escrowId: escrow_id,
-            eventType: 'spend.approved',
-            actorType: req.authType === 'api_key' ? 'agent' : 'human',
-            actorId: req.apiKey?.id || req.org.id,
-            details: {
-                spend_request_id: spendRequest.id,
-                amount_cents,
-                vendor,
-                category,
-                balance_before: balanceBefore,
-                balance_after: balanceAfter,
-                rules_evaluated: result.rulesEvaluated,
-                evaluation_time_ms: Date.now() - startTime
-            },
-            ipAddress: req.ip
-        });
+            // Trigger webhook for auto-approved spend
+            await queueWebhooks(req.org.id, 'spend.approved', buildSpendEventData(
+                spendRequest,
+                updatedEscrow,
+                result.rulesEvaluated
+            ));
         
-        // Trigger webhook for auto-approved spend
-        await queueWebhooks(req.org.id, 'spend.approved', buildSpendEventData(
-            spendRequest,
-            updatedEscrow,
-            result.rulesEvaluated
-        ));
-        
-        res.status(201).json({
-            ...formatSpendRequest(spendRequest),
-            remaining_balance_cents: balanceAfter
-        });
+            res.status(201).json({
+                ...formatSpendRequest(spendRequest),
+                remaining_balance_cents: actualBalanceAfter
+            });
+            
+        } catch (txError) {
+            // Handle race condition - another request got there first
+            if (txError.message === 'INSUFFICIENT_BALANCE') {
+                return res.status(400).json({
+                    error: 'Insufficient balance',
+                    status: 'denied',
+                    denial_reason: 'insufficient_balance_concurrent'
+                });
+            }
+            if (txError.message === 'ACCOUNT_NOT_ACTIVE') {
+                return res.status(400).json({
+                    error: 'Account is not active',
+                    status: 'denied',
+                    denial_reason: 'account_not_active'
+                });
+            }
+            throw txError; // Re-throw other errors to outer catch
+        }
         
     } catch (error) {
         console.error('Spend request error:', error);
