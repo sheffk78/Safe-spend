@@ -2,7 +2,9 @@ import React from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 // Pages
 import LandingPage from "@/pages/LandingPage";
@@ -36,10 +38,32 @@ import WebhooksPage from "@/pages/dashboard/WebhooksPage";
 import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 
+// Admin
+import AdminLayout from "@/layouts/AdminLayout";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import AdminOrgsPage from "@/pages/admin/AdminOrgsPage";
+import AdminOrgDetailPage from "@/pages/admin/AdminOrgDetailPage";
+
+// Admin wrapper component that provides AdminAuthContext
+const AdminRoutes = () => (
+    <AdminAuthProvider>
+        <ImpersonationBanner />
+        <Routes>
+            <Route path="/" element={<AdminLoginPage />} />
+            <Route element={<AdminLayout />}>
+                <Route path="orgs" element={<AdminOrgsPage />} />
+                <Route path="orgs/:orgId" element={<AdminOrgDetailPage />} />
+                <Route path="stats" element={<div className="text-ss-text">Platform Stats (Coming Soon)</div>} />
+                <Route path="settings" element={<div className="text-ss-text">Admin Settings (Coming Soon)</div>} />
+            </Route>
+        </Routes>
+    </AdminAuthProvider>
+);
+
 function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+            <AuthProvider>
                 <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<LandingPage />} />
@@ -81,9 +105,12 @@ function App() {
                         <Route path="audit" element={<AuditLogPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                     </Route>
+
+                    {/* Admin routes - separate auth system */}
+                    <Route path="/admin/*" element={<AdminRoutes />} />
                 </Routes>
-            </BrowserRouter>
-        </AuthProvider>
+            </AuthProvider>
+        </BrowserRouter>
     );
 }
 

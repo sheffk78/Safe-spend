@@ -24,6 +24,10 @@ const webhooksRoutes = require('./routes/webhooks');
 const apiKeysRoutes = require('./routes/api-keys');
 const stripeWebhookRoutes = require('./routes/stripe-webhook');
 
+// Admin Routes
+const adminAuthRoutes = require('./routes/admin-auth');
+const adminOrgsRoutes = require('./routes/admin-orgs');
+
 // Validate environment at startup
 validateEnvironment();
 const config = getConfig();
@@ -125,6 +129,12 @@ app.use('/api/v1/approvals', approvalsRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/webhooks', webhooksRoutes);
 app.use('/api/v1/api-keys', apiKeysRoutes);
+
+// ============================================
+// Admin Routes (Separate auth system)
+// ============================================
+app.use('/api/admin/auth', authRateLimiter, adminAuthRoutes);
+app.use('/api/admin/orgs', adminOrgsRoutes);
 
 // ============================================
 // Error Handling

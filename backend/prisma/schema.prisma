@@ -10,6 +10,21 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// Admin Users (for internal Agentic Trust operators)
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("support") // superadmin | support | read_only
+  name         String?
+  isActive     Boolean  @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
 // Organizations (users/companies)
 model Organization {
   id                String   @id @default(uuid())

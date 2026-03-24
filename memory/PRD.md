@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Guided Tour Complete - Full Onboarding Experience
+**Current Phase:** Prompt 14 Complete - Admin Control Plane
 **Last Updated:** March 24, 2026
 
 ---
@@ -264,6 +264,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 11. ~~Quick Start Templates~~ ✅ COMPLETE
 12. ~~Policy Builder Wizard~~ ✅ COMPLETE
 13. ~~Guided Tour (Onboarding)~~ ✅ COMPLETE
+14. ~~Admin Control Plane (Prompt 14)~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
 9. **SDK Generation** - Python, TypeScript SDKs
@@ -520,3 +521,71 @@ An interactive onboarding tour that walks first-time users through the key featu
 #### Access
 - Automatically starts on first dashboard visit
 - Restart via sidebar → "Tour" button
+
+
+---
+
+### Prompt 14 - Admin Control Plane (Completed - March 24, 2026)
+
+#### Overview
+Internal admin dashboard for Agentic Trust operators to view, manage, and troubleshoot client organizations. Completely separate authentication system from org/user auth.
+
+#### Database Changes
+- New `AdminUser` model with fields: id, email, passwordHash, role, name, isActive, lastLoginAt, createdAt, updatedAt
+- Admin roles: `superadmin`, `support`, `read_only`
+
+#### Backend Routes
+- **POST /api/admin/auth/login** - Admin login (issues admin JWT with 8h expiry)
+- **GET /api/admin/auth/me** - Get current admin profile
+- **GET /api/admin/orgs** - List all organizations with metrics
+- **GET /api/admin/orgs/:orgId** - Organization detail (escrows, policies, transactions, audit)
+- **POST /api/admin/orgs/:orgId/impersonate** - Generate impersonation JWT (2h expiry)
+- **GET /api/admin/stats/overview** - Platform-wide statistics
+
+#### Admin Middleware
+- `requireAdmin` - Validates admin JWT, rejects org tokens and API keys
+- `requireAdminRole(['superadmin', 'support'])` - Role-based access control
+
+#### Frontend Pages
+1. **Admin Login** (`/admin`) - Separate login with red branding, warning banner
+2. **Organizations List** (`/admin/orgs`) - Searchable/sortable table with metrics
+3. **Organization Detail** (`/admin/orgs/:orgId`) - Full org view with escrows, policies, transactions, audit
+4. **Platform Stats** (`/admin/stats`) - Placeholder for analytics
+5. **Admin Settings** (`/admin/settings`) - Placeholder for admin config
+
+#### Key Features
+- **Organization Directory**: Search, sort, view all client orgs
+- **Metrics**: Total balance, 30-day volume, escrow count, policy count per org
+- **Impersonation**: Admin can impersonate org to view their dashboard (audit logged)
+- **Impersonation Banner**: Red banner appears when viewing dashboard as another org
+- **Separate Auth**: Admin tokens are distinct from org tokens (different JWT structure)
+
+#### Security
+- Admin JWTs have `type: 'admin'` claim - rejected by org routes
+- Org JWTs and API keys are rejected by admin routes
+- Impersonation is audit-logged with admin ID and timestamp
+- Rate limiting applied to admin auth routes
+
+#### Default Admin Account
+- Email: admin@agentictrust.app
+- Password: AdminPassword123!
+- Role: superadmin
+- Seeded via: `node src/scripts/seed-admin.js`
+
+#### Files Created
+- `/app/backend/prisma/schema.prisma` (Added AdminUser model)
+- `/app/backend/src/routes/admin-auth.js` (Admin auth routes)
+- `/app/backend/src/routes/admin-orgs.js` (Admin org management)
+- `/app/backend/src/middleware/admin-auth.js` (Admin auth middleware)
+- `/app/backend/src/scripts/seed-admin.js` (Admin seeding script)
+- `/app/frontend/src/contexts/AdminAuthContext.js` (Admin auth state)
+- `/app/frontend/src/layouts/AdminLayout.js` (Admin sidebar layout)
+- `/app/frontend/src/pages/admin/AdminLoginPage.js`
+- `/app/frontend/src/pages/admin/AdminOrgsPage.js`
+- `/app/frontend/src/pages/admin/AdminOrgDetailPage.js`
+- `/app/frontend/src/components/ImpersonationBanner.js`
+- `/app/frontend/src/App.js` (Updated with admin routes)
+
+#### Access
+- URL: `/admin`
+- Credentials: admin@agentictrust.app / AdminPassword123!
