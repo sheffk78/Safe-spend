@@ -278,10 +278,11 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 
 ### P2 - Medium Priority (Completed)
 - ~~Analytics Dashboard~~ ✅
-- ~~PostgreSQL Migration~~ ✅
+- ~~PostgreSQL Migration~~ ✅ (Schema prepared, ready for deployment)
+- ~~CSV Export for Governance Reviews~~ ✅ (March 24, 2026)
 
 ### P3 - Future Enhancements
-1. **CSV/PDF Export** - Export data for governance reviews
+1. **PDF Statements** - Monthly trust-style statements per escrow
 2. **Real-time WebSocket notifications**
 3. **Multi-currency support**
 4. **Advanced reporting exports**
@@ -289,8 +290,50 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 ---
 
 ## Next Tasks
-1. CSV/PDF export for governance reviews and auditability
+1. PDF Statements (once real CSV usage patterns are observed)
 2. Production deployment (use PostgreSQL schema)
+
+---
+
+### CSV Export for Governance Reviews (Completed - March 24, 2026)
+
+#### Overview
+CSV export functionality for governance reviews and compliance audits. Allows owners and finance admins to download spend activity and audit events as CSV files.
+
+#### Backend Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/exports/summary` | GET | Preview record counts for exports |
+| `/v1/exports/spend-activity` | GET | Download spend requests as CSV |
+| `/v1/exports/audit-events` | GET | Download audit events as CSV |
+
+#### Filters
+- **Required**: start_date, end_date (ISO 8601 format)
+- **Optional**: escrow_id, status (for spend-activity), event_type, actor_type (for audit-events)
+
+#### Permissions
+- Owner: Full export access
+- Finance Admin: Full export access
+- Developer: No export access (403)
+- Read Only: No export access (403)
+
+#### CSV Format
+- ISO 8601 timestamps (YYYY-MM-DDTHH:MM:SSZ)
+- Proper CSV escaping for commas, quotes, newlines
+- Filename format: `safe-spend-{org-slug}-{report-type}-{YYYY-MM-DD}.csv`
+
+#### Frontend Components
+- **Exports Page** (`/dashboard/exports`) - Dedicated page with report type selection, filters, preview
+- **Export CSV Button** on Audit Log page
+- **Export CSV Button** on Transactions page
+
+#### Files Created
+- `/app/backend/src/routes/exports.js` - Export API routes
+- `/app/frontend/src/pages/dashboard/ExportsPage.js` - Exports UI page
+
+#### Test Results
+- Backend: 22/22 tests passed (100%)
+- Frontend: All UI elements verified working
 
 ---
 
