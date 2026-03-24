@@ -78,8 +78,31 @@ model EscrowAccount {
   dailyTracking    DailySpendTracking[]
   weeklyTracking   WeeklySpendTracking[]
   monthlyTracking  MonthlySpendTracking[]
+  fundingEvents    FundingEvent[]
 
   @@map("escrow_accounts")
+}
+
+// Funding Events (tracks Stripe payments)
+model FundingEvent {
+  id                    String   @id @default(uuid())
+  orgId                 String   @map("org_id")
+  escrowId              String   @map("escrow_id")
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  stripeSessionId       String?  @map("stripe_session_id")
+  stripeRefundId        String?  @map("stripe_refund_id")
+  amountCents           Int      @map("amount_cents")
+  currency              String   @default("usd")
+  status                String   @default("pending") // pending | succeeded | failed | refunded
+  type                  String   @default("funding") // funding | refund
+  metadata              String   @default("{}")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@map("funding_events")
 }
 
 // Spending Policies

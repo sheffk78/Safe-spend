@@ -62,6 +62,35 @@ export const fundEscrowAccount = async (id, amountCents) => {
     return handleResponse(response);
 };
 
+export const createFundingSession = async (id, amountCents, successUrl, cancelUrl) => {
+    const response = await fetch(`${API_URL}/api/v1/escrow-accounts/${id}/fund-session`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ 
+            amount_cents: amountCents,
+            success_url: successUrl,
+            cancel_url: cancelUrl
+        })
+    });
+    return handleResponse(response);
+};
+
+export const confirmFunding = async (id, sessionId) => {
+    const response = await fetch(`${API_URL}/api/v1/escrow-accounts/${id}/confirm-funding`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ session_id: sessionId })
+    });
+    return handleResponse(response);
+};
+
+export const getFundingHistory = async (id) => {
+    const response = await fetch(`${API_URL}/api/v1/escrow-accounts/${id}/funding-history`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
 export const pauseEscrowAccount = async (id) => {
     const response = await fetch(`${API_URL}/api/v1/escrow-accounts/${id}/pause`, {
         method: 'POST',

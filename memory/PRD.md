@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 07 Complete - Docs Site (API Reference + Integration Guides)
+**Current Phase:** Prompt 08 Complete - Stripe Integration
 **Last Updated:** March 24, 2026
 
 ---
@@ -211,6 +211,61 @@ cd /app/backend && npm test
 
 ---
 
+### Prompt 08 - Stripe Integration (Completed - March 24, 2026)
+
+#### Infrastructure
+- **Stripe SDK**: `stripe@14.25.0`
+- **Client**: `/app/backend/src/lib/stripe.js`
+- **Service**: `/app/backend/src/services/stripe-service.js`
+- **Webhook Handler**: `/app/backend/src/routes/stripe-webhook.js`
+
+#### Database Schema Updates
+```prisma
+model FundingEvent {
+  id                    String   @id @default(uuid())
+  orgId                 String   @map("org_id")
+  escrowId              String   @map("escrow_id")
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  stripeSessionId       String?  @map("stripe_session_id")
+  stripeRefundId        String?  @map("stripe_refund_id")
+  amountCents           Int      @map("amount_cents")
+  currency              String   @default("usd")
+  status                String   @default("pending") // pending | succeeded | failed | refunded
+  type                  String   @default("funding") // funding | refund
+  ...
+}
+```
+
+#### API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/escrow-accounts/:id/fund` | POST | Legacy simulated funding (for tests) |
+| `/v1/escrow-accounts/:id/fund-session` | POST | Create Stripe Checkout Session |
+| `/v1/escrow-accounts/:id/confirm-funding` | POST | Manual funding confirmation (dev mode) |
+| `/v1/escrow-accounts/:id/funding-history` | GET | Get funding event history |
+| `/v1/escrow-accounts/:id/close` | POST | Close with Stripe refund |
+| `/api/stripe/webhook` | POST | Stripe webhook handler |
+
+#### Frontend Updates
+- **Fund Modal**: Updated with Stripe vs Simulated payment selection
+- **Funding History Modal**: New modal to view funding events
+- **Success/Cancel callbacks**: Handle Stripe redirect responses
+
+#### Key Features
+1. **Stripe Customer per Org**: Auto-created on first fund
+2. **Checkout Session**: Stripe-hosted payment page
+3. **Webhook Processing**: Automatic balance updates on payment success
+4. **Refund on Close**: Remaining balance refunded when closing escrow
+5. **Funding History**: Track all funding events with Stripe IDs
+
+#### Environment Variables
+```
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
+```
+
+---
+
 ## Prioritized Backlog
 
 ### P0 - Critical (Next Prompts)
@@ -218,7 +273,7 @@ cd /app/backend && npm test
 2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
 3. ~~End-to-End Testing (Prompt 06)~~ ✅ COMPLETE
 4. ~~Docs Site (Prompt 07)~~ ✅ COMPLETE
-5. **Stripe Integration** - Real funding and disbursement
+5. ~~Stripe Integration (Prompt 08)~~ ✅ COMPLETE
 
 ### P1 - High Priority
 6. **SDK Generation** - Python, TypeScript SDKs
@@ -232,6 +287,6 @@ cd /app/backend && npm test
 ---
 
 ## Next Tasks
-1. Stripe integration for real fiat funding (Prompt 08 if provided)
-2. SDK generation (Python, TypeScript)
-3. MCP Server implementation
+1. SDK generation (Python, TypeScript)
+2. MCP Server implementation
+3. Email notifications for pending approvals

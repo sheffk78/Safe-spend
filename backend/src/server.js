@@ -11,8 +11,13 @@ const approvalsRoutes = require('./routes/approvals');
 const auditRoutes = require('./routes/audit');
 const webhooksRoutes = require('./routes/webhooks');
 const apiKeysRoutes = require('./routes/api-keys');
+const stripeWebhookRoutes = require('./routes/stripe-webhook');
 
 const app = express();
+
+// IMPORTANT: Stripe webhook route must be registered BEFORE body parsing middleware
+// because it needs the raw body for signature verification
+app.use('/api/stripe', stripeWebhookRoutes);
 
 // Middleware
 app.use(cors({

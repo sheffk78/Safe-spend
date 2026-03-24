@@ -3,6 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
 const { queueWebhooks } = require('../services/webhook-service');
+const stripeService = require('../services/stripe-service');
+const { isStripeConfigured } = require('../lib/stripe');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -134,7 +136,8 @@ router.get('/:id/balance', requireAuth, async (req, res) => {
 
 /**
  * POST /v1/escrow-accounts/:id/fund
- * Fund an escrow account (placeholder - no Stripe integration yet)
+ * Fund an escrow account (LEGACY - simulated funding without Stripe)
+ * Keep for backwards compatibility with tests
  */
 router.post('/:id/fund', requireAuth, async (req, res) => {
     try {
@@ -159,7 +162,7 @@ router.post('/:id/fund', requireAuth, async (req, res) => {
             return res.status(400).json({ error: 'Cannot fund a closed account' });
         }
         
-        // Update balance (placeholder - no real Stripe call)
+        // Update balance (simulated - no real Stripe call)
         const updated = await prisma.escrowAccount.update({
             where: { id: escrow.id },
             data: {
@@ -181,7 +184,8 @@ router.post('/:id/fund', requireAuth, async (req, res) => {
                 details: JSON.stringify({
                     amount_cents,
                     balance_before_cents: escrow.balanceCents,
-                    balance_after_cents: updated.balanceCents
+                    balance_after_cents: updated.balanceCents,
+                    source: 'simulated'
                 }),
                 ipAddress: req.ip
             }
@@ -203,6 +207,105 @@ router.post('/:id/fund', requireAuth, async (req, res) => {
     } catch (error) {
         console.error('Fund escrow error:', error);
         res.status(500).json({ error: 'Failed to fund escrow account' });
+    }
+});
+
+/**
+ * POST /v1/escrow-accounts/:id/fund-session
+ * Create a Stripe Checkout Session for funding
+ */
+router.post('/:id/fund-session', requireAuth, async (req, res) => {
+    try {
+        // Check if Stripe is configured
+        if (!isStripeConfigured()) {
+            return res.status(503).json({ 
+                error: 'Stripe is not configured. Please add STRIPE_SECRET_KEY to environment.' 
+            });
+        }
+
+        const { amount_cents, currency = 'usd', success_url, cancel_url } = req.body;
+        
+        if (!amount_cents || amount_cents <= 0) {
+            return res.status(400).json({ error: 'Valid amount_cents is required' });
+        }
+
+        if (!success_url || !cancel_url) {
+            return res.status(400).json({ error: 'success_url and cancel_url are required' });
+        }
+        
+        const result = await stripeService.createFundingSession({
+            orgId: req.org.id,
+            escrowId: req.params.id,
+            amountCents: amount_cents,
+            currency,
+            successUrl: success_url,
+            cancelUrl: cancel_url,
+        });
+        
+        res.json({
+            session_id: result.sessionId,
+            checkout_url: result.checkoutUrl,
+        });
+    } catch (error) {
+        console.error('Fund session error:', error);
+        res.status(500).json({ error: error.message || 'Failed to create funding session' });
+    }
+});
+
+/**
+ * POST /v1/escrow-accounts/:id/confirm-funding
+ * Manually confirm funding (for development without webhooks)
+ */
+router.post('/:id/confirm-funding', requireAuth, async (req, res) => {
+    try {
+        const { session_id } = req.body;
+        
+        if (!session_id) {
+            return res.status(400).json({ error: 'session_id is required' });
+        }
+        
+        const result = await stripeService.simulateFundingComplete(session_id);
+        
+        if (result.success) {
+            res.json({
+                message: 'Funding confirmed',
+                escrow: formatEscrowAccount(result.escrow),
+            });
+        } else {
+            res.status(400).json({ error: result.message || 'Failed to confirm funding' });
+        }
+    } catch (error) {
+        console.error('Confirm funding error:', error);
+        res.status(500).json({ error: error.message || 'Failed to confirm funding' });
+    }
+});
+
+/**
+ * GET /v1/escrow-accounts/:id/funding-history
+ * Get funding history for an escrow account
+ */
+router.get('/:id/funding-history', requireAuth, async (req, res) => {
+    try {
+        const escrow = await prisma.escrowAccount.findFirst({
+            where: {
+                id: req.params.id,
+                orgId: req.org.id,
+            },
+        });
+
+        if (!escrow) {
+            return res.status(404).json({ error: 'Escrow account not found' });
+        }
+
+        const history = await stripeService.getFundingHistory(req.params.id, req.org.id);
+        
+        res.json({
+            data: history,
+            total: history.length,
+        });
+    } catch (error) {
+        console.error('Funding history error:', error);
+        res.status(500).json({ error: 'Failed to get funding history' });
     }
 });
 
@@ -316,7 +419,7 @@ router.post('/:id/resume', requireAuth, async (req, res) => {
 
 /**
  * POST /v1/escrow-accounts/:id/close
- * Close an escrow account
+ * Close an escrow account with optional Stripe refund
  */
 router.post('/:id/close', requireAuth, async (req, res) => {
     try {
@@ -330,10 +433,31 @@ router.post('/:id/close', requireAuth, async (req, res) => {
         if (!escrow) {
             return res.status(404).json({ error: 'Escrow account not found' });
         }
+
+        if (escrow.status === 'closed') {
+            return res.status(400).json({ error: 'Account is already closed' });
+        }
         
+        let refundInfo = { refundId: null, refundedAmount: 0 };
+        
+        // If there's a remaining balance and Stripe is configured, process refund
+        if (escrow.balanceCents > 0 && isStripeConfigured()) {
+            try {
+                refundInfo = await stripeService.processEscrowRefund(escrow.id, req.org.id);
+            } catch (refundError) {
+                console.error('Stripe refund failed:', refundError);
+                // Continue with close even if refund fails
+                // The remaining balance will be noted in audit
+            }
+        }
+        
+        // Update escrow to closed status
         const updated = await prisma.escrowAccount.update({
             where: { id: escrow.id },
-            data: { status: 'closed' }
+            data: { 
+                status: 'closed',
+                balanceCents: 0  // Zero out balance on close
+            }
         });
         
         // Audit event
@@ -345,7 +469,11 @@ router.post('/:id/close', requireAuth, async (req, res) => {
                 eventType: 'escrow.closed',
                 actorType: 'human',
                 actorId: req.org.id,
-                details: JSON.stringify({ remaining_balance_cents: escrow.balanceCents }),
+                details: JSON.stringify({ 
+                    remaining_balance_cents: escrow.balanceCents,
+                    stripe_refund_id: refundInfo.refundId,
+                    refunded_amount_cents: refundInfo.refundedAmount,
+                }),
                 ipAddress: req.ip
             }
         });
@@ -354,10 +482,18 @@ router.post('/:id/close', requireAuth, async (req, res) => {
         await queueWebhooks(req.org.id, 'escrow.closed', {
             escrow_id: escrow.id,
             org_id: req.org.id,
-            remaining_balance_cents: escrow.balanceCents
+            remaining_balance_cents: escrow.balanceCents,
+            stripe_refund_id: refundInfo.refundId,
+            refunded_amount_cents: refundInfo.refundedAmount,
         });
         
-        res.json(formatEscrowAccount(updated));
+        res.json({
+            ...formatEscrowAccount(updated),
+            refund: refundInfo.refundId ? {
+                stripe_refund_id: refundInfo.refundId,
+                refunded_amount_cents: refundInfo.refundedAmount,
+            } : null,
+        });
     } catch (error) {
         console.error('Close escrow error:', error);
         res.status(500).json({ error: 'Failed to close escrow account' });

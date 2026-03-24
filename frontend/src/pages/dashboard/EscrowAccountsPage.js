@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
 import { 
     Wallet, 
@@ -10,12 +10,20 @@ import {
     Play, 
     X,
     MoreVertical,
-    ArrowRight
+    ArrowRight,
+    CreditCard,
+    History,
+    ExternalLink,
+    CheckCircle,
+    AlertTriangle
 } from 'lucide-react';
 import {
     listEscrowAccounts,
     createEscrowAccount,
     fundEscrowAccount,
+    createFundingSession,
+    confirmFunding,
+    getFundingHistory,
     pauseEscrowAccount,
     resumeEscrowAccount,
     closeEscrowAccount,
@@ -30,11 +38,26 @@ const EscrowAccountsPage = () => {
     const [error, setError] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showFundModal, setShowFundModal] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [actionMenuOpen, setActionMenuOpen] = useState(null);
+    const [fundingSuccess, setFundingSuccess] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         fetchAccounts();
+        
+        // Check for funding callback
+        const funding = searchParams.get('funding');
+        if (funding === 'success') {
+            setFundingSuccess({ type: 'success', message: 'Payment initiated! Your balance will update shortly.' });
+            searchParams.delete('funding');
+            setSearchParams(searchParams);
+        } else if (funding === 'cancel') {
+            setFundingSuccess({ type: 'warning', message: 'Funding was cancelled.' });
+            searchParams.delete('funding');
+            setSearchParams(searchParams);
+        }
     }, []);
 
     const fetchAccounts = async () => {
@@ -89,6 +112,12 @@ const EscrowAccountsPage = () => {
         setActionMenuOpen(null);
     };
 
+    const openHistoryModal = (account) => {
+        setSelectedAccount(account);
+        setShowHistoryModal(true);
+        setActionMenuOpen(null);
+    };
+
     // Calculate summary metrics
     const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance_cents || 0), 0);
     const totalFunded = accounts.reduce((sum, acc) => sum + (acc.total_funded_cents || 0), 0);
@@ -97,6 +126,30 @@ const EscrowAccountsPage = () => {
 
     return (
         <div className="space-y-6" data-testid="escrow-accounts-page">
+            {/* Funding Success/Cancel Message */}
+            {fundingSuccess && (
+                <div className={`flex items-center gap-3 p-4 rounded-lg border ${
+                    fundingSuccess.type === 'success' 
+                        ? 'bg-ss-accent/10 border-ss-accent/30' 
+                        : 'bg-yellow-500/10 border-yellow-500/30'
+                }`}>
+                    {fundingSuccess.type === 'success' ? (
+                        <CheckCircle className="text-ss-accent flex-shrink-0" size={20} />
+                    ) : (
+                        <AlertTriangle className="text-yellow-400 flex-shrink-0" size={20} />
+                    )}
+                    <span className={fundingSuccess.type === 'success' ? 'text-ss-accent' : 'text-yellow-400'}>
+                        {fundingSuccess.message}
+                    </span>
+                    <button 
+                        onClick={() => setFundingSuccess(null)}
+                        className="ml-auto text-ss-text-tertiary hover:text-ss-text"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -242,6 +295,14 @@ const EscrowAccountsPage = () => {
                                                             <DollarSign size={14} />
                                                             Fund Account
                                                         </button>
+                                                        <button
+                                                            onClick={() => openHistoryModal(account)}
+                                                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-ss-text hover:bg-[rgba(255,255,255,0.05)] transition-all"
+                                                            data-testid={`history-btn-${account.id}`}
+                                                        >
+                                                            <History size={14} />
+                                                            Funding History
+                                                        </button>
                                                         {account.status === 'active' && (
                                                             <button
                                                                 onClick={() => handlePause(account.id)}
@@ -316,6 +377,17 @@ const EscrowAccountsPage = () => {
                         setSelectedAccount(null);
                         fetchAccounts();
                     }}
+                />
+            )}
+
+            {/* History Modal */}
+            {showHistoryModal && selectedAccount && (
+                <FundingHistoryModal 
+                    account={selectedAccount}
+                    onClose={() => {
+                        setShowHistoryModal(false);
+                        setSelectedAccount(null);
+                    }} 
                 />
             )}
 
@@ -444,10 +516,11 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
     );
 };
 
-// Fund Account Modal
+// Fund Account Modal with Stripe integration
 const FundAccountModal = ({ account, onClose, onSuccess }) => {
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
+    const [useStripe, setUseStripe] = useState(true);
     const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
@@ -458,11 +531,29 @@ const FundAccountModal = ({ account, onClose, onSuccess }) => {
         setError(null);
 
         try {
-            await fundEscrowAccount(account.id, dollarsToCents(amount));
-            onSuccess();
+            if (useStripe) {
+                // Create Stripe checkout session
+                const baseUrl = window.location.origin;
+                const result = await createFundingSession(
+                    account.id,
+                    dollarsToCents(amount),
+                    `${baseUrl}/dashboard/accounts?funding=success`,
+                    `${baseUrl}/dashboard/accounts?funding=cancel`
+                );
+                
+                // Redirect to Stripe Checkout
+                if (result.checkout_url) {
+                    window.location.href = result.checkout_url;
+                } else {
+                    throw new Error('No checkout URL returned');
+                }
+            } else {
+                // Use simulated funding (for testing)
+                await fundEscrowAccount(account.id, dollarsToCents(amount));
+                onSuccess();
+            }
         } catch (err) {
             setError(err.message);
-        } finally {
             setLoading(false);
         }
     };
@@ -508,6 +599,44 @@ const FundAccountModal = ({ account, onClose, onSuccess }) => {
                             />
                         </div>
                     </div>
+                    
+                    {/* Payment method selection */}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-ss-text-secondary">Payment Method</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setUseStripe(true)}
+                                className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                                    useStripe 
+                                        ? 'border-ss-accent bg-ss-accent/10 text-ss-accent' 
+                                        : 'border-[rgba(255,255,255,0.1)] bg-ss-elevated text-ss-text-secondary hover:border-ss-accent/50'
+                                }`}
+                            >
+                                <CreditCard size={18} />
+                                <div className="text-left">
+                                    <p className="text-sm font-medium">Stripe</p>
+                                    <p className="text-xs opacity-70">Test cards</p>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setUseStripe(false)}
+                                className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                                    !useStripe 
+                                        ? 'border-ss-accent bg-ss-accent/10 text-ss-accent' 
+                                        : 'border-[rgba(255,255,255,0.1)] bg-ss-elevated text-ss-text-secondary hover:border-ss-accent/50'
+                                }`}
+                            >
+                                <DollarSign size={18} />
+                                <div className="text-left">
+                                    <p className="text-sm font-medium">Simulated</p>
+                                    <p className="text-xs opacity-70">Instant</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
                     {amount && parseFloat(amount) > 0 && (
                         <div className="p-4 bg-ss-accent/10 border border-ss-accent/20 rounded-lg">
                             <p className="text-xs text-ss-text-tertiary mb-1">New Balance After Funding</p>
@@ -516,6 +645,14 @@ const FundAccountModal = ({ account, onClose, onSuccess }) => {
                             </p>
                         </div>
                     )}
+
+                    {useStripe && (
+                        <div className="flex items-center gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 text-sm">
+                            <ExternalLink size={16} className="flex-shrink-0" />
+                            <span>You'll be redirected to Stripe to complete payment</span>
+                        </div>
+                    )}
+
                     <div className="flex gap-3 pt-2">
                         <button
                             type="button"
@@ -528,13 +665,132 @@ const FundAccountModal = ({ account, onClose, onSuccess }) => {
                         <button
                             type="submit"
                             disabled={loading || !amount || parseFloat(amount) <= 0}
-                            className="flex-1 px-4 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
+                            className="flex-1 px-4 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all flex items-center justify-center gap-2"
                             data-testid="submit-fund-btn"
                         >
-                            {loading ? 'Processing...' : 'Fund Account'}
+                            {loading ? (
+                                <>Processing...</>
+                            ) : useStripe ? (
+                                <>
+                                    <CreditCard size={16} />
+                                    Pay with Stripe
+                                </>
+                            ) : (
+                                'Fund Account'
+                            )}
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    );
+};
+
+// Funding History Modal
+const FundingHistoryModal = ({ account, onClose }) => {
+    const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchHistory();
+    }, [account.id]);
+
+    const fetchHistory = async () => {
+        setLoading(true);
+        try {
+            const data = await getFundingHistory(account.id);
+            setHistory(data.data || []);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getStatusBadge = (status) => {
+        const colors = {
+            pending: 'bg-yellow-500/20 text-yellow-400',
+            succeeded: 'bg-green-500/20 text-green-400',
+            failed: 'bg-red-500/20 text-red-400',
+            refunded: 'bg-purple-500/20 text-purple-400',
+        };
+        return colors[status] || 'bg-gray-500/20 text-gray-400';
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="funding-history-modal">
+            <div className="bg-ss-code border border-[rgba(255,255,255,0.1)] rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+                <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
+                    <div>
+                        <h2 className="font-heading text-lg font-semibold text-ss-text">Funding History</h2>
+                        <p className="text-sm text-ss-text-tertiary mt-0.5">{account.name}</p>
+                    </div>
+                    <button onClick={onClose} className="text-ss-text-secondary hover:text-ss-text">
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <RefreshCw className="animate-spin text-ss-text-tertiary" size={24} />
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-8 text-ss-error">{error}</div>
+                    ) : history.length === 0 ? (
+                        <div className="text-center py-8 text-ss-text-tertiary">
+                            <History size={32} className="mx-auto mb-2 opacity-50" />
+                            <p>No funding history yet</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {history.map((event) => (
+                                <div 
+                                    key={event.id} 
+                                    className="flex items-center justify-between p-4 bg-ss-elevated rounded-lg border border-[rgba(255,255,255,0.06)]"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                            event.type === 'refund' ? 'bg-purple-500/20' : 'bg-ss-accent/20'
+                                        }`}>
+                                            {event.type === 'refund' ? (
+                                                <History size={16} className="text-purple-400" />
+                                            ) : (
+                                                <DollarSign size={16} className="text-ss-accent" />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-ss-text">
+                                                {event.type === 'refund' ? 'Refund' : 'Funding'}
+                                            </p>
+                                            <p className="text-xs text-ss-text-tertiary">
+                                                {formatDate(event.created_at)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className={`text-sm font-mono font-semibold ${
+                                            event.type === 'refund' ? 'text-purple-400' : 'text-ss-accent'
+                                        }`}>
+                                            {event.type === 'refund' ? '-' : '+'}{formatCents(event.amount_cents)}
+                                        </p>
+                                        <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusBadge(event.status)}`}>
+                                            {event.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="p-6 border-t border-[rgba(255,255,255,0.06)]">
+                    <button
+                        onClick={onClose}
+                        className="w-full px-4 py-2.5 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary transition-all"
+                    >
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     );
