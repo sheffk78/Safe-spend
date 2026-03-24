@@ -44,6 +44,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 import AdminOrgsPage from "@/pages/admin/AdminOrgsPage";
 import AdminOrgDetailPage from "@/pages/admin/AdminOrgDetailPage";
+import AdminAnalyticsPage from "@/pages/admin/AdminAnalyticsPage";
 
 // Admin wrapper component that provides AdminAuthContext
 const AdminRoutes = () => (
@@ -54,7 +55,7 @@ const AdminRoutes = () => (
             <Route element={<AdminLayout />}>
                 <Route path="orgs" element={<AdminOrgsPage />} />
                 <Route path="orgs/:orgId" element={<AdminOrgDetailPage />} />
-                <Route path="stats" element={<div className="text-ss-text">Platform Stats (Coming Soon)</div>} />
+                <Route path="analytics" element={<AdminAnalyticsPage />} />
                 <Route path="settings" element={<div className="text-ss-text">Admin Settings (Coming Soon)</div>} />
             </Route>
         </Routes>

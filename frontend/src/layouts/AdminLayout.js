@@ -14,7 +14,7 @@ import {
 
 const navItems = [
     { label: 'Organizations', icon: Building2, path: '/admin/orgs' },
-    { label: 'Platform Stats', icon: BarChart3, path: '/admin/stats' },
+    { label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
     { label: 'Settings', icon: Settings, path: '/admin/settings' },
 ];
 
