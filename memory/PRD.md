@@ -4,8 +4,8 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 05 Complete - Approvals & Webhooks
-**Last Updated:** March 2026
+**Current Phase:** Prompt 06 Complete - End-to-End Testing Suite
+**Last Updated:** March 24, 2026
 
 ---
 
@@ -149,14 +149,58 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 
 ## Testing
 
-### Iteration 5 Results (March 2026)
-- Backend: 96% (24/25 tests passed, 1 skipped - no pending approval for deny test)
-- Frontend: 100% (all pages functional)
-- Test credentials: demo@test.com / Test123!
+### Prompt 06 - End-to-End Testing Suite (Completed - March 24, 2026)
+
+#### Test Infrastructure
+- **Framework**: Jest + Supertest
+- **Configuration**: `/app/backend/jest.config.js`
+- **Setup**: `/app/backend/tests/setup.js` - DB connection/disconnection
+- **Utilities**: `/app/backend/tests/utils.js` - Test helpers (createTestOrg, createApiKey, etc.)
+- **Documentation**: `/app/backend/TESTING.md`
+
+#### Test Suites (61 Tests Total - 100% Passing)
+
+| Suite | File | Tests | Coverage |
+|-------|------|-------|----------|
+| Auth | `auth.test.js` | 6 | Signup, login, /me endpoint, duplicate email, wrong password |
+| Escrow | `escrow.test.js` | 11 | Create, fund, list, pause/resume, close lifecycle |
+| Policies | `policies.test.js` | 11 | Per-tx limit, daily cap, vendor allow/block, category block, combined rules |
+| Spend + Approval | `spend-approval.test.js` | 11 | Auto-approve, pending, approve/deny, expiration, idempotency |
+| API Keys | `api-keys.test.js` | 9 | Create, list, revoke, activate/deactivate, agent key access, last_used_at |
+| Webhooks | `webhooks.test.js` | 13 | Register, list, delete, delivery queue, HMAC signatures, replay protection |
+
+#### Key Bug Fixes During Testing
+1. **API Key Header Support**: Updated auth middleware to accept both `X-API-Key` and `Authorization: Bearer` headers
+2. **Key Prefix Matching**: Fixed test assertion to match actual stored key prefix format (`sk_xxx...`)
+
+#### Running Tests
+```bash
+cd /app/backend && npm test
+```
+
+---
+
+## Prioritized Backlog
+
+### P0 - Critical (Next Prompts)
+1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
+2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
+3. ~~End-to-End Testing (Prompt 06)~~ ✅ COMPLETE
+4. **Stripe Integration** - Real funding and disbursement
+
+### P1 - High Priority
+5. **Documentation Page** - API reference, integration guides
+6. **SDK Generation** - Python, TypeScript SDKs
+
+### P2 - Medium Priority
+7. **MCP Server** - Model Context Protocol integration
+8. **Email Notifications** - Alert on pending approvals
+9. **Rate Limiting** - API request limits
+10. **Production Deployment** - Environment configuration
 
 ---
 
 ## Next Tasks
-1. Stripe integration for real fiat funding
+1. Stripe integration for real fiat funding (Prompt 07 if provided)
 2. API documentation page
 3. SDK generation (Python, TypeScript)
