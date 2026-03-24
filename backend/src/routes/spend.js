@@ -5,9 +5,13 @@ const { requireAuth } = require('../middleware/auth');
 const { evaluateSpendRequest } = require('../services/rules-engine');
 const { getDateBoundaries } = require('../services/rules-helpers');
 const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
+const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('../services/security-alerts');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Track consecutive denials per escrow for runaway detection
+const denialTracker = new Map();
 
 /**
  * POST /v1/spend
@@ -27,6 +31,26 @@ router.post('/', requireAuth, async (req, res) => {
             idempotency_key,
             metadata = {}
         } = req.body;
+        
+        // Check for injection attempts in input fields
+        const fieldsToCheck = { vendor, category, description };
+        for (const [field, value] of Object.entries(fieldsToCheck)) {
+            if (value) {
+                const injectionType = detectInjection(value);
+                if (injectionType) {
+                    // Track but don't block - Prisma handles safely
+                    // Fire and forget - don't await, errors logged internally
+                    trackInjectionAttempt(
+                        req.org.id,
+                        req.org.name,
+                        field,
+                        value,
+                        injectionType,
+                        req.requestId
+                    ).catch(() => {}); // Suppress unhandled rejection
+                }
+            }
+        }
         
         // Validate required fields
         if (!escrow_id || !amount_cents || !vendor) {
@@ -159,6 +183,23 @@ router.post('/', requireAuth, async (req, res) => {
                 balanceBeforeCents: escrowAccount.balanceCents,
                 metadata
             });
+            
+            // Track consecutive denials for runaway detection
+            const trackerKey = escrow_id;
+            const currentCount = (denialTracker.get(trackerKey) || 0) + 1;
+            denialTracker.set(trackerKey, currentCount);
+            
+            // Alert on potential runaway agent
+            if (currentCount >= 10) {
+                trackRunawayLoop(
+                    escrow_id,
+                    escrowAccount.name,
+                    req.org.id,
+                    req.org.name,
+                    currentCount,
+                    result.denialReason
+                ).catch(() => {}); // Fire and forget
+            }
             
             // Update denied total
             await prisma.escrowAccount.update({
@@ -341,6 +382,9 @@ router.post('/', requireAuth, async (req, res) => {
             });
             
             const { updatedEscrow, spendRequest, actualBalanceAfter } = transactionResult;
+            
+            // Reset denial tracker on successful spend
+            denialTracker.delete(escrow_id);
         
             // Update spend tracking (outside transaction for performance)
             await Promise.all([

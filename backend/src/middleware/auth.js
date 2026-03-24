@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { PrismaClient } = require('@prisma/client');
 const { hashApiKey } = require('../utils/ids');
 const { logger, events } = require('../lib/logger');
+const { trackFailedAuth } = require('../services/security-alerts');
 
 const prisma = new PrismaClient();
 
@@ -30,12 +31,15 @@ function timingSafeEqual(a, b) {
 /**
  * Generic unauthorized response (prevents enumeration)
  */
-function unauthorizedResponse(req, res) {
+function unauthorizedResponse(req, res, reason = 'Invalid or missing credentials') {
     events.authFailed({
         request_id: req.requestId,
         ip: req.ip,
         path: req.path,
     });
+    
+    // Track failed auth for security alerts (fire and forget)
+    trackFailedAuth(req.ip, req.path, reason).catch(() => {});
     
     return res.status(401).json({ 
         error: 'unauthorized',

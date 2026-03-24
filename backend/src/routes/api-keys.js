@@ -2,6 +2,7 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { generateId, generateApiKey } = require('../utils/ids');
 const { requireOrgAuth } = require('../middleware/auth');
+const { trackKeyRevocation } = require('../services/security-alerts');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -195,6 +196,15 @@ router.delete('/:id', requireOrgAuth, async (req, res) => {
                 ipAddress: req.ip
             }
         });
+        
+        // Track key revocation for security alerts
+        trackKeyRevocation(
+            req.org.id,
+            req.org.name,
+            apiKey.id,
+            apiKey.label,
+            req.org.id
+        ).catch(() => {}); // Fire and forget
         
         res.json({ message: 'API key revoked' });
     } catch (error) {

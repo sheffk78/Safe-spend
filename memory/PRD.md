@@ -1038,3 +1038,68 @@ Comprehensive security and abuse-resistance testing to validate the platform can
 #### Test Report Location
 `/app/test_reports/abuse_limits_hostile_report.md`
 
+
+
+---
+
+### Security Alerts System (Completed - March 24, 2026)
+
+#### Overview
+Real-time email alerts for suspicious activity sent to support@agentictrust.app via Postmark.
+
+#### Alert Types
+
+| Alert | Threshold | Description |
+|-------|-----------|-------------|
+| Injection Attempt | 5 attempts | SQL/XSS/Template injection detected in input fields |
+| Runaway Agent | 10 consecutive denials | Agent stuck in spending loop |
+| Key Revocations | 3 in 5 min window | Multiple API keys revoked rapidly |
+| Failed Auth | 10 attempts | Repeated failed authentication from same IP |
+| Approval Spam | Manual trigger | High volume of pending approvals |
+
+#### Implementation Files
+- `/app/backend/src/services/security-alerts.js` - Alert detection and email sending
+- `/app/backend/src/routes/spend.js` - Injection and runaway detection integration
+- `/app/backend/src/routes/api-keys.js` - Key revocation tracking
+- `/app/backend/src/middleware/auth.js` - Failed auth tracking
+
+#### Configuration
+```
+POSTMARK_API_KEY=<postmark_api_key>
+SENDER_EMAIL=no-reply@contact.agentictrust.app
+ALERT_EMAIL=support@agentictrust.app
+```
+
+#### Features
+- Rate-limited alerts (5 minute cooldown between same-type alerts)
+- Fire-and-forget (doesn't block request processing)
+- HTML email templates with dark theme branding
+- Links to admin dashboard for investigation
+
+---
+
+### Governance, Legal & UX Alignment Test (Completed - March 24, 2026)
+
+#### Test Summary
+Validated Safe-Spend's alignment with trust-grade fiduciary positioning.
+
+| Area | Status |
+|------|--------|
+| Trust vs Wallet Copy | **PASS** - "Your agent needs a trust account, not a wallet" |
+| Non-Technical Clarity | **PASS** - Requires manual verification |
+| Governance Model & Roles | **PARTIAL** - RBAC not implemented |
+| Legal Disclosures | **PASS** - Terms, Privacy, safe templates present |
+| Explainability & Auditability | **PASS** - Rules evaluation visible |
+| Exportability | **PARTIAL** - No CSV export |
+| Persona Alignment | **PASS** - Agent builders and ops personas supported |
+
+#### Overall Rating: **STRONG**
+
+#### Gaps Identified
+1. RBAC not implemented (P1)
+2. No CSV/PDF export for governance reviews (P2)
+3. No blocking confirmation for risky policies (P2)
+
+#### Test Report Location
+`/app/test_reports/governance_legal_ux_report.md`
+

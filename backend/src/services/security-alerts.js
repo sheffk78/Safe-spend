@@ -1,16 +1,18 @@
 /**
  * Security Alerts Service
- * Detects and reports suspicious activity via email
+ * Detects and reports suspicious activity via email (Postmark)
  */
 
-const { Resend } = require('resend');
-const logger = require('../lib/logger');
+const postmark = require('postmark');
+const { logger } = require('../lib/logger');
 
-// Initialize Resend client
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// Initialize Postmark client
+const client = process.env.POSTMARK_API_KEY 
+    ? new postmark.ServerClient(process.env.POSTMARK_API_KEY) 
+    : null;
 
-const ALERT_EMAIL = 'support@agentictrust.app';
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'alerts@agentictrust.app';
+const ALERT_EMAIL = process.env.ALERT_EMAIL || 'support@agentictrust.app';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'no-reply@contact.agentictrust.app';
 
 // In-memory tracking for rate limiting alerts (prevents alert spam)
 const alertTracker = {
@@ -30,34 +32,28 @@ const THRESHOLDS = {
 };
 
 /**
- * Send security alert email
+ * Send security alert email via Postmark
  */
 async function sendSecurityAlert(subject, htmlContent, metadata = {}) {
-    if (!resend) {
-        logger.warn('Security alert not sent - Resend API key not configured', { subject, ...metadata });
+    if (!client) {
+        logger.warn({ subject, ...metadata }, 'Security alert not sent - Postmark API key not configured');
         return false;
     }
 
     try {
-        const result = await resend.emails.send({
-            from: SENDER_EMAIL,
-            to: [ALERT_EMAIL],
-            subject: `[SECURITY ALERT] ${subject}`,
-            html: htmlContent,
+        const result = await client.sendEmail({
+            From: SENDER_EMAIL,
+            To: ALERT_EMAIL,
+            Subject: `[SECURITY ALERT] ${subject}`,
+            HtmlBody: htmlContent,
+            TextBody: `Security Alert: ${subject}. Please view the HTML version for details.`,
+            MessageStream: 'outbound'
         });
 
-        logger.info('Security alert sent', { 
-            subject, 
-            emailId: result.data?.id,
-            ...metadata 
-        });
+        logger.info({ subject, messageId: result.MessageID, ...metadata }, 'Security alert sent');
         return true;
     } catch (error) {
-        logger.error('Failed to send security alert', { 
-            error: error.message, 
-            subject,
-            ...metadata 
-        });
+        logger.error({ error: error.message, subject, ...metadata }, 'Failed to send security alert');
         return false;
     }
 }
@@ -122,12 +118,25 @@ function detectInjection(input) {
 async function trackInjectionAttempt(orgId, orgName, field, value, injectionType, requestId) {
     const key = orgId;
     
-    if (!shouldSendAlert(alertTracker.injectionAttempts, key)) {
-        const record = alertTracker.injectionAttempts.get(key);
-        if (record.count < THRESHOLDS.INJECTION_ATTEMPTS) return;
-    }
-
+    // Increment counter
     const record = alertTracker.injectionAttempts.get(key);
+    if (!record) {
+        alertTracker.injectionAttempts.set(key, { count: 1, lastAlert: 0 });
+        return; // First occurrence, don't alert yet
+    }
+    
+    record.count++;
+    
+    // Check if we've hit threshold
+    if (record.count < THRESHOLDS.INJECTION_ATTEMPTS) {
+        return; // Not enough attempts yet
+    }
+    
+    // Check cooldown
+    const now = Date.now();
+    if (now - record.lastAlert < THRESHOLDS.ALERT_COOLDOWN_MS) {
+        return; // Still in cooldown
+    }
     
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -186,12 +195,25 @@ async function trackInjectionAttempt(orgId, orgName, field, value, injectionType
 async function trackRunawayLoop(escrowId, escrowName, orgId, orgName, denialCount, denialReason) {
     const key = escrowId;
     
-    if (!shouldSendAlert(alertTracker.runawayLoops, key)) {
-        const record = alertTracker.runawayLoops.get(key);
-        if (record.count < THRESHOLDS.RUNAWAY_DENIALS) return;
-    }
-
+    // Increment counter
     const record = alertTracker.runawayLoops.get(key);
+    if (!record) {
+        alertTracker.runawayLoops.set(key, { count: 1, lastAlert: 0 });
+        return;
+    }
+    
+    record.count++;
+    
+    // Check if we've hit threshold
+    if (record.count < THRESHOLDS.RUNAWAY_DENIALS) {
+        return;
+    }
+    
+    // Check cooldown
+    const now = Date.now();
+    if (now - record.lastAlert < THRESHOLDS.ALERT_COOLDOWN_MS) {
+        return;
+    }
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -246,12 +268,25 @@ async function trackRunawayLoop(escrowId, escrowName, orgId, orgName, denialCoun
 async function trackKeyRevocation(orgId, orgName, keyId, keyLabel, revokedBy) {
     const key = orgId;
     
-    if (!shouldSendAlert(alertTracker.keyRevocations, key)) {
-        const record = alertTracker.keyRevocations.get(key);
-        if (record.count < THRESHOLDS.KEY_REVOCATIONS) return;
-    }
-
+    // Increment counter
     const record = alertTracker.keyRevocations.get(key);
+    if (!record) {
+        alertTracker.keyRevocations.set(key, { count: 1, lastAlert: 0 });
+        return;
+    }
+    
+    record.count++;
+    
+    // Check if we've hit threshold
+    if (record.count < THRESHOLDS.KEY_REVOCATIONS) {
+        return;
+    }
+    
+    // Check cooldown
+    const now = Date.now();
+    if (now - record.lastAlert < THRESHOLDS.ALERT_COOLDOWN_MS) {
+        return;
+    }
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -306,12 +341,25 @@ async function trackKeyRevocation(orgId, orgName, keyId, keyLabel, revokedBy) {
 async function trackFailedAuth(ip, path, reason) {
     const key = ip;
     
-    if (!shouldSendAlert(alertTracker.failedAuths, key)) {
-        const record = alertTracker.failedAuths.get(key);
-        if (record.count < THRESHOLDS.FAILED_AUTHS) return;
-    }
-
+    // Increment counter
     const record = alertTracker.failedAuths.get(key);
+    if (!record) {
+        alertTracker.failedAuths.set(key, { count: 1, lastAlert: 0 });
+        return;
+    }
+    
+    record.count++;
+    
+    // Check if we've hit threshold
+    if (record.count < THRESHOLDS.FAILED_AUTHS) {
+        return;
+    }
+    
+    // Check cooldown
+    const now = Date.now();
+    if (now - record.lastAlert < THRESHOLDS.ALERT_COOLDOWN_MS) {
+        return;
+    }
 
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
