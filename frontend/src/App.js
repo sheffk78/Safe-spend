@@ -12,6 +12,7 @@ import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 // Docs
 import DocsLayout from "@/layouts/DocsLayout";
@@ -108,6 +109,9 @@ function App() {
 
                     {/* Admin routes - separate auth system */}
                     <Route path="/admin/*" element={<AdminRoutes />} />
+
+                    {/* 404 catch-all */}
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </AuthProvider>
         </BrowserRouter>

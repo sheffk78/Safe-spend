@@ -38,7 +38,7 @@ const DashboardLayout = () => {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const shouldShowTour = useShouldShowTour();
-    const [showTour, setShowTour] = useState(true);
+    const [tourDismissed, setTourDismissed] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -46,10 +46,11 @@ const DashboardLayout = () => {
     };
 
     const handleTourComplete = () => {
-        setShowTour(false);
+        setTourDismissed(true);
     };
 
-    const tourActive = shouldShowTour && showTour;
+    // Only show tour if localStorage says we should AND user hasn't dismissed it this session
+    const tourActive = shouldShowTour && !tourDismissed;
 
     const isActive = (path) => {
         if (path === '/dashboard') {

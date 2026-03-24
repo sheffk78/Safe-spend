@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** SDKs Complete - Python, TypeScript, MCP Server
+**Current Phase:** Frontend QA Complete - All SDKs Done
 **Last Updated:** March 24, 2026
 
 ---
