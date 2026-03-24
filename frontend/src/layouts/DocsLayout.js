@@ -8,7 +8,8 @@ import {
     Puzzle,
     ChevronRight,
     ArrowLeft,
-    ExternalLink
+    ExternalLink,
+    Scale
 } from 'lucide-react';
 
 const navigation = [
@@ -17,6 +18,12 @@ const navigation = [
         items: [
             { name: 'What is Safe-Spend?', href: '/docs', icon: BookOpen },
             { name: 'Core Concepts', href: '/docs/concepts', icon: BookOpen },
+        ]
+    },
+    {
+        title: 'Concepts',
+        items: [
+            { name: 'Trust Law & Governance', href: '/docs/trust-law', icon: Scale },
         ]
     },
     {

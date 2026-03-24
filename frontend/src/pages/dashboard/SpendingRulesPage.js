@@ -121,6 +121,10 @@ const SpendingRulesPage = () => {
                             <BookOpen size={14} />
                             Learn how the rules engine works
                         </Link>
+                        {' · '}
+                        <Link to="/docs/trust-law" className="text-ss-accent hover:underline inline-flex items-center gap-1">
+                            New to fiduciary policies? Read the Trust Law Explainer
+                        </Link>
                     </p>
                 </div>
                 <div className="flex items-center gap-3">

@@ -19,6 +19,7 @@ import DocsQuickstart from "@/pages/docs/DocsQuickstart";
 import DocsApiReference from "@/pages/docs/DocsApiReference";
 import DocsWebhooks from "@/pages/docs/DocsWebhooks";
 import DocsIntegrations from "@/pages/docs/DocsIntegrations";
+import DocsTrustLaw from "@/pages/docs/DocsTrustLaw";
 
 // Dashboard
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -50,6 +51,7 @@ function App() {
                     <Route path="/docs" element={<DocsLayout />}>
                         <Route index element={<DocsOverview />} />
                         <Route path="concepts" element={<DocsConcepts />} />
+                        <Route path="trust-law" element={<DocsTrustLaw />} />
                         <Route path="quickstart" element={<DocsQuickstart />} />
                         <Route path="api" element={<DocsApiReference />} />
                         <Route path="webhooks" element={<DocsWebhooks />} />

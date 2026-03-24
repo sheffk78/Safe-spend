@@ -145,7 +145,12 @@ const AuditLogPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Audit Log</h1>
-                    <p className="text-ss-text-secondary mt-1">Complete immutable record of all account activity</p>
+                    <p className="text-ss-text-secondary mt-1">
+                        Complete immutable record of all account activity.{' '}
+                        <a href="/docs/trust-law#concept-mapping" className="text-ss-accent hover:underline">
+                            Learn how audit logs map to trust accounting →
+                        </a>
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button

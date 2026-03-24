@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompts 10 & 11 Complete - Terms of Service & Privacy Policy
+**Current Phase:** Prompt 12 Complete - Trust Law Explainer & Governance Patterns
 **Last Updated:** March 24, 2026
 
 ---
@@ -259,6 +259,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 6. ~~Production Hardening (Prompt 09)~~ ✅ COMPLETE
 7. ~~Terms of Service (Prompt 10)~~ ✅ COMPLETE
 8. ~~Privacy Policy (Prompt 11)~~ ✅ COMPLETE
+9. ~~Trust Law Explainer (Prompt 12)~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
 9. **SDK Generation** - Python, TypeScript SDKs
@@ -320,3 +321,47 @@ src/middleware/error-handler.js # Global error handling
 - `.env.example` - Environment variable template
 
 #### Test Suite: 75 tests passing
+
+---
+
+### Prompt 10 & 11 - Terms of Service & Privacy Policy (Completed - March 24, 2026)
+
+- `/terms` - Full Terms of Service page with 16 sections
+- `/privacy` - Full Privacy Policy page with 12 sections
+- Both use matching dark theme, table of contents, and professional legal formatting
+- Section IDs for deep linking
+- Links from landing page footer
+
+---
+
+### Prompt 12 - Trust Law Explainer & Governance Patterns (Completed - March 24, 2026)
+
+#### New Documentation Page
+- **Route**: `/docs/trust-law`
+- **Navigation**: Added "Concepts" section in docs sidebar with "Trust Law & Governance" item
+
+#### Content Sections
+1. **Why Trust Law for AI Agents?** - Explains trust law fundamentals and AI agent risks ($82K horror story)
+2. **Core Concept Mapping Table** - 7-row table mapping Safe-Spend concepts to trust law equivalents
+3. **Governance Pattern 1: Marketing Agent Budget** - Example policy with JSON config
+4. **Governance Pattern 2: AI Procurement Agent** - SaaS/tools spending controls
+5. **Governance Pattern 3: R&D Experiments / Sandboxes** - Bounded-loss exploration budgets
+6. **Governance Pattern 4: Multi-Agent, Single Escrow** - Shared funds with distinct policies
+7. **How to Explain This to Stakeholders** - Talking points for Legal, Finance, and Security teams
+
+#### UI Components
+- In-page Table of Contents navigation
+- PatternCard component for governance patterns
+- PolicyCodeBlock for JSON examples with syntax highlighting
+- ConceptTable for trust law mapping
+
+#### Contextual Links Added
+- **SpendingRulesPage**: "New to fiduciary policies? Read the Trust Law Explainer → /docs/trust-law"
+- **AuditLogPage**: "Learn how audit logs map to trust accounting → /docs/trust-law#concept-mapping"
+
+#### Files Created/Modified
+- `/app/frontend/src/pages/docs/DocsTrustLaw.js` (NEW)
+- `/app/frontend/src/layouts/DocsLayout.js` (Updated navigation)
+- `/app/frontend/src/App.js` (Added route)
+- `/app/frontend/src/pages/dashboard/SpendingRulesPage.js` (Added link)
+- `/app/frontend/src/pages/dashboard/AuditLogPage.js` (Added link)
