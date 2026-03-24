@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** P2 Complete - Analytics & PostgreSQL Migration Ready
+**Current Phase:** P2 Complete - SDK & Framework Integrations Ready
 **Last Updated:** March 24, 2026
 
 ---
@@ -280,18 +280,56 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 - ~~Analytics Dashboard~~ ✅
 - ~~PostgreSQL Migration~~ ✅ (Schema prepared, ready for deployment)
 - ~~CSV Export for Governance Reviews~~ ✅ (March 24, 2026)
+- ~~SDK & Framework Integrations~~ ✅ (March 24, 2026)
 
 ### P3 - Future Enhancements
 1. **PDF Statements** - Monthly trust-style statements per escrow
 2. **Real-time WebSocket notifications**
 3. **Multi-currency support**
-4. **Advanced reporting exports**
+4. **CrewAI Integration** - Alternative to LangChain
 
 ---
 
 ## Next Tasks
 1. PDF Statements (once real CSV usage patterns are observed)
 2. Production deployment (use PostgreSQL schema)
+3. CrewAI integration (if demand observed)
+
+---
+
+### SDK & Framework Integrations (Completed - March 24, 2026)
+
+#### Overview
+Developer adoption toolkit with Python SDK, LangChain integration, and MCP server for AI agent builders.
+
+#### Python SDK (`safespend`)
+- **Location**: `/app/sdks/python/safespend/`
+- **Installation**: `pip install safespend` or `pip install safespend[langchain]`
+- **Features**:
+  - Typed client with `SafeSpendClient`
+  - Error handling: `AuthenticationError`, `ValidationError`, `NotFoundError`, `RateLimitError`
+  - Methods: `create_spend()`, `get_escrow_balance()`, `list_spend_requests()`, `get_spend_request()`
+
+#### LangChain Integration
+- **Location**: `/app/sdks/python/safespend/integrations/langchain_tools.py`
+- **Tools**:
+  - `SafeSpendTool` - Create governed spend requests
+  - `SafeSpendCheckBalanceTool` - Check escrow balance
+  - `SafeSpendListSpendsTool` - List recent spends
+  - `SafeSpendGetSpendTool` - Get spend details
+- **Factory**: `create_safespend_toolkit(client, default_escrow_id)`
+
+#### MCP Server
+- **Location**: `/app/sdks/mcp-server/`
+- **Installation**: `npm install -g @safespend/mcp-server`
+- **Tools**: `list_escrow_accounts`, `get_escrow_balance`, `create_spend`, `list_spend_requests`, `list_policies`
+
+#### SDK Documentation Page
+- **Route**: `/docs/sdks`
+- **Content**: 4 SDK cards, installation guides, code examples, tool tables
+
+#### Test Results
+- Frontend: 20/20 tests passed (100%)
 
 ---
 
