@@ -1,11 +1,86 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="2" skipped="0" tests="16" time="582.545" timestamp="2026-03-24T13:38:26.223088+00:00" hostname="agent-env-e5a991c9-2f7e-4539-b5aa-2a9462333fa4"><testcase classname="backend.tests.test_abuse_limits_trust.TestApiKeyLifecycleMisuse" name="test_1_1_key_revocation_immediate_effect" time="1.083" /><testcase classname="backend.tests.test_abuse_limits_trust.TestApiKeyLifecycleMisuse" name="test_1_2_shared_key_misuse_bounded_by_policy" time="21.199" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_1_per_key_rate_limit" time="9.324" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_2_per_org_rate_limit" time="92.177" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_3_global_safeguard_health_check" time="14.509"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfeddfd7cf010&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:271: in setup
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="6" failures="1" skipped="0" tests="16" time="531.033" timestamp="2026-03-24T13:43:32.976838+00:00" hostname="agent-env-e5a991c9-2f7e-4539-b5aa-2a9462333fa4"><testcase classname="backend.tests.test_abuse_limits_trust.TestApiKeyLifecycleMisuse" name="test_1_1_key_revocation_immediate_effect" time="48.556"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestApiKeyLifecycleMisuse object at 0xfc7913579590&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:149: in setup
     assert self.org is not None, "Failed to create test org"
 E   AssertionError: Failed to create test org
 E   assert None is not None
-E    +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfeddfd7cf010&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_1_large_policies_performance" time="19.307" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_2_timezone_edge_cases" time="0.913" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_3_idempotency_abuse" time="0.949" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRunawayAgentBehavior" name="test_4_1_infinite_loop_single_escrow" time="3.100" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRunawayAgentBehavior" name="test_4_2_multi_escrow_runaway" time="84.766" /><testcase classname="backend.tests.test_abuse_limits_trust.TestMultiTenantIsolation" name="test_5_1_noisy_neighbor" time="153.507" /><testcase classname="backend.tests.test_abuse_limits_trust.TestMultiTenantIsolation" name="test_5_2_webhook_flood_containment" time="59.567"><failure message="AssertionError: Failed to create org&#10;assert None is not None">backend/tests/test_abuse_limits_trust.py:816: in test_5_2_webhook_flood_containment
-    assert org is not None, "Failed to create org"
-E   AssertionError: Failed to create org
-E   assert None is not None</failure></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestInjectionMalformedInput" name="test_6_1_sql_injection_at_scale" time="108.919"><failure message="AssertionError: SQL injection caused 2 server errors!&#10;assert 2 == 0">backend/tests/test_abuse_limits_trust.py:937: in test_6_1_sql_injection_at_scale
-    assert results["error_500"] == 0, f"SQL injection caused {results['error_500']} server errors!"
-E   AssertionError: SQL injection caused 2 server errors!
-E   assert 2 == 0</failure></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestInjectionMalformedInput" name="test_6_2_oversized_requests" time="1.682" /><testcase classname="backend.tests.test_abuse_limits_trust.TestApprovalsAbuse" name="test_7_1_approval_spam" time="10.187" /><testcase classname="backend.tests.test_abuse_limits_trust.TestApprovalsAbuse" name="test_7_2_approval_bypass_reuse" time="1.244" /></testsuite></testsuites>
+E    +  where None = &lt;test_abuse_limits_trust.TestApiKeyLifecycleMisuse object at 0xfc7913579590&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestApiKeyLifecycleMisuse" name="test_1_2_shared_key_misuse_bounded_by_policy" time="50.040"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestApiKeyLifecycleMisuse object at 0xfc791357a250&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:149: in setup
+    assert self.org is not None, "Failed to create test org"
+E   AssertionError: Failed to create test org
+E   assert None is not None
+E    +  where None = &lt;test_abuse_limits_trust.TestApiKeyLifecycleMisuse object at 0xfc791357a250&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_1_per_key_rate_limit" time="60.067"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfc791357a910&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:271: in setup
+    assert self.org is not None, "Failed to create test org"
+E   AssertionError: Failed to create test org
+E   assert None is not None
+E    +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfc791357a910&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_2_per_org_rate_limit" time="20.093"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfc791357ad90&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:271: in setup
+    assert self.org is not None, "Failed to create test org"
+E   AssertionError: Failed to create test org
+E   assert None is not None
+E    +  where None = &lt;test_abuse_limits_trust.TestRateLimitsAntiDos object at 0xfc791357ad90&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRateLimitsAntiDos" name="test_2_3_global_safeguard_health_check" time="42.216"><failure message="requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='build-instructions-4.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)">/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:1395: in getresponse
+    response.begin()
+/usr/local/lib/python3.11/http/client.py:325: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:286: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/socket.py:718: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1314: in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1166: in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:644: in send
+    resp = conn.urlopen(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:841: in urlopen
+    retries = retries.increment(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:490: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/util/util.py:39: in reraise
+    raise value
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:787: in urlopen
+    response = self._make_request(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='build-instructions-4.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)
+
+During handling of the above exception, another exception occurred:
+backend/tests/test_abuse_limits_trust.py:394: in test_2_3_global_safeguard_health_check
+    health_response = requests.get(f"{BASE_URL}/api/health", timeout=10)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:73: in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:59: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:690: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='build-instructions-4.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)</failure></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_1_large_policies_performance" time="20.209"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestRulesEnginePathological object at 0xfc791357bc90&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:414: in setup
+    assert self.org is not None, "Failed to create test org"
+E   AssertionError: Failed to create test org
+E   assert None is not None
+E    +  where None = &lt;test_abuse_limits_trust.TestRulesEnginePathological object at 0xfc791357bc90&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_2_timezone_edge_cases" time="20.193"><error message="failed on setup with &quot;AssertionError: Failed to create test org&#10;assert None is not None&#10; +  where None = &lt;test_abuse_limits_trust.TestRulesEnginePathological object at 0xfc791358c310&gt;.org&quot;">backend/tests/test_abuse_limits_trust.py:414: in setup
+    assert self.org is not None, "Failed to create test org"
+E   AssertionError: Failed to create test org
+E   assert None is not None
+E    +  where None = &lt;test_abuse_limits_trust.TestRulesEnginePathological object at 0xfc791358c310&gt;.org</error></testcase><testcase classname="backend.tests.test_abuse_limits_trust.TestRulesEnginePathological" name="test_3_3_idempotency_abuse" time="0.920" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRunawayAgentBehavior" name="test_4_1_infinite_loop_single_escrow" time="3.242" /><testcase classname="backend.tests.test_abuse_limits_trust.TestRunawayAgentBehavior" name="test_4_2_multi_escrow_runaway" time="15.659" /><testcase classname="backend.tests.test_abuse_limits_trust.TestMultiTenantIsolation" name="test_5_1_noisy_neighbor" time="154.602" /><testcase classname="backend.tests.test_abuse_limits_trust.TestMultiTenantIsolation" name="test_5_2_webhook_flood_containment" time="80.723" /><testcase classname="backend.tests.test_abuse_limits_trust.TestInjectionMalformedInput" name="test_6_1_sql_injection_at_scale" time="2.222" /><testcase classname="backend.tests.test_abuse_limits_trust.TestInjectionMalformedInput" name="test_6_2_oversized_requests" time="1.637" /><testcase classname="backend.tests.test_abuse_limits_trust.TestApprovalsAbuse" name="test_7_1_approval_spam" time="9.119" /><testcase classname="backend.tests.test_abuse_limits_trust.TestApprovalsAbuse" name="test_7_2_approval_bypass_reuse" time="1.277" /></testsuite></testsuites>
