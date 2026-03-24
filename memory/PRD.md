@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** P2 Complete - SDK & Framework Integrations Ready
+**Current Phase:** P3 Complete - Fiduciary Policy Engine UX Shipped
 **Last Updated:** March 24, 2026
 
 ---
@@ -294,6 +294,63 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 1. PDF Statements (once real CSV usage patterns are observed)
 2. Production deployment (use PostgreSQL schema)
 3. CrewAI integration (if demand observed)
+
+---
+
+### Fiduciary Policy Engine UX (Completed - March 24, 2026)
+
+#### Overview
+A complete redesign of the Spending Rules page to frame policies through a trust-law lens. The new "Fiduciary Policies" page presents spending controls as Trust Mandates that govern how AI agents can spend.
+
+#### Key Changes
+1. **Renamed**: "Spending Rules" → "Fiduciary Policies" throughout the app
+2. **New Icon**: Scale icon (instead of Shield) to emphasize fiduciary responsibility
+3. **Trust Mandate Language**: Explanatory text uses "Trust Mandate" terminology
+4. **Purpose Field**: New free-form text field for describing the policy's intent
+
+#### Policy Overview Dashboard
+- **Stats Cards**: Total Policies, Active (Locked), Drafts Pending, Archived
+- **Draft Alert Banner**: Shows count of policies pending review with Trust Mandate messaging
+- **Enhanced Policy Cards**: 
+  - Shows purpose field when set
+  - Displays approval threshold tags (Auto < $X, Human > $X)
+  - Status badges (Draft/Active/Archived)
+  - Quick summary of limits
+
+#### 4-Step Policy Creation Wizard
+| Step | Name | Description |
+|------|------|-------------|
+| 1 | Basics & Purpose | Policy name, escrow (trust account) selection, purpose with presets |
+| 2 | Amount Thresholds | Dual-slider visualization for auto-approve vs human-review, spending limits |
+| 3 | Restrictions | Vendor/category allow/deny lists, business hours time windows |
+| 4 | Review & Activate | Summary view, Save as Draft or Activate Policy buttons |
+
+#### Purpose Presets
+- Marketing, Engineering, Operations, Research, Procurement, Custom
+
+#### Dual-Slider Visualization
+- Visual bar showing auto-approve zone (green), human-review zone (amber), and deny zone (red)
+- Clearly displays threshold configuration at a glance
+
+#### Backend Changes
+- Added `purpose` field to `SpendingPolicy` model in Prisma schema
+- Updated policy routes to handle `purpose` in create/update/get operations
+- `purpose` field is optional, appears in all policy responses
+
+#### Files Created/Modified
+- `/app/frontend/src/pages/dashboard/FiduciaryPoliciesPage.js` (NEW - 1100+ lines)
+- `/app/frontend/src/layouts/DashboardLayout.js` (Updated nav label and icon)
+- `/app/frontend/src/App.js` (Updated route import)
+- `/app/backend/prisma/schema.prisma` (Added purpose field)
+- `/app/backend/src/routes/policies.js` (Updated CRUD operations)
+
+#### Test Results
+- Backend: 18/18 tests passed (100%)
+- Frontend: 25/25 tests passed (100%)
+- Full testing via testing_agent_v3_fork (iteration 17)
+
+#### Access
+- Dashboard → Fiduciary Policies (sidebar, `/dashboard/rules`)
 
 ---
 
