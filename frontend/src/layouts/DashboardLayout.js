@@ -16,9 +16,23 @@ import {
     Menu,
     X,
     Play,
-    CreditCard
+    CreditCard,
+    Users,
+    Crown,
+    ShieldCheck,
+    Code2,
+    Eye
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getMyRole } from '@/lib/api';
+
+// Role configuration
+const ROLE_CONFIG = {
+    owner: { label: 'Owner', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+    finance_admin: { label: 'Finance Admin', icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+    developer: { label: 'Developer', icon: Code2, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    read_only: { label: 'Read Only', icon: Eye, color: 'text-gray-400', bg: 'bg-gray-400/10' }
+};
 
 const navItems = [
     { label: 'Overview', icon: LayoutDashboard, path: '/dashboard' },
@@ -30,6 +44,7 @@ const navItems = [
     { label: 'API Keys', icon: Key, path: '/dashboard/keys' },
     { label: 'Webhooks', icon: Webhook, path: '/dashboard/webhooks' },
     { label: 'Audit Log', icon: FileText, path: '/dashboard/audit' },
+    { label: 'Team', icon: Users, path: '/dashboard/team' },
     { label: 'Pricing & Plans', icon: CreditCard, path: '/dashboard/pricing' },
     { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
 ];
@@ -41,6 +56,19 @@ const DashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const shouldShowTour = useShouldShowTour();
     const [tourDismissed, setTourDismissed] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const fetchRole = async () => {
+            try {
+                const roleData = await getMyRole();
+                setUserRole(roleData.role);
+            } catch (err) {
+                console.error('Failed to fetch user role:', err);
+            }
+        };
+        fetchRole();
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -112,6 +140,20 @@ const DashboardLayout = () => {
                 <div className="p-4 border-t border-[rgba(255,255,255,0.06)]">
                     <div className="mb-3">
                         <p className="text-xs text-ss-text-tertiary truncate">{user?.email}</p>
+                        {userRole && (
+                            <div className="mt-1.5">
+                                {(() => {
+                                    const config = ROLE_CONFIG[userRole] || ROLE_CONFIG.read_only;
+                                    const RoleIcon = config.icon;
+                                    return (
+                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
+                                            <RoleIcon size={12} />
+                                            {config.label}
+                                        </span>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-1">
                         <TourHelpButton className="flex-1 justify-center" />

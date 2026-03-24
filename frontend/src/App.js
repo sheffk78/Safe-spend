@@ -14,6 +14,8 @@ import SignupPage from "@/pages/SignupPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import InviteAcceptPage from "@/pages/InviteAcceptPage";
+import ApprovalActionPage from "@/pages/ApprovalActionPage";
 
 // Docs
 import DocsLayout from "@/layouts/DocsLayout";
@@ -40,6 +42,7 @@ import WebhooksPage from "@/pages/dashboard/WebhooksPage";
 import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
 import PricingPage from "@/pages/dashboard/PricingPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
+import TeamPage from "@/pages/dashboard/TeamPage";
 
 // Admin
 import AdminLayout from "@/layouts/AdminLayout";
@@ -76,6 +79,8 @@ function App() {
                     <Route path="/signup" element={<SignupPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/invite/:token" element={<InviteAcceptPage />} />
+                    <Route path="/approval-action" element={<ApprovalActionPage />} />
 
                     {/* Docs routes */}
                     <Route path="/docs" element={<DocsLayout />}>
@@ -109,6 +114,7 @@ function App() {
                         <Route path="webhooks" element={<WebhooksPage />} />
                         <Route path="audit" element={<AuditLogPage />} />
                         <Route path="pricing" element={<PricingPage />} />
+                        <Route path="team" element={<TeamPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                     </Route>
 

@@ -176,8 +176,8 @@ async function sendApprovalNotification(approval) {
             escrowName: spendRequest.escrowAccount?.name || 'Unknown',
             policyName: spendRequest.spendingPolicy?.name,
             timeRemaining,
-            approveUrl: `${FRONTEND_URL}/api/v1/approvals/action?token=${approveToken}`,
-            denyUrl: `${FRONTEND_URL}/api/v1/approvals/action?token=${denyToken}`,
+            approveUrl: `${FRONTEND_URL}/approval-action?token=${approveToken}`,
+            denyUrl: `${FRONTEND_URL}/approval-action?token=${denyToken}`,
             dashboardUrl: `${FRONTEND_URL}/dashboard/approvals/${approval.id}`,
             requestId: spendRequest.id
         });

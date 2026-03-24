@@ -84,6 +84,7 @@ async function requireOrgAuth(req, res, next) {
         
         req.org = org;
         req.authType = 'jwt';
+        req.userEmail = decoded.email; // Extract email from JWT for RBAC
         next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {

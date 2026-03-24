@@ -386,6 +386,70 @@ export const expireStaleApprovals = async () => {
     return handleResponse(response);
 };
 
+// ============ Team / RBAC ============
+export const listTeamMembers = async () => {
+    const response = await fetch(`${API_URL}/api/v1/team`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const getTeamRoles = async () => {
+    const response = await fetch(`${API_URL}/api/v1/team/roles`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const getMyRole = async () => {
+    const response = await fetch(`${API_URL}/api/v1/team/my-role`, {
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const inviteTeamMember = async (email, role) => {
+    const response = await fetch(`${API_URL}/api/v1/team/invite`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ email, role })
+    });
+    return handleResponse(response);
+};
+
+export const updateMemberRole = async (memberId, role) => {
+    const response = await fetch(`${API_URL}/api/v1/team/${memberId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ role })
+    });
+    return handleResponse(response);
+};
+
+export const removeMember = async (memberId) => {
+    const response = await fetch(`${API_URL}/api/v1/team/${memberId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+};
+
+export const getInviteDetails = async (token) => {
+    const response = await fetch(`${API_URL}/api/v1/team/invite/${token}`, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return handleResponse(response);
+};
+
+export const acceptInvite = async (token) => {
+    const response = await fetch(`${API_URL}/api/v1/team/accept-invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+    });
+    return handleResponse(response);
+};
+
 // ============ Utility Functions ============
 export const formatCents = (cents) => {
     if (cents === null || cents === undefined) return '$0.00';

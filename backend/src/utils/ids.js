@@ -13,7 +13,8 @@ const ID_PREFIXES = {
     auditEvent: 'evt_',
     webhook: 'whk_',
     webhookDelivery: 'dlv_',
-    event: 'evt_'
+    event: 'evt_',
+    orgMember: 'mbr_'
 };
 
 /**
