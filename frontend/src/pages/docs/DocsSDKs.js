@@ -93,6 +93,34 @@ result = agent.run(
     "Check my budget balance, then buy $25 of OpenAI credits if I have enough"
 )`;
 
+    const budgetAwareAgentCode = `# Full example: examples/budget_aware_agent.py
+from safespend import SafeSpendClient
+from safespend.integrations import create_safespend_toolkit
+from langchain.agents import AgentExecutor, create_structured_chat_agent
+from langchain_openai import ChatOpenAI
+
+# Initialize
+client = SafeSpendClient(api_key=os.environ["SAFESPEND_API_KEY"])
+tools = create_safespend_toolkit(client, default_escrow_id="esc_123")
+llm = ChatOpenAI(model="gpt-4")
+
+# System prompt for budget-aware behavior
+system_prompt = """You are a Budget-Aware AI Assistant.
+Before any purchase:
+1. Check your balance
+2. If sufficient, make the purchase  
+3. Handle denials gracefully
+"""
+
+# Create and run agent
+agent = create_structured_chat_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+# Interactive session
+result = executor.invoke({
+    "input": "Buy $50 of Anthropic credits for Claude API access"
+})`;
+
     const mcpConfigCode = `// Claude Desktop config (~/.config/Claude/claude_desktop_config.json)
 {
   "mcpServers": {
@@ -293,6 +321,23 @@ if (spend.status === 'approved') {
                     </tbody>
                 </table>
             </div>
+
+            <DocsHeading level={3}>Budget-Aware Agent Example</DocsHeading>
+
+            <DocsText>
+                Build an agent that checks its budget before making purchases and handles denials gracefully.
+                See the full example at <InlineCode>examples/budget_aware_agent.py</InlineCode>.
+            </DocsText>
+
+            <CodeBlock language="python" code={budgetAwareAgentCode} />
+
+            <Callout type="info" title="Complete Examples Available">
+                The <InlineCode>examples/</InlineCode> directory in the Python SDK includes:
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                    <li><strong>simple_agent.py</strong> — Minimal integration example</li>
+                    <li><strong>budget_aware_agent.py</strong> — Full-featured agent with interactive mode</li>
+                </ul>
+            </Callout>
 
             {/* MCP Server Section */}
             <DocsHeading level={2} id="mcp-server">MCP Server</DocsHeading>

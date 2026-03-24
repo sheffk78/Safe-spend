@@ -319,6 +319,15 @@ Developer adoption toolkit with Python SDK, LangChain integration, and MCP serve
   - `SafeSpendGetSpendTool` - Get spend details
 - **Factory**: `create_safespend_toolkit(client, default_escrow_id)`
 
+#### Example Agents
+- **Location**: `/app/sdks/python/examples/`
+- **simple_agent.py**: Minimal LangChain integration
+- **budget_aware_agent.py**: Full-featured agent with:
+  - Interactive chat session
+  - Demo scenario mode
+  - Budget-aware system prompts
+  - Proper error handling
+
 #### MCP Server
 - **Location**: `/app/sdks/mcp-server/`
 - **Installation**: `npm install -g @safespend/mcp-server`

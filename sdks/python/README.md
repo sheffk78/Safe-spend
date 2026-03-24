@@ -347,6 +347,26 @@ Task: Purchase $50 of Anthropic API credits for AI inference.
 result = agent.run(agent_prompt)
 ```
 
+## Examples
+
+The `examples/` directory contains complete working examples:
+
+### Simple Agent
+A minimal example showing basic Safe-Spend + LangChain integration:
+```bash
+cd examples
+python simple_agent.py
+```
+
+### Budget-Aware Agent
+A comprehensive example with interactive mode and demo scenarios:
+```bash
+cd examples
+python budget_aware_agent.py
+```
+
+See [examples/README.md](examples/README.md) for full documentation.
+
 ## License
 
 Proprietary. See LICENSE file for details.
