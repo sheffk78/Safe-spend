@@ -654,13 +654,61 @@ function checkMonthlyCap(context) {
 }
 
 /**
+ * Filter policies that apply to a specific agent
+ * If no AAV claims, returns all active policies
+ * If AAV claims present, returns only policies that authorize this agent
+ */
+function getApplicablePolicies(policies, aavClaims) {
+    const agentId = aavClaims?.agent_id;
+    const grantId = aavClaims?.grant_id;
+    
+    // If no agent identity, return all active policies
+    if (!agentId && !grantId) {
+        return policies.filter(p => p.isActive && p.status === 'active');
+    }
+    
+    // Filter to policies that apply to this agent
+    return policies.filter(policy => {
+        if (!policy.isActive || policy.status !== 'active') return false;
+        
+        // If policy has no AAV restrictions, it applies to all agents
+        if (!policy.aavEnabled) return true;
+        
+        const policyAgents = parseJsonField(policy.authorizedAgentIds, []);
+        const policyGrants = parseJsonField(policy.aavGrantIds, []);
+        
+        // If policy has no agent restrictions, it applies to all
+        if (policyAgents.length === 0 && policyGrants.length === 0) return true;
+        
+        // Check if agent matches
+        if (agentId && policyAgents.includes(agentId)) return true;
+        if (grantId && policyGrants.includes(grantId)) return true;
+        
+        return false;
+    });
+}
+
+/**
  * Step 9: VENDOR CHECK
+ * Now filters to only applicable policies based on agent identity
  */
 function checkVendor(context) {
-    const { policies, request } = context;
+    const { policies, request, aavClaims } = context;
     const vendor = request.vendor;
     
-    for (const policy of policies) {
+    // Get only policies that apply to this agent
+    const applicablePolicies = getApplicablePolicies(policies, aavClaims);
+    
+    if (applicablePolicies.length === 0) {
+        return {
+            rule: 'vendor_check',
+            passed: true,
+            reason: 'No applicable policies with vendor restrictions',
+            metadata: { vendor }
+        };
+    }
+    
+    for (const policy of applicablePolicies) {
         const allowedVendors = parseJsonField(policy.allowedVendors, []);
         const blockedVendors = parseJsonField(policy.blockedVendors, []);
         const matchMode = policy.vendorMatchMode || 'exact';
@@ -673,7 +721,7 @@ function checkVendor(context) {
                         rule: 'vendor_check',
                         rule_id: policy.id,
                         passed: false,
-                        reason: `Vendor "${vendor}" is blocked`,
+                        reason: `Vendor "${vendor}" is blocked by policy "${policy.name}"`,
                         metadata: {
                             vendor,
                             blocked_pattern: blocked,
@@ -700,7 +748,7 @@ function checkVendor(context) {
                     rule: 'vendor_check',
                     rule_id: policy.id,
                     passed: false,
-                    reason: `Vendor "${vendor}" is not in allowlist`,
+                    reason: `Vendor "${vendor}" is not in allowlist for policy "${policy.name}"`,
                     metadata: {
                         vendor,
                         allowed_vendors: allowedVendors,
@@ -716,7 +764,7 @@ function checkVendor(context) {
         rule: 'vendor_check',
         passed: true,
         reason: 'Vendor is allowed',
-        metadata: { vendor }
+        metadata: { vendor, policies_checked: applicablePolicies.map(p => p.name) }
     };
 }
 
