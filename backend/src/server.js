@@ -27,6 +27,7 @@ const stripeWebhookRoutes = require('./routes/stripe-webhook');
 // Admin Routes
 const adminAuthRoutes = require('./routes/admin-auth');
 const adminOrgsRoutes = require('./routes/admin-orgs');
+const adminApiV1Routes = require('./routes/admin-api-v1');
 
 // Validate environment at startup
 validateEnvironment();
@@ -135,6 +136,9 @@ app.use('/api/v1/api-keys', apiKeysRoutes);
 // ============================================
 app.use('/api/admin/auth', authRateLimiter, adminAuthRoutes);
 app.use('/api/admin/orgs', adminOrgsRoutes);
+
+// Admin API v1 (Internal automation - NOT for public documentation)
+app.use('/api/admin/v1', adminApiV1Routes);
 
 // ============================================
 // Error Handling

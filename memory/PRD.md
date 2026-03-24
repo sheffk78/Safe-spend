@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 14 Complete - Admin Control Plane
+**Current Phase:** Prompt 15 Complete - Admin API v1
 **Last Updated:** March 24, 2026
 
 ---
@@ -265,6 +265,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 12. ~~Policy Builder Wizard~~ ✅ COMPLETE
 13. ~~Guided Tour (Onboarding)~~ ✅ COMPLETE
 14. ~~Admin Control Plane (Prompt 14)~~ ✅ COMPLETE
+15. ~~Admin API v1 (Prompt 15)~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
 9. **SDK Generation** - Python, TypeScript SDKs
@@ -589,3 +590,69 @@ Internal admin dashboard for Agentic Trust operators to view, manage, and troubl
 #### Access
 - URL: `/admin`
 - Credentials: admin@agentictrust.app / AdminPassword123!
+
+
+---
+
+### Prompt 15 - Admin API v1 (Completed - March 24, 2026)
+
+#### Overview
+Internal-only REST API for Kit and internal automation to programmatically create and bootstrap Safe-Spend organizations. NOT for public documentation - this is a service-to-service API.
+
+#### Endpoints
+
+1. **POST /api/admin/v1/orgs** - Create a new organization
+   - Request: `{ name, email, plan, auto_bootstrap?, password? }`
+   - Response: org details, bootstrap results (if auto_bootstrap), initial_org_token, initial_password
+   - Plans: `sandbox`, `builder`, `scale`
+   - Auto-bootstrap creates all 3 governance patterns
+
+2. **POST /api/admin/v1/orgs/:orgId/bootstrap** - Bootstrap resources for existing org
+   - Request: `{ presets: { marketing_agent_budget?, procurement_agent?, sandbox_experiments? }, webhook_url? }`
+   - Response: created escrows, policies, api_keys, webhooks
+
+3. **GET /api/admin/v1/orgs/:orgId/checklist** - Get org readiness checklist
+   - Response: checks for escrows, policies, agent keys, webhooks, recent spend
+   - Includes `ready_for_production` flag and recommendations
+
+4. **GET /api/admin/v1/patterns** - List available governance patterns
+   - Returns pattern definitions with limits and defaults
+
+#### Governance Patterns
+Pre-defined patterns from Trust Law Explainer (Prompt 12):
+- **marketing_agent_budget**: $5K budget, $100/tx, $500/day, auto-approve <$50
+- **procurement_agent**: $3K budget, $300/tx, $1K/day, auto-approve <$150
+- **sandbox_experiments**: $500 budget, $20/tx, $100/day, auto-approve <$10
+
+#### Security
+- All endpoints require admin JWT authentication
+- Org JWTs and API keys are rejected (403 Forbidden)
+- All actions are audit-logged with admin ID
+- Auto-generated passwords returned only when not provided
+
+#### Files Created
+- `/app/backend/src/routes/admin-api-v1.js` (NEW - ~640 lines)
+- `/app/backend/prisma/schema.prisma` (Added `plan` field to Organization)
+- `/app/backend/src/server.js` (Registered new routes)
+
+#### Usage Examples
+
+**Create org with full bootstrap:**
+```bash
+curl -X POST /api/admin/v1/orgs \
+  -H "Authorization: Bearer {admin_token}" \
+  -d '{"name":"Acme Corp","email":"admin@acme.ai","plan":"builder","auto_bootstrap":true}'
+```
+
+**Bootstrap existing org with selective patterns:**
+```bash
+curl -X POST /api/admin/v1/orgs/{org_id}/bootstrap \
+  -H "Authorization: Bearer {admin_token}" \
+  -d '{"presets":{"sandbox_experiments":true},"webhook_url":"https://example.com/webhook"}'
+```
+
+**Check org readiness:**
+```bash
+curl /api/admin/v1/orgs/{org_id}/checklist \
+  -H "Authorization: Bearer {admin_token}"
+```
