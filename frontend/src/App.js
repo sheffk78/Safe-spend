@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Pages
 import LandingPage from "@/pages/LandingPage";
@@ -65,6 +66,7 @@ const AdminRoutes = () => (
 function App() {
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <AuthProvider>
                 <Routes>
                     {/* Public routes */}
