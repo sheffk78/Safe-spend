@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 15 Complete - Admin API v1
+**Current Phase:** Prompt 16 Complete - Python SDK
 **Last Updated:** March 24, 2026
 
 ---
@@ -266,19 +266,20 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 13. ~~Guided Tour (Onboarding)~~ ✅ COMPLETE
 14. ~~Admin Control Plane (Prompt 14)~~ ✅ COMPLETE
 15. ~~Admin API v1 (Prompt 15)~~ ✅ COMPLETE
+16. ~~Python SDK (Prompt 16)~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
-9. **SDK Generation** - Python, TypeScript SDKs
-10. **MCP Server Package** - `@safespend/mcp-server`
+1. **TypeScript SDK** - TypeScript/JavaScript SDK for Node.js
+2. **MCP Server Package** - `@safespend/mcp-server`
 
 ### P2 - Medium Priority
-11. **Email Notifications** - Alert on pending approvals
-12. **Production Deployment** - CI/CD, monitoring
+3. **Email Notifications** - Alert on pending approvals
+4. **Production Deployment** - CI/CD, monitoring
 
 ---
 
 ## Next Tasks
-1. SDK generation (Python, TypeScript)
+1. TypeScript SDK generation
 2. MCP Server implementation
 3. Email notifications for pending approvals
 
@@ -656,3 +657,92 @@ curl -X POST /api/admin/v1/orgs/{org_id}/bootstrap \
 curl /api/admin/v1/orgs/{org_id}/checklist \
   -H "Authorization: Bearer {admin_token}"
 ```
+
+
+---
+
+### Prompt 16 - Python SDK (Completed - March 24, 2026)
+
+#### Overview
+A minimal, developer-friendly Python SDK for the Safe-Spend API. Enables agent builders, backend engineers, and ops teams to integrate Safe-Spend with minimal boilerplate.
+
+#### Package Structure
+```
+/app/sdks/python/
+├── README.md           # Installation & usage guide
+├── pyproject.toml      # Python package configuration
+└── safespend/
+    ├── __init__.py     # Public API exports
+    ├── _version.py     # Version: 0.1.0
+    ├── client.py       # SafeSpendClient class
+    ├── errors.py       # Custom exceptions
+    └── types.py        # TypedDict definitions
+```
+
+#### SafeSpendClient Methods
+
+| Category | Methods |
+|----------|---------|
+| Escrow | `list_escrow_accounts()`, `get_escrow_account()`, `create_escrow_account()`, `fund_escrow_account()`, `get_escrow_balance()`, `pause_escrow_account()`, `resume_escrow_account()`, `close_escrow_account()` |
+| Policies | `list_policies()`, `get_policy()`, `create_policy()`, `delete_policy()` |
+| Spend | `create_spend()`, `list_spend_requests()`, `get_spend_request()`, `cancel_spend_request()` |
+| Approvals | `list_approvals()`, `get_approval()`, `approve()`, `deny()` |
+
+#### Error Handling
+- `SafeSpendError` - Base exception
+- `AuthenticationError` - 401 responses
+- `PermissionError` - 403 responses
+- `NotFoundError` - 404 responses
+- `RateLimitError` - 429 responses
+- `ValidationError` - 400 responses (with details)
+- `APIError` - 5xx and other errors
+
+#### Usage Example
+```python
+from safespend import SafeSpendClient
+
+client = SafeSpendClient(
+    api_key="sk_live_...",
+    base_url="https://api.safespend.app",
+)
+
+# Create and fund an escrow
+escrow = client.create_escrow_account(name="Marketing Budget")
+client.fund_escrow_account(escrow["id"], amount_cents=100000)
+
+# Create a policy
+client.create_policy(
+    escrow_id=escrow["id"],
+    name="Marketing Policy",
+    per_transaction_limit_cents=10000,
+    auto_approve_under_cents=5000,
+)
+
+# Make a spend request
+spend = client.create_spend(
+    escrow_id=escrow["id"],
+    amount_cents=2500,
+    vendor="Anthropic",
+    category="ai_compute",
+)
+print(f"Status: {spend['status']}")
+```
+
+#### Key Features
+- Type hints throughout (Python 3.9+)
+- Automatic idempotency key generation
+- Clean error mapping from HTTP status codes
+- Minimal dependencies (`requests` only)
+- Good docstrings and examples
+
+#### Installation
+```bash
+pip install safespend
+# Or from source:
+cd /app/sdks/python && pip install -e .
+```
+
+#### Notes
+- Approval endpoints require org tokens (JWT), not API keys
+- Designed for human review flows, not agent automation
+

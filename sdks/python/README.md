@@ -1,0 +1,253 @@
+# Safe-Spend Python SDK
+
+A minimal, developer-friendly Python client for the **Safe-Spend API** — fiat-first escrow and spending-control for AI agents, part of the [Agentic Trust](https://agentictrust.app) suite.
+
+## Installation
+
+```bash
+pip install safespend
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/agentictrust/safespend-python.git
+cd safespend-python
+pip install -e .
+```
+
+## Quickstart
+
+```python
+from safespend import SafeSpendClient
+
+# Initialize the client with your API key
+client = SafeSpendClient(api_key="sk_test_...")
+
+# List escrow accounts
+escrows = client.list_escrow_accounts()
+for escrow in escrows:
+    print(f"{escrow['name']}: ${escrow['balance_cents']/100:.2f}")
+
+# Create a spend request
+spend = client.create_spend(
+    escrow_id="esc_9f3k2m",
+    amount_cents=4999,
+    vendor="Anthropic",
+    category="ai_compute",
+    description="Claude API credits top-up",
+)
+
+# Check the result
+if spend["status"] == "approved":
+    print(f"Spend approved! Remaining: ${spend.get('remaining_balance_cents', 0)/100:.2f}")
+elif spend["status"] == "pending":
+    print(f"Awaiting human approval. Approval ID: {spend.get('approval_id')}")
+elif spend["status"] == "denied":
+    print(f"Spend denied: {spend.get('denial_reason')}")
+```
+
+## Error Handling
+
+The SDK raises typed exceptions for common error cases:
+
+```python
+from safespend import (
+    SafeSpendClient,
+    SafeSpendError,
+    AuthenticationError,
+    ValidationError,
+    NotFoundError,
+    RateLimitError,
+)
+
+client = SafeSpendClient(api_key="sk_test_...")
+
+try:
+    spend = client.create_spend(
+        escrow_id="esc_invalid",
+        amount_cents=100,
+        vendor="Test",
+    )
+except AuthenticationError:
+    print("Invalid API key")
+except NotFoundError:
+    print("Escrow account not found")
+except ValidationError as e:
+    print(f"Validation error: {e.message}")
+    if e.details:
+        print(f"Details: {e.details}")
+except RateLimitError:
+    print("Rate limit exceeded, try again later")
+except SafeSpendError as e:
+    print(f"API error: {e}")
+```
+
+## API Reference
+
+### Escrow Accounts
+
+```python
+# List all escrow accounts
+escrows = client.list_escrow_accounts()
+
+# Get a specific escrow account
+escrow = client.get_escrow_account("esc_123")
+
+# Create an escrow account
+escrow = client.create_escrow_account(
+    name="Marketing Budget Q1",
+    description="Budget for ad spend",
+)
+
+# Fund an escrow account (simulated, for testing)
+escrow = client.fund_escrow_account("esc_123", amount_cents=100000)
+
+# Get balance only
+balance = client.get_escrow_balance("esc_123")
+
+# Pause/resume/close
+client.pause_escrow_account("esc_123")
+client.resume_escrow_account("esc_123")
+client.close_escrow_account("esc_123")
+```
+
+### Spending Policies
+
+```python
+# List policies
+policies = client.list_policies()
+policies = client.list_policies(escrow_id="esc_123")
+
+# Create a policy
+policy = client.create_policy(
+    escrow_id="esc_123",
+    name="Marketing Policy",
+    per_transaction_limit_cents=10000,  # $100 max per transaction
+    daily_limit_cents=50000,            # $500 per day
+    auto_approve_under_cents=5000,      # Auto-approve under $50
+    vendor_allowlist=["Google Ads", "Meta Ads"],
+)
+
+# Delete a policy
+client.delete_policy("pol_123")
+```
+
+### Spend Requests
+
+```python
+# Create a spend request
+spend = client.create_spend(
+    escrow_id="esc_123",
+    amount_cents=2500,
+    vendor="OpenAI",
+    category="ai_compute",
+    description="GPT-4 API usage",
+    idempotency_key="order-12345",  # Optional, for safe retries
+)
+
+# List spend requests
+spends = client.list_spend_requests()
+spends = client.list_spend_requests(escrow_id="esc_123", status="approved")
+
+# Get spend request details
+spend = client.get_spend_request("sr_123")
+
+# Cancel a pending spend request
+spend = client.cancel_spend_request("sr_123")
+```
+
+### Approvals
+
+> **Note**: Approval endpoints require **organization tokens** (JWT), not API keys.
+> Use `Authorization: Bearer <org_token>` from the dashboard login.
+> This is intentional — approvals should be managed by humans, not agents.
+
+```python
+# For approval management, initialize with an org token instead of API key
+human_client = SafeSpendClient(
+    api_key="<org_jwt_token>",  # JWT from /v1/auth/login
+    base_url="https://api.safespend.app",
+)
+
+# List pending approvals
+approvals = human_client.list_approvals()  # Defaults to status="pending"
+approvals = human_client.list_approvals(status="approved")
+
+# Get approval details
+approval = human_client.get_approval("apr_123")
+
+# Approve a pending request
+result = human_client.approve("apr_123", note="Approved by finance team")
+
+# Deny a pending request
+result = human_client.deny("apr_123", note="Over budget", reason="budget_exceeded")
+```
+
+## Advanced Usage
+
+### Custom Base URL
+
+Point to staging or local development:
+
+```python
+client = SafeSpendClient(
+    api_key="sk_test_...",
+    base_url="http://localhost:8001/api",
+)
+```
+
+### Request Timeout
+
+Customize the request timeout (default: 10 seconds):
+
+```python
+client = SafeSpendClient(
+    api_key="sk_test_...",
+    timeout=30.0,
+)
+```
+
+### Idempotency
+
+For safe retries, always provide an `idempotency_key`:
+
+```python
+spend = client.create_spend(
+    escrow_id="esc_123",
+    amount_cents=5000,
+    vendor="AWS",
+    idempotency_key=f"order-{order_id}",
+)
+```
+
+If you don't provide one, the SDK generates a unique key automatically.
+
+### Direct API Access
+
+For endpoints not covered by high-level methods:
+
+```python
+# Use _request for direct API calls
+result = client._request(
+    "PATCH",
+    f"/v1/policies/{policy_id}",
+    json={"daily_limit_cents": 100000},
+)
+```
+
+## Compatibility
+
+- Python 3.9+
+- Fully typed with type hints
+- Uses `requests` library for HTTP
+
+## Support
+
+- **Documentation**: [agentictrust.app/docs](https://agentictrust.app/docs)
+- **Issues**: [GitHub Issues](https://github.com/agentictrust/safespend-python/issues)
+- **Email**: support@agentictrust.app
+
+## License
+
+Proprietary. See LICENSE file for details.
