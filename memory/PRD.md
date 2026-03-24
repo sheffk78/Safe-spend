@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 09 Complete - Production Hardening & Deployment
+**Current Phase:** Prompts 10 & 11 Complete - Terms of Service & Privacy Policy
 **Last Updated:** March 24, 2026
 
 ---
@@ -250,21 +250,23 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 
 ## Prioritized Backlog
 
-### P0 - Critical (Next Prompts)
+### P0 - Critical (Completed)
 1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
 2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
 3. ~~End-to-End Testing (Prompt 06)~~ ✅ COMPLETE
 4. ~~Docs Site (Prompt 07)~~ ✅ COMPLETE
 5. ~~Stripe Integration (Prompt 08)~~ ✅ COMPLETE
 6. ~~Production Hardening (Prompt 09)~~ ✅ COMPLETE
+7. ~~Terms of Service (Prompt 10)~~ ✅ COMPLETE
+8. ~~Privacy Policy (Prompt 11)~~ ✅ COMPLETE
 
-### P1 - High Priority
-7. **SDK Generation** - Python, TypeScript SDKs
-8. **MCP Server Package** - `@safespend/mcp-server`
+### P1 - High Priority (Future)
+9. **SDK Generation** - Python, TypeScript SDKs
+10. **MCP Server Package** - `@safespend/mcp-server`
 
 ### P2 - Medium Priority
-9. **Email Notifications** - Alert on pending approvals
-10. **Production Deployment** - CI/CD, monitoring
+11. **Email Notifications** - Alert on pending approvals
+12. **Production Deployment** - CI/CD, monitoring
 
 ---
 
