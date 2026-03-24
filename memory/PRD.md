@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 13 Complete - API Playground & Quick Start Templates
+**Current Phase:** Guided Tour Complete - Full Onboarding Experience
 **Last Updated:** March 24, 2026
 
 ---
@@ -263,6 +263,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 10. ~~API Playground (Prompt 13)~~ ✅ COMPLETE
 11. ~~Quick Start Templates~~ ✅ COMPLETE
 12. ~~Policy Builder Wizard~~ ✅ COMPLETE
+13. ~~Guided Tour (Onboarding)~~ ✅ COMPLETE
 
 ### P1 - High Priority (Future)
 9. **SDK Generation** - Python, TypeScript SDKs
@@ -477,3 +478,45 @@ One-click creation of pre-configured escrow accounts with matching spending poli
 
 #### Access
 - Dashboard → Quick Start button (top right header)
+
+
+---
+
+### Guided Tour (Completed - March 24, 2026)
+
+#### Overview
+An interactive onboarding tour that walks first-time users through the key features of Safe-Spend. Automatically shows for new users, can be restarted from the sidebar.
+
+#### Tour Steps (7 total)
+1. **Welcome** - Introduction and tour overview
+2. **Quick Start** - Highlights the Quick Start button with spotlight effect
+3. **Escrow Accounts** - Explains segregated fund pools
+4. **Spending Rules** - Explains fiduciary policies
+5. **Playground** - Highlights the API testing environment
+6. **API Keys** - Explains agent authentication
+7. **Completion** - Summary with "Get Started" CTA
+
+#### Features
+- **Spotlight overlay** with animated border on highlighted elements
+- **Arrow pointers** pointing to specific UI elements
+- **Action tips** suggesting next steps
+- **Progress dots** showing tour position
+- **Keyboard navigation** (Arrow keys, Enter, Escape)
+- **Skip/Close** functionality
+- **Restart capability** via sidebar "Tour" button
+- **Persistence** - tour completion saved to localStorage
+
+#### Components
+- `GuidedTour.js` - Main tour orchestrator
+- `TourTooltip` - Step content display
+- `Spotlight` - Element highlighting with cutout
+- `TourHelpButton` - Sidebar button to restart tour
+- `useShouldShowTour()` - Hook to check tour state
+
+#### Files Created/Modified
+- `/app/frontend/src/components/GuidedTour.js` (NEW)
+- `/app/frontend/src/layouts/DashboardLayout.js` (Integrated tour + help button)
+
+#### Access
+- Automatically starts on first dashboard visit
+- Restart via sidebar → "Tour" button

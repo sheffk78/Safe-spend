@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import GuidedTour, { useShouldShowTour, TourHelpButton } from '@/components/GuidedTour';
 import { 
     LayoutDashboard, 
     Wallet, 
@@ -36,11 +37,19 @@ const DashboardLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const shouldShowTour = useShouldShowTour();
+    const [showTour, setShowTour] = useState(true);
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
+
+    const handleTourComplete = () => {
+        setShowTour(false);
+    };
+
+    const tourActive = shouldShowTour && showTour;
 
     const isActive = (path) => {
         if (path === '/dashboard') {
@@ -101,14 +110,17 @@ const DashboardLayout = () => {
                     <div className="mb-3">
                         <p className="text-xs text-ss-text-tertiary truncate">{user?.email}</p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-ss-text-secondary hover:text-ss-text hover:bg-[rgba(255,255,255,0.04)] rounded-md transition-all duration-150"
-                        data-testid="logout-btn"
-                    >
-                        <LogOut size={18} />
-                        Log out
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <TourHelpButton className="flex-1 justify-center" />
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 flex-1 justify-center px-3 py-2 text-sm text-ss-text-secondary hover:text-ss-text hover:bg-[rgba(255,255,255,0.04)] rounded-md transition-all duration-150"
+                            data-testid="logout-btn"
+                        >
+                            <LogOut size={16} />
+                            Log out
+                        </button>
+                    </div>
                 </div>
             </aside>
 
@@ -138,6 +150,9 @@ const DashboardLayout = () => {
                     <Outlet />
                 </div>
             </main>
+
+            {/* Guided Tour */}
+            {tourActive && <GuidedTour onComplete={handleTourComplete} />}
         </div>
     );
 };
