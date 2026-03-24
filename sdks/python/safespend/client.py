@@ -41,6 +41,8 @@ class SafeSpendClient:
         api_key: str,
         base_url: str = "https://api.safespend.app",
         timeout: float = 10.0,
+        max_retries: int = 3,
+        retry_delay: float = 1.0,
     ) -> None:
         """
         Initialize the Safe-Spend client.
@@ -49,13 +51,23 @@ class SafeSpendClient:
             api_key: Your Safe-Spend API key (starts with 'sk_').
             base_url: Base URL for the Safe-Spend API. Override for staging/local dev.
             timeout: Request timeout in seconds.
+            max_retries: Maximum number of retries for transient failures (5xx, timeouts).
+            retry_delay: Initial delay between retries in seconds (uses exponential backoff).
         """
         if not api_key:
             raise ValueError("api_key is required")
         
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        # Normalize base URL - ensure it ends with /api if it's a custom deployment
+        base_url = base_url.rstrip("/")
+        if not base_url.endswith("/api") and "api.safespend.app" not in base_url:
+            # Custom deployment URL (e.g., preview.emergentagent.com) - add /api prefix
+            self.base_url = f"{base_url}/api"
+        else:
+            self.base_url = base_url
         self.timeout = timeout
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
         self._session = requests.Session()
         self._session.headers.update({
             "Authorization": f"Bearer {api_key}",
@@ -72,7 +84,7 @@ class SafeSpendClient:
         json: Optional[Dict[str, Any]] = None,
     ) -> Any:
         """
-        Make an HTTP request and handle errors.
+        Make an HTTP request with automatic retry for transient failures.
         
         Args:
             method: HTTP method (GET, POST, PATCH, DELETE).
@@ -92,59 +104,82 @@ class SafeSpendClient:
             APIError: On 5xx or other unexpected responses.
         """
         url = f"{self.base_url}{path}"
+        last_error: Optional[Exception] = None
         
-        try:
-            response = self._session.request(
-                method=method,
-                url=url,
-                params=params,
-                json=json,
-                timeout=self.timeout,
-            )
-        except requests.exceptions.Timeout:
-            raise APIError("Request timed out", status_code=0, body=None)
-        except requests.exceptions.ConnectionError as e:
-            raise APIError(f"Connection error: {e}", status_code=0, body=None)
-        except requests.exceptions.RequestException as e:
-            raise APIError(f"Request failed: {e}", status_code=0, body=None)
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = self._session.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    json=json,
+                    timeout=self.timeout,
+                )
+            except requests.exceptions.Timeout:
+                last_error = APIError("Request timed out", status_code=0, body=None)
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise last_error
+            except requests.exceptions.ConnectionError as e:
+                last_error = APIError(f"Connection error: {e}", status_code=0, body=None)
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise last_error
+            except requests.exceptions.RequestException as e:
+                raise APIError(f"Request failed: {e}", status_code=0, body=None)
+            
+            # Parse response body
+            try:
+                body = response.json()
+            except ValueError:
+                body = {"raw": response.text}
+            
+            # Handle error responses
+            if response.status_code == 400:
+                error_msg = body.get("error", "Validation error")
+                details = body.get("details")
+                raise ValidationError(error_msg, details=details)
+            
+            if response.status_code == 401:
+                error_msg = body.get("error", "Authentication failed")
+                raise AuthenticationError(error_msg)
+            
+            if response.status_code == 403:
+                error_msg = body.get("error", "Permission denied")
+                raise PermissionError(error_msg)
+            
+            if response.status_code == 404:
+                error_msg = body.get("error", "Not found")
+                raise NotFoundError(error_msg)
+            
+            if response.status_code == 429:
+                # Rate limit - retry with exponential backoff
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                error_msg = body.get("error", "Rate limit exceeded")
+                raise RateLimitError(error_msg)
+            
+            if response.status_code >= 500:
+                # Server error - retry with exponential backoff
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                error_msg = body.get("error", "Server error")
+                raise APIError(error_msg, status_code=response.status_code, body=body)
+            
+            if not response.ok:
+                error_msg = body.get("error", f"HTTP {response.status_code}")
+                raise APIError(error_msg, status_code=response.status_code, body=body)
+            
+            return body
         
-        # Parse response body
-        try:
-            body = response.json()
-        except ValueError:
-            body = {"raw": response.text}
-        
-        # Handle error responses
-        if response.status_code == 400:
-            error_msg = body.get("error", "Validation error")
-            details = body.get("details")
-            raise ValidationError(error_msg, details=details)
-        
-        if response.status_code == 401:
-            error_msg = body.get("error", "Authentication failed")
-            raise AuthenticationError(error_msg)
-        
-        if response.status_code == 403:
-            error_msg = body.get("error", "Permission denied")
-            raise PermissionError(error_msg)
-        
-        if response.status_code == 404:
-            error_msg = body.get("error", "Not found")
-            raise NotFoundError(error_msg)
-        
-        if response.status_code == 429:
-            error_msg = body.get("error", "Rate limit exceeded")
-            raise RateLimitError(error_msg)
-        
-        if response.status_code >= 500:
-            error_msg = body.get("error", "Server error")
-            raise APIError(error_msg, status_code=response.status_code, body=body)
-        
-        if not response.ok:
-            error_msg = body.get("error", f"HTTP {response.status_code}")
-            raise APIError(error_msg, status_code=response.status_code, body=body)
-        
-        return body
+        # Should not reach here
+        if last_error:
+            raise last_error
+        raise APIError("Unknown error", status_code=0, body=None)
     
     # -------------------------------------------------------------------------
     # Escrow Accounts

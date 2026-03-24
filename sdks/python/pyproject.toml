@@ -44,6 +44,15 @@ langchain = [
     "langchain-core>=0.1.0",
     "pydantic>=2.0",
 ]
+async = [
+    "httpx>=0.24.0",
+]
+all = [
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "pydantic>=2.0",
+    "httpx>=0.24.0",
+]
 
 [project.urls]
 Homepage = "https://agentictrust.app"

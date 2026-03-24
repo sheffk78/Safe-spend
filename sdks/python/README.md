@@ -8,6 +8,19 @@ A minimal, developer-friendly Python client for the **Safe-Spend API** — fiat-
 pip install safespend
 ```
 
+Or install with optional dependencies:
+
+```bash
+# With LangChain support
+pip install safespend[langchain]
+
+# With async client support
+pip install safespend[async]
+
+# With everything
+pip install safespend[all]
+```
+
 Or install from source:
 
 ```bash
@@ -82,6 +95,51 @@ except RateLimitError:
 except SafeSpendError as e:
     print(f"API error: {e}")
 ```
+
+## Async Client
+
+For high-performance applications, use the async client:
+
+```bash
+pip install safespend[async]
+```
+
+```python
+import asyncio
+from safespend import AsyncSafeSpendClient
+
+async def main():
+    async with AsyncSafeSpendClient(api_key="sk_test_...") as client:
+        # All methods are now async
+        escrows = await client.list_escrow_accounts()
+        
+        spend = await client.create_spend(
+            escrow_id="esc_123",
+            amount_cents=2500,
+            vendor="OpenAI",
+        )
+        
+        print(f"Status: {spend['status']}")
+
+asyncio.run(main())
+```
+
+### Retry Configuration
+
+Both sync and async clients support automatic retries for transient failures:
+
+```python
+client = SafeSpendClient(
+    api_key="sk_test_...",
+    max_retries=3,      # Retry up to 3 times (default)
+    retry_delay=1.0,    # Initial delay of 1 second (exponential backoff)
+)
+```
+
+Retries are triggered for:
+- HTTP 429 (Rate Limit)
+- HTTP 5xx (Server Errors)
+- Connection timeouts
 
 ## API Reference
 

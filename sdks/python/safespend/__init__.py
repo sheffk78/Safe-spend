@@ -13,6 +13,14 @@ Example:
     ...     amount_cents=1000,
     ...     vendor="Anthropic",
     ... )
+
+Async Example:
+    >>> from safespend import AsyncSafeSpendClient
+    >>> import asyncio
+    >>> async def main():
+    ...     async with AsyncSafeSpendClient(api_key="sk_test_...") as client:
+    ...         escrows = await client.list_escrow_accounts()
+    >>> asyncio.run(main())
 """
 
 from .client import SafeSpendClient
@@ -27,8 +35,16 @@ from .errors import (
 )
 from ._version import __version__
 
+# Lazy import async client to avoid httpx dependency requirement
+def __getattr__(name):
+    if name == "AsyncSafeSpendClient":
+        from .async_client import AsyncSafeSpendClient
+        return AsyncSafeSpendClient
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 __all__ = [
     "SafeSpendClient",
+    "AsyncSafeSpendClient",
     "SafeSpendError",
     "AuthenticationError",
     "PermissionError",
