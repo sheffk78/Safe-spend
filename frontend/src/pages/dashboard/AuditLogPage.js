@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
     FileText, 
     RefreshCw, 
     X,
     Filter,
     ChevronDown,
-    ExternalLink
+    ExternalLink,
+    FileDown
 } from 'lucide-react';
 import {
     listAuditEvents,
@@ -153,6 +155,14 @@ const AuditLogPage = () => {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Link
+                        to="/dashboard/exports?type=audit-events"
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                        data-testid="export-audit-btn"
+                    >
+                        <FileDown size={16} />
+                        Export CSV
+                    </Link>
                     <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={`flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg transition-all ${

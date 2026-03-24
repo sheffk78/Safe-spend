@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import StatusBadge from '@/components/StatusBadge';
-import { ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowRight, RefreshCw, FileDown } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -52,15 +52,25 @@ const TransactionsPage = () => {
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Transactions</h1>
                     <p className="text-ss-text-secondary mt-1">View all spend requests and their outcomes</p>
                 </div>
-                <button
-                    onClick={fetchTransactions}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
-                    data-testid="refresh-btn"
-                >
-                    <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                    Refresh
-                </button>
+                <div className="flex items-center gap-2">
+                    <Link
+                        to="/dashboard/exports?type=spend-activity"
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                        data-testid="export-transactions-btn"
+                    >
+                        <FileDown size={16} />
+                        Export CSV
+                    </Link>
+                    <button
+                        onClick={fetchTransactions}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                        data-testid="refresh-btn"
+                    >
+                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                </div>
             </div>
 
             {/* Error */}

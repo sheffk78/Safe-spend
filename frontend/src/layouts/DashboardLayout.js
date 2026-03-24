@@ -21,7 +21,8 @@ import {
     Crown,
     ShieldCheck,
     Code2,
-    Eye
+    Eye,
+    FileDown
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getMyRole } from '@/lib/api';
@@ -44,6 +45,7 @@ const navItems = [
     { label: 'API Keys', icon: Key, path: '/dashboard/keys' },
     { label: 'Webhooks', icon: Webhook, path: '/dashboard/webhooks' },
     { label: 'Audit Log', icon: FileText, path: '/dashboard/audit' },
+    { label: 'Exports', icon: FileDown, path: '/dashboard/exports' },
     { label: 'Team', icon: Users, path: '/dashboard/team' },
     { label: 'Pricing & Plans', icon: CreditCard, path: '/dashboard/pricing' },
     { label: 'Settings', icon: Settings, path: '/dashboard/settings' },

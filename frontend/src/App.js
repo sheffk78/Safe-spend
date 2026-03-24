@@ -43,6 +43,7 @@ import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
 import PricingPage from "@/pages/dashboard/PricingPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 import TeamPage from "@/pages/dashboard/TeamPage";
+import ExportsPage from "@/pages/dashboard/ExportsPage";
 
 // Admin
 import AdminLayout from "@/layouts/AdminLayout";
@@ -115,6 +116,7 @@ function App() {
                         <Route path="audit" element={<AuditLogPage />} />
                         <Route path="pricing" element={<PricingPage />} />
                         <Route path="team" element={<TeamPage />} />
+                        <Route path="exports" element={<ExportsPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                     </Route>
 
