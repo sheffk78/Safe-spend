@@ -6,10 +6,26 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { requireOrgAuth, requirePermission } = require('../middleware/auth');
+const { exportRateLimiter } = require('../middleware/rate-limit');
 const rbacService = require('../services/rbac-service');
+const { generateId } = require('../utils/ids');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// ============================================
+// Export Configuration
+// ============================================
+const EXPORT_CONFIG = {
+    // Maximum date range in days (90 days = ~3 months)
+    maxDateRangeDays: 90,
+    
+    // PDF Statement feature flags (for future implementation)
+    pdf: {
+        enabled: false, // Set to true when PDF generation is ready
+        maxStatementsPerMonth: 12, // Limit statement generation
+    }
+};
 
 /**
  * Format date to ISO 8601 (YYYY-MM-DDTHH:MM:SSZ)
@@ -60,6 +76,87 @@ function generateFilename(orgName, reportType) {
 }
 
 /**
+ * Validate date range and check max allowed range
+ * Returns { valid, startDate, endDate, error }
+ */
+function validateDateRange(start_date, end_date) {
+    if (!start_date || !end_date) {
+        return { 
+            valid: false, 
+            error: 'start_date and end_date are required' 
+        };
+    }
+    
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return { 
+            valid: false, 
+            error: 'Invalid date format. Use ISO 8601 (YYYY-MM-DD)' 
+        };
+    }
+    
+    if (startDate > endDate) {
+        return {
+            valid: false,
+            error: 'start_date must be before end_date'
+        };
+    }
+    
+    // Check max date range
+    const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    if (daysDiff > EXPORT_CONFIG.maxDateRangeDays) {
+        return {
+            valid: false,
+            error: `Date range exceeds maximum of ${EXPORT_CONFIG.maxDateRangeDays} days. Please narrow your date range.`,
+            max_days: EXPORT_CONFIG.maxDateRangeDays,
+            requested_days: daysDiff
+        };
+    }
+    
+    // Set end date to end of day
+    endDate.setHours(23, 59, 59, 999);
+    
+    return { valid: true, startDate, endDate, daysDiff };
+}
+
+/**
+ * Log export generation to audit trail
+ */
+async function logExportAuditEvent(req, reportType, recordCount, filters) {
+    try {
+        await prisma.auditEvent.create({
+            data: {
+                id: generateId('auditEvent'),
+                orgId: req.org.id,
+                eventType: 'export.generated',
+                actorType: 'human',
+                actorId: req.userEmail || req.org.email,
+                details: JSON.stringify({
+                    report_type: reportType,
+                    record_count: recordCount,
+                    filters: {
+                        start_date: filters.startDate?.toISOString(),
+                        end_date: filters.endDate?.toISOString(),
+                        escrow_id: filters.escrowId || null,
+                        status: filters.status || null,
+                        event_type: filters.eventType || null,
+                        actor_type: filters.actorType || null,
+                    },
+                    exported_by: req.userEmail,
+                    user_role: req.userRole,
+                }),
+                ipAddress: req.ip || req.headers?.['x-forwarded-for']?.split(',')[0] || 'unknown',
+            }
+        });
+    } catch (error) {
+        // Log but don't fail the export if audit logging fails
+        console.error('Failed to log export audit event:', error);
+    }
+}
+
+/**
  * Middleware to check export permission (owner or finance_admin)
  */
 async function requireExportPermission(req, res, next) {
@@ -104,31 +201,26 @@ async function requireExportPermission(req, res, next) {
  * - end_date: ISO date string (required)
  * - escrow_id: Filter by escrow account (optional)
  * - status: Filter by status (optional: all, approved, denied, pending, expired)
+ * 
+ * Rate limited: 10 requests per 5 minutes per org
+ * Max date range: 90 days
  */
-router.get('/spend-activity', requireOrgAuth, requireExportPermission, async (req, res) => {
+router.get('/spend-activity', requireOrgAuth, requireExportPermission, exportRateLimiter, async (req, res) => {
     try {
         const { start_date, end_date, escrow_id, status } = req.query;
         
-        // Validate date range
-        if (!start_date || !end_date) {
+        // Validate date range with max limit
+        const validation = validateDateRange(start_date, end_date);
+        if (!validation.valid) {
             return res.status(400).json({
-                error: 'start_date and end_date are required',
+                error: validation.error,
+                max_days: validation.max_days,
+                requested_days: validation.requested_days,
                 request_id: req.requestId,
             });
         }
         
-        const startDate = new Date(start_date);
-        const endDate = new Date(end_date);
-        
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            return res.status(400).json({
-                error: 'Invalid date format. Use ISO 8601 (YYYY-MM-DD)',
-                request_id: req.requestId,
-            });
-        }
-        
-        // Set end date to end of day
-        endDate.setHours(23, 59, 59, 999);
+        const { startDate, endDate } = validation;
         
         // Build query
         const where = {
@@ -200,6 +292,14 @@ router.get('/spend-activity', requireOrgAuth, requireExportPermission, async (re
         const csv = toCSV(spendRequests, columns);
         const filename = generateFilename(req.org.name, 'spend-activity');
         
+        // Log export to audit trail
+        await logExportAuditEvent(req, 'spend-activity', spendRequests.length, {
+            startDate,
+            endDate,
+            escrowId: escrow_id,
+            status,
+        });
+        
         // Send response
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -224,31 +324,26 @@ router.get('/spend-activity', requireOrgAuth, requireExportPermission, async (re
  * - escrow_id: Filter by escrow account (optional)
  * - event_type: Filter by event type (optional)
  * - actor_type: Filter by actor type (optional: human, agent, system)
+ * 
+ * Rate limited: 10 requests per 5 minutes per org
+ * Max date range: 90 days
  */
-router.get('/audit-events', requireOrgAuth, requireExportPermission, async (req, res) => {
+router.get('/audit-events', requireOrgAuth, requireExportPermission, exportRateLimiter, async (req, res) => {
     try {
         const { start_date, end_date, escrow_id, event_type, actor_type } = req.query;
         
-        // Validate date range
-        if (!start_date || !end_date) {
+        // Validate date range with max limit
+        const validation = validateDateRange(start_date, end_date);
+        if (!validation.valid) {
             return res.status(400).json({
-                error: 'start_date and end_date are required',
+                error: validation.error,
+                max_days: validation.max_days,
+                requested_days: validation.requested_days,
                 request_id: req.requestId,
             });
         }
         
-        const startDate = new Date(start_date);
-        const endDate = new Date(end_date);
-        
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            return res.status(400).json({
-                error: 'Invalid date format. Use ISO 8601 (YYYY-MM-DD)',
-                request_id: req.requestId,
-            });
-        }
-        
-        // Set end date to end of day
-        endDate.setHours(23, 59, 59, 999);
+        const { startDate, endDate } = validation;
         
         // Build query
         const where = {
@@ -319,6 +414,15 @@ router.get('/audit-events', requireOrgAuth, requireExportPermission, async (req,
         const csv = toCSV(flattenedEvents, columns);
         const filename = generateFilename(req.org.name, 'audit-events');
         
+        // Log export to audit trail
+        await logExportAuditEvent(req, 'audit-events', auditEvents.length, {
+            startDate,
+            endDate,
+            escrowId: escrow_id,
+            eventType: event_type,
+            actorType: actor_type,
+        });
+        
         // Send response
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -336,29 +440,24 @@ router.get('/audit-events', requireOrgAuth, requireExportPermission, async (req,
 /**
  * GET /v1/exports/summary
  * Get export summary/preview without generating full CSV
+ * Shows max date range limit info
  */
 router.get('/summary', requireOrgAuth, requireExportPermission, async (req, res) => {
     try {
         const { start_date, end_date, escrow_id, report_type } = req.query;
         
-        if (!start_date || !end_date) {
+        // Validate date range with max limit
+        const validation = validateDateRange(start_date, end_date);
+        if (!validation.valid) {
             return res.status(400).json({
-                error: 'start_date and end_date are required',
+                error: validation.error,
+                max_days: validation.max_days,
+                requested_days: validation.requested_days,
                 request_id: req.requestId,
             });
         }
         
-        const startDate = new Date(start_date);
-        const endDate = new Date(end_date);
-        
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            return res.status(400).json({
-                error: 'Invalid date format. Use ISO 8601 (YYYY-MM-DD)',
-                request_id: req.requestId,
-            });
-        }
-        
-        endDate.setHours(23, 59, 59, 999);
+        const { startDate, endDate, daysDiff } = validation;
         
         const baseWhere = {
             orgId: req.org.id,
@@ -395,6 +494,8 @@ router.get('/summary', requireOrgAuth, requireExportPermission, async (req, res)
             date_range: {
                 start: startDate.toISOString(),
                 end: endDate.toISOString(),
+                days: daysDiff,
+                max_days: EXPORT_CONFIG.maxDateRangeDays,
             },
             spend_activity: {
                 total_records: spendCount,
@@ -409,6 +510,10 @@ router.get('/summary', requireOrgAuth, requireExportPermission, async (req, res)
                     event_type: item.eventType,
                     count: item._count.eventType,
                 })),
+            },
+            config: {
+                max_date_range_days: EXPORT_CONFIG.maxDateRangeDays,
+                pdf_enabled: EXPORT_CONFIG.pdf.enabled,
             },
         });
         

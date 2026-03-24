@@ -18,6 +18,11 @@ import { listEscrowAccounts, getMyRole } from '@/lib/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
+// Export configuration
+const EXPORT_CONFIG = {
+    maxDateRangeDays: 90, // Must match backend
+};
+
 // Report type configurations
 const REPORT_TYPES = {
     'spend-activity': {
@@ -91,6 +96,12 @@ const ExportsPage = () => {
     const [success, setSuccess] = useState(null);
     const [summary, setSummary] = useState(null);
     const [loadingSummary, setLoadingSummary] = useState(false);
+    
+    // Calculate date range days
+    const dateRangeDays = startDate && endDate 
+        ? Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1
+        : 0;
+    const dateRangeExceeded = dateRangeDays > EXPORT_CONFIG.maxDateRangeDays;
     
     // Fetch escrows and user role on mount
     useEffect(() => {
@@ -335,6 +346,17 @@ const ExportsPage = () => {
                 </div>
             </div>
             
+            {/* Date Range Warning */}
+            {dateRangeExceeded && (
+                <div className="flex items-center gap-2 text-amber-400 text-sm bg-amber-400/10 px-4 py-3 rounded-lg border border-amber-400/20">
+                    <AlertCircle size={18} />
+                    <span>
+                        Date range exceeds {EXPORT_CONFIG.maxDateRangeDays} days ({dateRangeDays} days selected). 
+                        Please narrow your date range to generate an export.
+                    </span>
+                </div>
+            )}
+            
             {/* Summary Preview */}
             <div className="bg-ss-card border border-[rgba(255,255,255,0.06)] rounded-xl p-6">
                 <h2 className="font-medium text-ss-text mb-4 flex items-center gap-2">
@@ -418,12 +440,12 @@ const ExportsPage = () => {
             <div className="flex items-center justify-between">
                 <p className="text-xs text-ss-text-tertiary flex items-center gap-1.5">
                     <Clock size={12} />
-                    Exports use ISO 8601 date format (YYYY-MM-DDTHH:MM:SSZ)
+                    Exports use ISO 8601 date format. Max range: {EXPORT_CONFIG.maxDateRangeDays} days.
                 </p>
                 
                 <button
                     onClick={handleExport}
-                    disabled={loading || !canExport || !recordCount}
+                    disabled={loading || !canExport || !recordCount || dateRangeExceeded}
                     className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     data-testid="generate-export-btn"
                 >

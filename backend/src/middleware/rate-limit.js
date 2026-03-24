@@ -101,6 +101,36 @@ const keyCreationRateLimiter = rateLimit({
 });
 
 /**
+ * Export rate limiter - 10 requests per 5 minutes per org
+ * Prevents abuse of CSV generation which can be resource-intensive
+ */
+const exportRateLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 10, // 10 exports per 5 minutes
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: orgKeyGenerator,
+    handler: (req, res) => {
+        events.rateLimitExceeded({
+            request_id: req.requestId,
+            ip: req.ip,
+            path: req.path,
+            org_id: req.org?.id,
+            limiter: 'export',
+        });
+        
+        res.status(429).json({
+            error: 'rate_limit_exceeded',
+            message: 'Too many export requests. Please wait a few minutes before generating another export.',
+            retry_after: Math.ceil(req.rateLimit.resetTime / 1000 - Date.now() / 1000),
+            request_id: req.requestId,
+        });
+    },
+    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    validate: { xForwardedForHeader: false },
+});
+
+/**
  * Global rate limiter - 200 requests per minute per IP
  */
 const globalRateLimiter = rateLimit({
@@ -123,5 +153,6 @@ module.exports = {
     authRateLimiter,
     spendRateLimiter,
     keyCreationRateLimiter,
+    exportRateLimiter,
     globalRateLimiter,
 };
