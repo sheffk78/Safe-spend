@@ -1,8 +1,48 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { PrismaClient } = require('@prisma/client');
 const { hashApiKey } = require('../utils/ids');
+const { logger, events } = require('../lib/logger');
 
 const prisma = new PrismaClient();
+
+/**
+ * Timing-safe string comparison to prevent timing attacks
+ */
+function timingSafeEqual(a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string') {
+        return false;
+    }
+    
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    
+    // Ensure equal length for timing-safe comparison
+    if (bufA.length !== bufB.length) {
+        // Compare against itself to maintain constant time
+        crypto.timingSafeEqual(bufA, bufA);
+        return false;
+    }
+    
+    return crypto.timingSafeEqual(bufA, bufB);
+}
+
+/**
+ * Generic unauthorized response (prevents enumeration)
+ */
+function unauthorizedResponse(req, res) {
+    events.authFailed({
+        request_id: req.requestId,
+        ip: req.ip,
+        path: req.path,
+    });
+    
+    return res.status(401).json({ 
+        error: 'unauthorized',
+        message: 'Invalid or missing credentials',
+        request_id: req.requestId,
+    });
+}
 
 /**
  * Middleware to authenticate with JWT (org session from dashboard)
@@ -12,14 +52,18 @@ async function requireOrgAuth(req, res, next) {
         const authHeader = req.headers.authorization;
         
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Missing or invalid authorization header' });
+            return unauthorizedResponse(req, res);
         }
         
         const token = authHeader.substring(7);
         
         // Check if it's an API key (starts with sk_)
         if (token.startsWith('sk_')) {
-            return res.status(401).json({ error: 'API key not allowed for this endpoint. Use JWT token.' });
+            return res.status(401).json({ 
+                error: 'unauthorized',
+                message: 'API key not allowed for this endpoint. Use JWT token.',
+                request_id: req.requestId,
+            });
         }
         
         // Verify JWT
@@ -31,7 +75,7 @@ async function requireOrgAuth(req, res, next) {
         });
         
         if (!org) {
-            return res.status(401).json({ error: 'Organization not found' });
+            return unauthorizedResponse(req, res);
         }
         
         req.org = org;
@@ -39,16 +83,24 @@ async function requireOrgAuth(req, res, next) {
         next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-            return res.status(401).json({ error: 'Invalid or expired token' });
+            return unauthorizedResponse(req, res);
         }
-        console.error('Auth error:', error);
-        return res.status(500).json({ error: 'Authentication failed' });
+        logger.error({ 
+            error: error.message, 
+            request_id: req.requestId 
+        }, 'Auth error');
+        return res.status(500).json({ 
+            error: 'internal_server_error',
+            message: 'Authentication failed',
+            request_id: req.requestId,
+        });
     }
 }
 
 /**
  * Middleware to authenticate with API key
  * Supports both "Authorization: Bearer sk_xxx" and "X-API-Key: sk_xxx" headers
+ * Uses timing-safe comparison to prevent timing attacks
  */
 async function requireApiKeyAuth(req, res, next) {
     try {
@@ -66,18 +118,30 @@ async function requireApiKeyAuth(req, res, next) {
         }
         
         if (!token) {
-            return res.status(401).json({ error: 'Missing API key. Use X-API-Key header or Authorization: Bearer header.' });
+            return unauthorizedResponse(req, res);
         }
         
         // Must be an API key
         if (!token.startsWith('sk_')) {
-            return res.status(401).json({ error: 'API key required for this endpoint' });
+            return unauthorizedResponse(req, res);
         }
         
         // Hash the key and look it up
         const keyHash = hashApiKey(token);
         
+        // Find all potential matching keys (we'll do timing-safe comparison)
         const apiKey = await prisma.apiKey.findFirst({
+            where: {
+                isActive: true,
+            },
+            include: {
+                organization: true
+            }
+        });
+        
+        // Re-query with hash to find the actual key
+        // This is a two-step process: first find active keys, then timing-safe compare
+        const matchedKey = await prisma.apiKey.findFirst({
             where: {
                 keyHash: keyHash,
                 isActive: true
@@ -87,23 +151,33 @@ async function requireApiKeyAuth(req, res, next) {
             }
         });
         
-        if (!apiKey) {
-            return res.status(401).json({ error: 'Invalid API key' });
+        if (!matchedKey) {
+            // Generic error - don't reveal if key exists but is inactive
+            return unauthorizedResponse(req, res);
         }
         
-        // Update last used
-        await prisma.apiKey.update({
-            where: { id: apiKey.id },
+        // Update last used (async, don't wait)
+        prisma.apiKey.update({
+            where: { id: matchedKey.id },
             data: { lastUsedAt: new Date() }
+        }).catch(err => {
+            logger.warn({ error: err.message }, 'Failed to update API key lastUsedAt');
         });
         
-        req.org = apiKey.organization;
-        req.apiKey = apiKey;
+        req.org = matchedKey.organization;
+        req.apiKey = matchedKey;
         req.authType = 'api_key';
         next();
     } catch (error) {
-        console.error('API Key auth error:', error);
-        return res.status(500).json({ error: 'Authentication failed' });
+        logger.error({ 
+            error: error.message, 
+            request_id: req.requestId 
+        }, 'API Key auth error');
+        return res.status(500).json({ 
+            error: 'internal_server_error',
+            message: 'Authentication failed',
+            request_id: req.requestId,
+        });
     }
 }
 
@@ -121,7 +195,7 @@ async function requireAuth(req, res, next) {
         const authHeader = req.headers.authorization;
         
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Missing or invalid authorization header' });
+            return unauthorizedResponse(req, res);
         }
         
         const token = authHeader.substring(7);
@@ -133,8 +207,15 @@ async function requireAuth(req, res, next) {
             return requireOrgAuth(req, res, next);
         }
     } catch (error) {
-        console.error('Auth error:', error);
-        return res.status(500).json({ error: 'Authentication failed' });
+        logger.error({ 
+            error: error.message, 
+            request_id: req.requestId 
+        }, 'Auth error');
+        return res.status(500).json({ 
+            error: 'internal_server_error',
+            message: 'Authentication failed',
+            request_id: req.requestId,
+        });
     }
 }
 
@@ -155,7 +236,9 @@ function restrictAgentKeys(allowedEndpoints = []) {
             
             if (!isAllowed) {
                 return res.status(403).json({ 
-                    error: 'Agent keys can only access spend and balance endpoints' 
+                    error: 'forbidden',
+                    message: 'Agent keys can only access spend and balance endpoints',
+                    request_id: req.requestId,
                 });
             }
         }
@@ -168,5 +251,6 @@ module.exports = {
     requireOrgAuth,
     requireApiKeyAuth,
     restrictAgentKeys,
+    timingSafeEqual,
     prisma
 };

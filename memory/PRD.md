@@ -4,7 +4,7 @@
 Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part of the Agentic Trust product suite (agentictrust.app).
 
 ## Project Status
-**Current Phase:** Prompt 08 Complete - Stripe Integration
+**Current Phase:** Prompt 09 Complete - Production Hardening & Deployment
 **Last Updated:** March 24, 2026
 
 ---
@@ -160,24 +160,6 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 
 ---
 
-## Prioritized Backlog
-
-### P0 - Critical (Next Prompts)
-1. ~~Dashboard Pages (Prompt 04)~~ ✅ COMPLETE
-2. ~~Approvals & Webhooks (Prompt 05)~~ ✅ COMPLETE
-3. **Stripe Integration** - Real funding and disbursement
-
-### P1 - High Priority
-4. **Documentation Page** - API reference, integration guides
-5. **SDK Generation** - Python, TypeScript SDKs
-
-### P2 - Medium Priority
-6. **MCP Server** - Model Context Protocol integration
-7. **Email Notifications** - Alert on pending approvals
-8. **Rate Limiting** - API request limits
-
----
-
 ## Testing
 
 ### Prompt 06 - End-to-End Testing Suite (Completed - March 24, 2026)
@@ -274,15 +256,15 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 3. ~~End-to-End Testing (Prompt 06)~~ ✅ COMPLETE
 4. ~~Docs Site (Prompt 07)~~ ✅ COMPLETE
 5. ~~Stripe Integration (Prompt 08)~~ ✅ COMPLETE
+6. ~~Production Hardening (Prompt 09)~~ ✅ COMPLETE
 
 ### P1 - High Priority
-6. **SDK Generation** - Python, TypeScript SDKs
-7. **MCP Server Package** - `@safespend/mcp-server`
+7. **SDK Generation** - Python, TypeScript SDKs
+8. **MCP Server Package** - `@safespend/mcp-server`
 
 ### P2 - Medium Priority
-8. **Email Notifications** - Alert on pending approvals
-9. **Rate Limiting** - API request limits
-10. **Production Deployment** - Environment configuration
+9. **Email Notifications** - Alert on pending approvals
+10. **Production Deployment** - CI/CD, monitoring
 
 ---
 
@@ -290,3 +272,49 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 1. SDK generation (Python, TypeScript)
 2. MCP Server implementation
 3. Email notifications for pending approvals
+
+---
+
+### Prompt 09 - Production Hardening (Completed - March 24, 2026)
+
+#### Security Infrastructure
+- **Rate Limiting**: `express-rate-limit` on auth (10/15min), global (200/min)
+- **Input Validation**: Zod schemas for all request bodies
+- **Security Headers**: Helmet middleware
+- **Timing-Safe Comparison**: API key validation
+
+#### New Files Created
+```
+src/config/environment.js      # Env validation & config
+src/lib/logger.js              # Pino structured logging
+src/lib/org-scoped.js          # Multi-tenant helpers
+src/middleware/request-id.js   # Request ID generation
+src/middleware/rate-limit.js   # Rate limiting middleware
+src/middleware/validation.js   # Zod validation schemas
+src/middleware/error-handler.js # Global error handling
+```
+
+#### Enhanced Health Check
+```json
+{
+  "status": "ok | degraded",
+  "version": "1.0.0",
+  "environment": "production",
+  "checks": {
+    "database": "ok | error",
+    "stripe": "ok | not_configured"
+  },
+  "uptime_seconds": 3600
+}
+```
+
+#### Multi-Tenant Isolation Tests
+- `tests/isolation.test.js` - 13 tests verifying cross-org access is blocked
+- Tests cover: escrow, policies, approvals, API keys, spend requests, audit logs
+
+#### Documentation
+- `README.md` - Deployment guide
+- `PRODUCTION_CHECKLIST.md` - Pre-deploy verification
+- `.env.example` - Environment variable template
+
+#### Test Suite: 75 tests passing

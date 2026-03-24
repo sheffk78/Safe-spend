@@ -1,6 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const { PrismaClient } = require('@prisma/client');
+
+// Config & Logging
+const { validateEnvironment, getConfig } = require('./config/environment');
+const { logger, events } = require('./lib/logger');
+
+// Middleware
+const { requestIdMiddleware } = require('./middleware/request-id');
+const { globalRateLimiter, authRateLimiter } = require('./middleware/rate-limit');
+const { errorHandler, notFoundHandler } = require('./middleware/error-handler');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -13,29 +24,100 @@ const webhooksRoutes = require('./routes/webhooks');
 const apiKeysRoutes = require('./routes/api-keys');
 const stripeWebhookRoutes = require('./routes/stripe-webhook');
 
+// Validate environment at startup
+validateEnvironment();
+const config = getConfig();
+const prisma = new PrismaClient();
+
 const app = express();
+
+// Track server start time for uptime calculation
+const serverStartTime = Date.now();
+
+// Trust proxy for proper IP detection behind Kubernetes/load balancers
+app.set('trust proxy', true);
 
 // IMPORTANT: Stripe webhook route must be registered BEFORE body parsing middleware
 // because it needs the raw body for signature verification
 app.use('/api/stripe', stripeWebhookRoutes);
 
-// Middleware
+// ============================================
+// Security Middleware
+// ============================================
+
+// Helmet for security headers
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for API
+    crossOriginEmbedderPolicy: false,
+}));
+
+// Request ID for tracing
+app.use(requestIdMiddleware);
+
+// CORS configuration
 app.use(cors({
-    origin: process.env.CORS_ORIGINS === '*' ? '*' : process.env.CORS_ORIGINS?.split(','),
+    origin: config.corsOrigins === '*' ? '*' : config.corsOrigins,
     credentials: true
 }));
-app.use(express.json());
 
-// Trust proxy for proper IP detection behind Kubernetes
-app.set('trust proxy', true);
+// Body parsing
+app.use(express.json({ limit: '1mb' }));
 
-// Health check
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+// Global rate limiter (applied to all routes except health)
+app.use(globalRateLimiter);
+
+// ============================================
+// Health Check (Enhanced)
+// ============================================
+app.get('/api/health', async (req, res) => {
+    const checks = {
+        database: 'unknown',
+        stripe: 'unknown',
+    };
+
+    let overallStatus = 'ok';
+
+    // Database check
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        checks.database = 'ok';
+    } catch (error) {
+        checks.database = 'error';
+        overallStatus = 'degraded';
+        logger.error({ error: error.message }, 'Health check: Database connection failed');
+    }
+
+    // Stripe check (just verify key is configured)
+    if (config.stripeSecretKey) {
+        checks.stripe = 'ok';
+    } else {
+        checks.stripe = 'not_configured';
+        // Don't mark as degraded - Stripe is optional in dev
+        if (config.isProd) {
+            overallStatus = 'degraded';
+        }
+    }
+
+    const statusCode = overallStatus === 'ok' ? 200 : 503;
+
+    res.status(statusCode).json({
+        status: overallStatus,
+        version: '1.0.0',
+        environment: config.env,
+        checks,
+        uptime_seconds: Math.floor((Date.now() - serverStartTime) / 1000),
+        timestamp: new Date().toISOString(),
+    });
 });
 
-// API v1 routes
-app.use('/api/v1/auth', authRoutes);
+// ============================================
+// API Routes
+// ============================================
+
+// Apply auth rate limiter to auth routes
+app.use('/api/v1/auth', authRateLimiter, authRoutes);
+
+// Other API v1 routes
 app.use('/api/v1/escrow-accounts', escrowAccountsRoutes);
 app.use('/api/v1/policies', policiesRoutes);
 app.use('/api/v1/spend', spendRoutes);
@@ -44,24 +126,69 @@ app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/webhooks', webhooksRoutes);
 app.use('/api/v1/api-keys', apiKeysRoutes);
 
-// 404 handler
-app.use('/api/*', (req, res) => {
-    res.status(404).json({ error: 'Endpoint not found' });
+// ============================================
+// Error Handling
+// ============================================
+
+// 404 handler for API routes
+app.use('/api/*', notFoundHandler);
+
+// Global error handler (must be last)
+app.use(errorHandler);
+
+// ============================================
+// Server Startup & Shutdown
+// ============================================
+
+const PORT = config.port;
+let server;
+
+// Graceful shutdown handling
+async function gracefulShutdown(signal) {
+    logger.info({ signal }, 'Received shutdown signal. Closing server...');
+    
+    if (server) {
+        server.close(async () => {
+            logger.info('HTTP server closed');
+            
+            // Disconnect database
+            await prisma.$disconnect();
+            logger.info('Database disconnected');
+            
+            process.exit(0);
+        });
+
+        // Force exit after 10 seconds if graceful shutdown fails
+        setTimeout(() => {
+            logger.error('Forced shutdown after timeout');
+            process.exit(1);
+        }, 10000);
+    } else {
+        process.exit(0);
+    }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    logger.fatal({ error: error.message, stack: error.stack }, 'Uncaught exception');
+    gracefulShutdown('uncaughtException');
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error({ reason, promise }, 'Unhandled rejection');
 });
-
-const PORT = process.env.PORT || 8001;
 
 // Only start server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Safe-Spend API server running on port ${PORT}`);
-        console.log(`Health check: http://0.0.0.0:${PORT}/api/health`);
+    server = app.listen(PORT, '0.0.0.0', () => {
+        logger.info({
+            port: PORT,
+            environment: config.env,
+            log_level: config.logLevel,
+        }, `Safe-Spend API server started`);
     });
 }
 
