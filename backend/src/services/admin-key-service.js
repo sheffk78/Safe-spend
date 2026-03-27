@@ -1,6 +1,7 @@
 /**
  * Admin API Key Service
  * Handles generation and validation of admin API keys for automation (Kit)
+ * Supports scope-based access control
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -10,46 +11,55 @@ const prisma = new PrismaClient();
 
 const KEY_PREFIX = 'ss_admin_';
 
+// Valid scopes
+const VALID_SCOPES = ['health', 'blog', 'metrics', 'audit', 'keys', '*'];
+
 /**
- * Generate a new admin API key
+ * Generate a new admin API key with scopes
  */
-async function generateAdminKey({ name, description, createdBy }) {
-    // Generate random key
-    const randomBytes = crypto.randomBytes(32).toString('hex');
+async function generateAdminKey({ label, description, scopes = ['*'] }) {
+    // Validate scopes
+    const invalidScopes = scopes.filter(s => !VALID_SCOPES.includes(s));
+    if (invalidScopes.length > 0) {
+        throw new Error(`Invalid scopes: ${invalidScopes.join(', ')}`);
+    }
+    
+    // Generate random key (32 alphanumeric chars)
+    const randomBytes = crypto.randomBytes(24).toString('hex').substring(0, 32);
     const fullKey = `${KEY_PREFIX}${randomBytes}`;
     
     // Hash the key for storage
     const keyHash = crypto.createHash('sha256').update(fullKey).digest('hex');
     
-    // Create short prefix for display (first 8 chars after prefix)
-    const keyPrefix = `${KEY_PREFIX}${randomBytes.substring(0, 8)}...`;
+    // Create display prefix (first 12 chars after prefix + last 4)
+    const keyPrefix = `${KEY_PREFIX}${randomBytes.substring(0, 8)}...${randomBytes.slice(-4)}`;
     
     const adminKey = await prisma.adminApiKey.create({
         data: {
-            name,
+            label,
             description,
             keyHash,
             keyPrefix,
-            createdBy
+            scopes: JSON.stringify(scopes)
         }
     });
     
     return {
-        key_id: adminKey.id,
-        name: adminKey.name,
+        id: adminKey.id,
+        key: fullKey, // Only returned once at creation!
+        label: adminKey.label,
         description: adminKey.description,
-        type: 'admin',
-        prefix: keyPrefix,
-        secret: fullKey, // Only returned once at creation
+        scopes: JSON.parse(adminKey.scopes),
+        key_prefix: keyPrefix,
         created_at: adminKey.createdAt.toISOString()
     };
 }
 
 /**
- * Validate an admin API key
- * Returns the key record if valid, null otherwise
+ * Validate an admin API key and check scope
+ * Returns the key record if valid and has required scope, null otherwise
  */
-async function validateAdminKey(key) {
+async function validateAdminKey(key, requiredScope = null) {
     if (!key || !key.startsWith(KEY_PREFIX)) {
         return null;
     }
@@ -64,17 +74,31 @@ async function validateAdminKey(key) {
         return null;
     }
     
+    // Check scope if required
+    if (requiredScope) {
+        const scopes = JSON.parse(adminKey.scopes || '[]');
+        const hasScope = scopes.includes('*') || scopes.includes(requiredScope);
+        if (!hasScope) {
+            return { error: 'INSUFFICIENT_SCOPE', requiredScope, adminKey };
+        }
+    }
+    
     // Update last used timestamp
     await prisma.adminApiKey.update({
         where: { id: adminKey.id },
         data: { lastUsedAt: new Date() }
     });
     
-    return adminKey;
+    return {
+        id: adminKey.id,
+        label: adminKey.label,
+        scopes: JSON.parse(adminKey.scopes),
+        key_prefix: adminKey.keyPrefix
+    };
 }
 
 /**
- * List all admin API keys
+ * List all admin API keys (without secrets)
  */
 async function listAdminKeys() {
     const keys = await prisma.adminApiKey.findMany({
@@ -82,19 +106,19 @@ async function listAdminKeys() {
     });
     
     return keys.map(key => ({
-        key_id: key.id,
-        name: key.name,
+        id: key.id,
+        label: key.label,
         description: key.description,
-        prefix: key.keyPrefix,
+        scopes: JSON.parse(key.scopes || '[]'),
+        key_prefix: key.keyPrefix,
         is_active: key.isActive,
         last_used_at: key.lastUsedAt?.toISOString() || null,
-        created_at: key.createdAt.toISOString(),
-        created_by: key.createdBy
+        created_at: key.createdAt.toISOString()
     }));
 }
 
 /**
- * Revoke an admin API key
+ * Revoke (deactivate) an admin API key
  */
 async function revokeAdminKey(keyId) {
     const key = await prisma.adminApiKey.update({
@@ -103,8 +127,8 @@ async function revokeAdminKey(keyId) {
     });
     
     return {
-        key_id: key.id,
-        name: key.name,
+        id: key.id,
+        label: key.label,
         is_active: key.isActive,
         revoked_at: new Date().toISOString()
     };
@@ -121,11 +145,29 @@ async function deleteAdminKey(keyId) {
     return { deleted: true };
 }
 
+/**
+ * Count admin keys (for bootstrap check)
+ */
+async function countAdminKeys() {
+    return await prisma.adminApiKey.count();
+}
+
+/**
+ * Check if any admin keys exist
+ */
+async function hasAdminKeys() {
+    const count = await countAdminKeys();
+    return count > 0;
+}
+
 module.exports = {
     generateAdminKey,
     validateAdminKey,
     listAdminKeys,
     revokeAdminKey,
     deleteAdminKey,
-    KEY_PREFIX
+    countAdminKeys,
+    hasAdminKeys,
+    KEY_PREFIX,
+    VALID_SCOPES
 };

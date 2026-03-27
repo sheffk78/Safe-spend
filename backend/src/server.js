@@ -36,9 +36,11 @@ const adminAnalyticsRoutes = require('./routes/admin-analytics');
 
 // Blog Routes
 const blogPublicRoutes = require('./routes/blog-public');
-const { router: blogAdminRoutes } = require('./routes/blog-admin');
-const adminKeysRoutes = require('./routes/admin-keys');
 const blogPagesRoutes = require('./routes/blog-pages');
+
+// New Admin API (unified with scopes)
+const adminApiRoutes = require('./routes/admin-api');
+const errorLogService = require('./services/error-log-service');
 
 // Validate environment at startup
 validateEnvironment();
@@ -182,19 +184,21 @@ app.use('/api/admin/analytics', adminAnalyticsRoutes);
 // Public blog API endpoints
 app.use('/api/blog', blogPublicRoutes);
 
-// Admin blog API endpoints (requires admin auth)
-app.use('/api/admin/blog', blogAdminRoutes);
-
-// Admin API keys management
-app.use('/api/admin/keys', adminKeysRoutes);
-
 // Server-rendered blog pages (SEO-friendly HTML)
 // Must be before the 404 handler
 app.use('/blog', blogPagesRoutes);
 
 // ============================================
+// New Unified Admin API (with scopes)
+// ============================================
+app.use('/api/admin', adminApiRoutes);
+
+// ============================================
 // Error Handling
 // ============================================
+
+// Error logging middleware (captures errors before handler)
+app.use(errorLogService.createErrorMiddleware());
 
 // 404 handler for API routes
 app.use('/api/*', notFoundHandler);

@@ -1754,3 +1754,80 @@ curl -X POST "$API/api/admin/blog/posts" \
 curl -X POST "$API/api/admin/blog/posts/$ID/publish" \
   -H "Authorization: Bearer ss_admin_xxx..."
 ```
+
+
+---
+
+### Admin API Implementation (Completed - March 27, 2026)
+
+#### Overview
+Implemented a unified Admin API with scope-based access control for platform operations, monitoring, and content management.
+
+#### Scope System
+Admin keys support fine-grained access control with the following scopes:
+- `health` - System health and status monitoring
+- `blog` - Blog CRUD operations
+- `metrics` - Platform metrics and analytics
+- `audit` - Cross-organization audit log access
+- `keys` - Admin key management
+- `*` - Superadmin (all scopes)
+
+#### Endpoints
+
+**Health (scope: health)**
+- `GET /api/admin/health` - Public health check (no auth)
+- `GET /api/admin/status` - Detailed system status with service health
+- `GET /api/admin/errors` - Recent application errors
+
+**Metrics (scope: metrics)**
+- `GET /api/admin/metrics/overview` - High-level platform dashboard
+- `GET /api/admin/metrics/activity` - Recent platform activity feed
+- `GET /api/admin/metrics/stripe` - Stripe-specific metrics
+
+**Audit (scope: audit)**
+- `GET /api/admin/audit` - Cross-org audit log query
+
+**Keys (scope: keys)**
+- `POST /api/admin/keys` - Create new admin key with scopes
+- `GET /api/admin/keys` - List all admin keys
+- `DELETE /api/admin/keys/:id` - Revoke an admin key
+
+**Blog (scope: blog)**
+- `POST /api/admin/blog/posts` - Create post
+- `GET /api/admin/blog/posts` - List posts
+- `GET /api/admin/blog/posts/:id` - Get post
+- `PATCH /api/admin/blog/posts/:id` - Update post
+- `DELETE /api/admin/blog/posts/:id` - Delete post
+- `POST /api/admin/blog/posts/:id/publish` - Publish
+- `POST /api/admin/blog/posts/:id/unpublish` - Unpublish
+
+**Setup (bootstrap)**
+- `POST /api/admin/setup` - Create initial superadmin key (requires ADMIN_SETUP_TOKEN)
+
+#### Files Created/Updated
+- `/app/backend/src/routes/admin-api.js` - Unified admin routes
+- `/app/backend/src/services/admin-key-service.js` - Key management with scopes
+- `/app/backend/src/services/error-log-service.js` - Error logging service
+- `/app/backend/prisma/schema.prisma` - Updated AdminApiKey with scopes, added ErrorLog
+
+#### Usage Examples
+
+**Bootstrap first key:**
+```bash
+curl -X POST "$API/api/admin/setup" \
+  -H "Authorization: Bearer $ADMIN_SETUP_TOKEN" \
+  -d '{"label":"Superadmin"}'
+```
+
+**Create scoped key for Kit:**
+```bash
+curl -X POST "$API/api/admin/keys" \
+  -H "Authorization: Bearer $SUPERADMIN_KEY" \
+  -d '{"label":"Kit Blog Publisher","scopes":["blog"]}'
+```
+
+**Check platform metrics:**
+```bash
+curl "$API/api/admin/metrics/overview" \
+  -H "Authorization: Bearer $ADMIN_KEY"
+```
