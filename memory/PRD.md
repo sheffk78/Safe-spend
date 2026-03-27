@@ -1648,3 +1648,109 @@ Prepared the codebase for deployment on PostgreSQL-compatible platforms (Railway
 3. Follow the guide in DEPLOYMENT.md
 4. Configure environment variables
 5. Deploy!
+
+
+---
+
+### Blog System Implementation (Completed - March 27, 2026)
+
+#### Overview
+Implemented a full-featured blog system for content marketing and SEO, designed to be managed via Admin API keys (for automation tools like Kit).
+
+#### Backend Features
+
+**Data Model (Prisma):**
+- `BlogPost` model with full schema:
+  - Title, slug (auto-generated), markdown content
+  - Author info (name, bio, avatar)
+  - Cover image, tags, category
+  - Complete SEO fields (meta title/description, OG tags, Twitter cards, JSON-LD)
+  - Auto-computed: word count, reading time, HTML rendering
+  - Status: draft, published, archived
+
+- `AdminApiKey` model for automation:
+  - `ss_admin_` prefixed keys
+  - Hash-based storage for security
+  - Last used tracking
+
+**Public API (`/api/blog/*`):**
+- `GET /posts` - List published posts with pagination and tag filtering
+- `GET /posts/:slug` - Get single post (increments views)
+- `GET /tags` - List tags with counts
+- `GET /categories` - List categories with counts
+- `GET /rss` - RSS 2.0 feed
+- `GET /sitemap` - XML sitemap
+
+**Admin API (`/api/admin/blog/*`):**
+- `POST /posts` - Create post (auto-computes slug, reading time, SEO defaults)
+- `GET /posts` - List all posts (drafts, published, archived)
+- `GET /posts/:id` - Get any post by ID
+- `PUT /posts/:id` - Update post (partial updates supported)
+- `DELETE /posts/:id` - Soft delete (archive) or hard delete with `?hard=true`
+- `POST /posts/:id/publish` - Publish draft
+- `POST /posts/:id/unpublish` - Revert to draft
+- `POST /posts/:id/export` - Export with Dev.to frontmatter
+
+**Admin Keys API (`/api/admin/keys/*`):**
+- `POST /` - Generate new admin API key
+- `GET /` - List all keys
+- `POST /:id/revoke` - Revoke key
+- `DELETE /:id` - Delete key
+
+#### Frontend Features
+
+**Blog Index Page (`/blog`):**
+- SEO-optimized with meta tags and RSS link
+- Hero section with description
+- Tag filter bar (clickable pills)
+- Post grid with cards showing:
+  - Cover image
+  - Author, date, reading time
+  - Title, excerpt, tags
+- Pagination
+
+**Blog Post Page (`/blog/:slug`):**
+- Full SEO meta tags (title, description, keywords, robots)
+- Open Graph and Twitter Card tags
+- JSON-LD structured data
+- Back to blog link
+- Category badge
+- Title with author avatar, date, reading time
+- Cover image
+- Prose-styled content with:
+  - Headings, paragraphs, lists
+  - Code blocks with syntax styling
+  - Blockquotes, links, images
+- Tag links at bottom
+
+#### Files Created
+- `/app/backend/src/services/blog-service.js` - Core blog logic
+- `/app/backend/src/services/admin-key-service.js` - Admin API key management
+- `/app/backend/src/routes/blog-public.js` - Public API routes
+- `/app/backend/src/routes/blog-admin.js` - Admin API routes
+- `/app/backend/src/routes/admin-keys.js` - Admin key routes
+- `/app/backend/src/routes/blog-pages.js` - Server-rendered pages (backup)
+- `/app/frontend/src/pages/BlogPage.js` - React blog components
+
+#### Testing
+- Created test blog post via Admin API
+- Verified blog index and post pages render correctly
+- RSS feed and sitemap generate properly
+- SEO meta tags present on pages
+
+#### Usage Example (Kit Automation)
+```bash
+# Generate admin API key
+curl -X POST "$API/api/admin/keys" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -d '{"name":"Kit Publisher"}'
+
+# Create blog post
+curl -X POST "$API/api/admin/blog/posts" \
+  -H "Authorization: Bearer ss_admin_xxx..." \
+  -d '{"title":"...", "content":"...", "tags":["..."]}'
+
+# Publish
+curl -X POST "$API/api/admin/blog/posts/$ID/publish" \
+  -H "Authorization: Bearer ss_admin_xxx..."
+```

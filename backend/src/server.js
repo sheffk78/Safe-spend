@@ -34,6 +34,12 @@ const adminOrgsRoutes = require('./routes/admin-orgs');
 const adminApiV1Routes = require('./routes/admin-api-v1');
 const adminAnalyticsRoutes = require('./routes/admin-analytics');
 
+// Blog Routes
+const blogPublicRoutes = require('./routes/blog-public');
+const { router: blogAdminRoutes } = require('./routes/blog-admin');
+const adminKeysRoutes = require('./routes/admin-keys');
+const blogPagesRoutes = require('./routes/blog-pages');
+
 // Validate environment at startup
 validateEnvironment();
 const config = getConfig();
@@ -168,6 +174,23 @@ app.use('/api/admin/v1', adminApiV1Routes);
 
 // Admin Analytics (Charts and metrics)
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
+
+// ============================================
+// Blog Routes
+// ============================================
+
+// Public blog API endpoints
+app.use('/api/blog', blogPublicRoutes);
+
+// Admin blog API endpoints (requires admin auth)
+app.use('/api/admin/blog', blogAdminRoutes);
+
+// Admin API keys management
+app.use('/api/admin/keys', adminKeysRoutes);
+
+// Server-rendered blog pages (SEO-friendly HTML)
+// Must be before the 404 handler
+app.use('/blog', blogPagesRoutes);
 
 // ============================================
 // Error Handling

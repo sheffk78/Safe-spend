@@ -121,6 +121,56 @@ async def proxy_api(request: Request, path: str):
             media_type="application/json"
         )
 
+# Proxy /blog routes to Node.js (server-rendered pages)
+@app.api_route("/blog/{path:path}", methods=["GET"])
+async def proxy_blog(request: Request, path: str = ""):
+    try:
+        # Build target URL
+        target_url = f"http://127.0.0.1:{NODE_INTERNAL_PORT}/blog/{path}"
+        if request.query_params:
+            target_url += f"?{request.query_params}"
+        
+        # Forward headers
+        headers = {}
+        for key, value in request.headers.items():
+            if key.lower() not in ['host', 'content-length', 'transfer-encoding', 'connection']:
+                headers[key] = value
+        
+        # Make request to Node.js
+        response = await http_client.request(
+            method="GET",
+            url=target_url,
+            headers=headers,
+        )
+        
+        # Return response
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers={k: v for k, v in response.headers.items() 
+                    if k.lower() not in ['content-length', 'content-encoding', 'transfer-encoding', 'connection']},
+            media_type=response.headers.get('content-type', 'text/html')
+        )
+    
+    except httpx.ConnectError:
+        return Response(
+            content='<h1>Blog service unavailable</h1>',
+            status_code=503,
+            media_type="text/html"
+        )
+    except Exception as e:
+        print(f"Blog proxy error: {e}", flush=True)
+        return Response(
+            content=f'<h1>Error: {str(e)}</h1>',
+            status_code=500,
+            media_type="text/html"
+        )
+
+# Handle /blog root (without trailing path)
+@app.get("/blog")
+async def proxy_blog_root(request: Request):
+    return await proxy_blog(request, "")
+
 # Root redirect
 @app.get("/")
 async def root():

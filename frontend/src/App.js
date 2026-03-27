@@ -17,6 +17,9 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import InviteAcceptPage from "@/pages/InviteAcceptPage";
 import ApprovalActionPage from "@/pages/ApprovalActionPage";
 
+// Blog
+import { BlogIndexPage, BlogPostPage } from "@/pages/BlogPage";
+
 // Docs
 import DocsLayout from "@/layouts/DocsLayout";
 import DocsOverview from "@/pages/docs/DocsOverview";
@@ -96,6 +99,10 @@ function App() {
                         <Route path="integrations" element={<DocsIntegrations />} />
                         <Route path="sdks" element={<DocsSDKs />} />
                     </Route>
+
+                    {/* Blog routes */}
+                    <Route path="/blog" element={<BlogIndexPage />} />
+                    <Route path="/blog/:slug" element={<BlogPostPage />} />
 
                     {/* Protected dashboard routes */}
                     <Route

@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Admin Users (for internal Agentic Trust operators)
@@ -424,4 +424,77 @@ model MonthlySpendTracking {
 
   @@unique([escrowId, monthStart])
   @@map("monthly_spend_tracking")
+}
+
+
+// Blog Post
+model BlogPost {
+  id                  String    @id @default(uuid())
+  title               String
+  slug                String    @unique
+  content             String    // Markdown content
+  contentHtml         String    @map("content_html") // Pre-rendered HTML
+  excerpt             String?   // Max 155 chars
+  status              String    @default("draft") // draft | published | archived
+  
+  // Author info (stored as JSON)
+  authorName          String    @map("author_name")
+  authorBio           String?   @map("author_bio")
+  authorAvatarUrl     String?   @map("author_avatar_url")
+  
+  // Cover image
+  coverImageUrl       String?   @map("cover_image_url")
+  coverImageAlt       String?   @map("cover_image_alt")
+  
+  // Categorization
+  tags                String    @default("[]") // JSON array
+  category            String?
+  
+  // SEO fields (stored as JSON for flexibility)
+  seoMetaTitle        String?   @map("seo_meta_title")
+  seoMetaDescription  String?   @map("seo_meta_description")
+  seoCanonicalUrl     String?   @map("seo_canonical_url")
+  seoOgTitle          String?   @map("seo_og_title")
+  seoOgDescription    String?   @map("seo_og_description")
+  seoOgImage          String?   @map("seo_og_image")
+  seoOgType           String?   @default("article") @map("seo_og_type")
+  seoTwitterCard      String?   @default("summary_large_image") @map("seo_twitter_card")
+  seoTwitterTitle     String?   @map("seo_twitter_title")
+  seoTwitterDescription String? @map("seo_twitter_description")
+  seoTwitterImage     String?   @map("seo_twitter_image")
+  seoKeywords         String?   @map("seo_keywords") // JSON array
+  seoRobots           String?   @default("index, follow") @map("seo_robots")
+  seoStructuredData   String?   @map("seo_structured_data") // JSON-LD
+  
+  // Computed fields
+  readingTimeMinutes  Int       @default(0) @map("reading_time_minutes")
+  wordCount           Int       @default(0) @map("word_count")
+  
+  // Timestamps
+  publishedAt         DateTime? @map("published_at")
+  scheduledAt         DateTime? @map("scheduled_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  
+  // Stats
+  views               Int       @default(0)
+  isFeatured          Boolean   @default(false) @map("is_featured")
+  relatedPosts        String    @default("[]") @map("related_posts") // JSON array of slugs
+  
+  @@map("blog_posts")
+}
+
+// Admin API Keys (for Kit and other automation)
+model AdminApiKey {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  keyHash     String    @unique @map("key_hash")
+  keyPrefix   String    @map("key_prefix") // e.g., "ss_admin_abc..."
+  isActive    Boolean   @default(true) @map("is_active")
+  lastUsedAt  DateTime? @map("last_used_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  createdBy   String?   @map("created_by") // Admin user ID
+  
+  @@map("admin_api_keys")
 }
