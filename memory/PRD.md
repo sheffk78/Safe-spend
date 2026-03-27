@@ -5,7 +5,7 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 
 ## Project Status
 **Current Phase:** Ready for External Deployment
-**Last Updated:** March 24, 2026
+**Last Updated:** March 27, 2026
 
 ---
 
@@ -287,6 +287,83 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, for signature verification)
 2. **Real-time WebSocket notifications**
 3. **Multi-currency support**
 4. **CrewAI Integration** - Alternative to LangChain
+
+---
+
+### Feedback System (Completed - March 27, 2026)
+
+#### Overview
+Comprehensive feedback collection system enabling users to provide inline contextual feedback, submit feature requests, and participate in periodic NPS pulse checks. Includes admin dashboard for triage and management.
+
+#### Components
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| Inline Page Feedback | `FeedbackComponents.js` | Sentiment reactions + optional notes on any dashboard page |
+| Milestone Toasts | `FeedbackComponents.js` | Celebration feedback after key accomplishments |
+| Error Clarity | `FeedbackComponents.js` | "Was this error clear?" prompts |
+| Pulse Check | `PulseCheck.js` | NPS score + improvement suggestion + use case survey |
+| Feature Request Board | `FeedbackPage.js` | Public votable board at `/feedback` |
+| Admin Dashboard | `AdminFeedbackPage.js` | Unified triage view at `/admin/feedback` |
+
+#### Database Schema
+```prisma
+model FeedbackItem {
+  id, type, sentiment, npsScore, note, page, endpoint, 
+  errorCode, milestone, useCases, orgId, userId,
+  isAcknowledged, adminNotes, convertedTo, createdAt
+}
+
+model FeatureRequest {
+  id, title, description, category, status, statusNote,
+  voteCount, voters, submittedByUserId, submittedByOrgId,
+  submittedByOrgName, isAnonymous, comments, statusHistory,
+  isPinned, createdAt, updatedAt
+}
+
+model UserPulseTracking {
+  id, orgId, userId, lastPulseShownAt, lastPulseCompletedAt,
+  milestonesShown, createdAt, updatedAt
+}
+```
+
+#### API Endpoints
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/v1/feedback` | POST | User JWT | Submit inline feedback |
+| `/v1/feedback/tracking` | GET | User JWT | Get user's feedback tracking info |
+| `/v1/feedback/tracking/pulse-shown` | POST | User JWT | Mark pulse check as shown |
+| `/v1/feedback/requests` | GET | User JWT | List feature requests |
+| `/v1/feedback/requests` | POST | User JWT | Submit feature request |
+| `/v1/feedback/requests/:id` | GET | User JWT | Get request detail |
+| `/v1/feedback/requests/:id/vote` | POST | User JWT | Toggle vote |
+| `/v1/feedback/requests/:id/comment` | POST | User JWT | Add comment |
+| `/v1/feedback/categories` | GET | User JWT | Get category list with counts |
+| `/admin/feedback` | GET | Admin Key | List all feedback items |
+| `/admin/feedback/stats` | GET | Admin Key | Overview statistics (NPS, sentiment) |
+| `/admin/feedback/digest` | GET | Admin Key | Daily digest for reporting |
+| `/admin/feedback/:id` | PATCH | Admin Key | Acknowledge/add notes/convert to request |
+| `/admin/feedback/requests` | GET | Admin Key | List all requests (admin view) |
+| `/admin/feedback/requests/:id` | PATCH | Admin Key | Update status/pin |
+| `/admin/feedback/requests/:id/comment` | POST | Admin Key | Comment as team |
+| `/admin/feedback/requests/merge` | POST | Admin Key | Merge duplicate requests |
+| `/admin/feedback/export` | GET | Admin Key | CSV export |
+
+#### Feature Request Statuses
+- `new` → `under_review` → `planned` → `in_progress` → `shipped`
+- `declined` (with optional merge into another request)
+
+#### Rate Limits
+- Feedback: 10 per minute per user
+- Feature requests: 5 per day per user
+- Voting: 30 per minute per user
+- Comments: 10 per minute per user
+
+#### Admin Dashboard Tabs
+1. **Overview**: NPS trend, request counts, sentiment breakdown, top requests, pain points
+2. **Triage**: All feedback items with type filtering, acknowledge/convert actions
+3. **Requests**: Feature request list with status management
 
 ---
 
