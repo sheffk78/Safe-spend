@@ -1487,6 +1487,53 @@ Implemented the delegation-first pattern where agents draft spending configurati
 
 ---
 
+### Core Functionality Testing (Completed - March 27, 2026)
+
+#### Overview
+Comprehensive backend testing following the testing-core.md guidelines, covering 73 test cases across 13 sections to validate the core escrow, spending, and rules engine functionality.
+
+#### Test Results: 100% Pass (73/73)
+
+| Section | Tests | Status |
+|---------|-------|--------|
+| T1: Authentication & Key Permissions | 6 | ✅ PASS |
+| T2: API Key Management | 3 | ✅ PASS |
+| T3: Escrow Account Lifecycle | 10 | ✅ PASS |
+| T4: Spending Policy Configuration | 4 | ✅ PASS |
+| T5: Rules Engine 13-Step Cascade | 12 | ✅ PASS |
+| T6: Spend Request Lifecycle | 4 | ✅ PASS |
+| T7: Approval Workflow | 6 | ✅ PASS |
+| T8: Audit Trail | 5 | ✅ PASS |
+| T9: Webhooks | 7 | ✅ PASS |
+| T10: Escrow Account Closure | 3 | ✅ PASS |
+| T11: Admin API | 4 | ✅ PASS |
+| T12: Data Integrity & Edge Cases | 6 | ✅ PASS |
+| T13: Daily/Weekly/Monthly Tracking | 3 | ✅ PASS |
+
+#### Critical Path Tests Validated
+1. **T5.3 Idempotency** - Same key returns same result, balance deducted once
+2. **T5.4 Balance check** - Cannot spend more than available
+3. **T12.1 Race condition** - Concurrent spends cannot overdraw
+4. **T5.5-T5.6 Per-tx limits** - Boundary correctness verified
+5. **T5.8 Vendor enforcement** - Unauthorized vendors blocked
+6. **T7.3-T7.4 Approval workflow** - Human can approve/deny
+7. **T5.14 Atomic balance** - Math is exact (no rounding errors)
+8. **T1.5 Agent key restrictions** - Agents cannot escalate privileges
+9. **T8.1 Audit completeness** - Every action logged
+10. **T9.6 Webhook signatures** - HMAC payloads verifiable
+
+#### Key Findings
+- Policies must have `draft: false` for rules to be enforced
+- Agent keys (`sk_agent_*`) have restricted permissions
+- AAV signature verification is MOCKED (for future AAV integration)
+- Rate limiting (429) functions correctly during rapid requests
+
+#### Test Files
+- `/app/backend/tests/test_core_escrow_rules_engine.py`
+- `/app/test_reports/iteration_25.json`
+
+---
+
 ### Cross-Product Integration Testing (Completed - March 24, 2026)
 
 #### Overview
