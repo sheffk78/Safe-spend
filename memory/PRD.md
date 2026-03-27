@@ -1940,3 +1940,69 @@ Built a comprehensive Admin Dashboard UI using the new API key authentication sy
 #### Access
 - Admin Login: `/admin/login`
 - Admin Dashboard: `/admin` (requires ss_admin_... key)
+
+
+---
+
+### Public API Playground (Completed - March 27, 2026)
+
+#### Overview
+Built an interactive API Playground at `/playground` that allows developers to explore and test the Safe-Spend API directly from their browser without writing any code.
+
+#### Features
+
+**Two Modes:**
+1. **Demo Mode** (default) - Pre-loaded with fake data, no API key required. All responses are simulated client-side.
+2. **Live Mode** - User enters their `sk_live_`, `sk_test_`, or `sk_agent_` API key to make real requests.
+
+**8 Quick Scenarios:**
+1. Submit a Spend Request ($49.99 to Anthropic) → Approved
+2. Check Account Balance → Shows remaining funds
+3. Create an Escrow Account → Creates new wallet
+4. Set a Spending Policy → Attaches governance rules
+5. Trigger a Denial ($750 to Meta Ads) → Shows failed rules
+6. Trigger Human Approval ($300 to Anthropic) → Pending status
+7. View Audit Trail → Recent denied requests
+8. List Pending Approvals → Requests awaiting review
+
+**Request Builder:**
+- Form tab with editable fields and amount conversion (cents → dollars)
+- Code tab with curl, Python, and Node.js snippets
+- Live-updating as user modifies fields
+
+**Response Viewer:**
+- Pretty tab: Formatted JSON with syntax highlighting
+- Plain English tab: Human-readable explanations of what happened
+- Status badge (200 OK, etc.), response time, and demo indicator
+
+**UX Features:**
+- Onboarding overlay on first visit
+- Keyboard shortcuts (⌘+Enter to send, ⌘+K to search)
+- Status bar showing current mode, balance, and account count
+- URL deep linking for scenarios and endpoints
+- Reset Demo Data button
+
+#### Demo Data Simulator
+The demo mode includes a full client-side simulation engine (`simulateDemoRequest`) that:
+- Evaluates spending policies (limits, vendors, categories)
+- Returns realistic responses (approved, denied, pending_approval)
+- Deducts balances on approved spends
+- Generates Plain English explanations for all scenarios
+
+#### Files Created
+- `/app/frontend/src/pages/PlaygroundPage.js` - Main playground component
+
+#### Files Updated
+- `/app/frontend/src/App.js` - Added `/playground` route
+- `/app/frontend/src/components/Navbar.js` - Added Playground nav link
+- `/app/frontend/src/pages/LandingPage.js` - Changed hero CTA to "Try the API Playground"
+
+#### Test Results
+- All features tested via testing_agent_v3_fork (iteration 23)
+- 100% pass rate
+- Bug fixed: "Trigger Human Approval" scenario was showing denial due to policy limits (per_transaction_limit increased from $100 to $500)
+
+#### Access
+- Public Playground: `/playground` (no authentication required)
+- Demo Mode: Works immediately with simulated data
+- Live Mode: Requires valid API key (`sk_live_*`, `sk_test_*`, or `sk_agent_*`)
