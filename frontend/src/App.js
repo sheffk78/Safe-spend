@@ -2,9 +2,8 @@ import React from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { AdminProvider } from "@/contexts/AdminContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import ImpersonationBanner from "@/components/ImpersonationBanner";
 import ScrollToTop from "@/components/ScrollToTop";
 
 // Pages
@@ -50,27 +49,34 @@ import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 import TeamPage from "@/pages/dashboard/TeamPage";
 import ExportsPage from "@/pages/dashboard/ExportsPage";
 
-// Admin
+// Admin (new API key based system)
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminLoginPage from "@/pages/admin/AdminLoginPage";
-import AdminOrgsPage from "@/pages/admin/AdminOrgsPage";
-import AdminOrgDetailPage from "@/pages/admin/AdminOrgDetailPage";
-import AdminAnalyticsPage from "@/pages/admin/AdminAnalyticsPage";
+import AdminOverviewPage from "@/pages/admin/AdminOverviewPage";
+import AdminHealthPage from "@/pages/admin/AdminHealthPage";
+import AdminBlogPage from "@/pages/admin/AdminBlogPage";
+import AdminBlogEditorPage from "@/pages/admin/AdminBlogEditorPage";
+import AdminMetricsPage from "@/pages/admin/AdminMetricsPage";
+import AdminAuditPage from "@/pages/admin/AdminAuditPage";
+import AdminKeysPage from "@/pages/admin/AdminKeysPage";
 
-// Admin wrapper component that provides AdminAuthContext
+// Admin wrapper component that provides AdminContext (API key auth)
 const AdminRoutes = () => (
-    <AdminAuthProvider>
-        <ImpersonationBanner />
+    <AdminProvider>
         <Routes>
-            <Route path="/" element={<AdminLoginPage />} />
+            <Route path="/login" element={<AdminLoginPage />} />
             <Route element={<AdminLayout />}>
-                <Route path="orgs" element={<AdminOrgsPage />} />
-                <Route path="orgs/:orgId" element={<AdminOrgDetailPage />} />
-                <Route path="analytics" element={<AdminAnalyticsPage />} />
-                <Route path="settings" element={<div className="text-ss-text">Admin Settings (Coming Soon)</div>} />
+                <Route index element={<AdminOverviewPage />} />
+                <Route path="health" element={<AdminHealthPage />} />
+                <Route path="blog" element={<AdminBlogPage />} />
+                <Route path="blog/new" element={<AdminBlogEditorPage />} />
+                <Route path="blog/edit/:id" element={<AdminBlogEditorPage />} />
+                <Route path="metrics" element={<AdminMetricsPage />} />
+                <Route path="audit" element={<AdminAuditPage />} />
+                <Route path="keys" element={<AdminKeysPage />} />
             </Route>
         </Routes>
-    </AdminAuthProvider>
+    </AdminProvider>
 );
 
 function App() {
