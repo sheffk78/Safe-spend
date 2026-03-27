@@ -30,10 +30,15 @@ next-env.d.ts
 dist/
 dist
 
-# Environment files (comprehensive coverage)
+# Environment files
+.env.local
+.env.*.local
+*.env.example
 
+# Sensitive credentials (NEVER commit these)
 *token.json*
 *credentials.json*
+memory/test_credentials.md
 
 # Logs and debug files
 npm-debug.log*
@@ -63,6 +68,8 @@ chainlit.md
 
 # Data and databases
 agenthub/agents/youtube/db
+*.db
+*.db-journal
 
 # Archive files and large assets
 **/*.zip
@@ -77,31 +84,7 @@ agenthub/agents/youtube/db
 .cache/
 
 # Mobile development
-android-sdk/ frontend/node_modules/.cache/default-development/19.pack
-frontend/node_modules/.cache/default-development/19.pack
-frontend/node_modules/.cache/default-development/24.pack
--e 
-# Environment files
-*.env
-*.env.*
-frontend/node_modules/.cache/default-development/31.pack
--e 
-# Environment files
-*.env
-*.env.*
-frontend/node_modules/.cache/default-development/28.pack
-frontend/node_modules/.cache/default-development/6.pack
-frontend/node_modules/.cache/default-development/0.pack
-frontend/node_modules/.cache/default-development/1.pack
-frontend/node_modules/.cache/default-development/2.pack
-frontend/node_modules/.cache/default-development/2.pack
-frontend/node_modules/.cache/default-development/7.pack
+android-sdk/
 frontend/node_modules/.cache/default-development/4.pack
-frontend/node_modules/.cache/default-development/11.pack
-frontend/node_modules/.cache/default-development/9.pack
-frontend/node_modules/.cache/default-development/14.pack
--e 
-# Environment files
-*.env
-*.env.*
+frontend/node_modules/.cache/default-development/31.pack
 frontend/node_modules/.cache/default-development/3.pack

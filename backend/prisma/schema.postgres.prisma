@@ -1,0 +1,656 @@
+// This is your Prisma schema file for Safe-Spend
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin Users (for internal Agentic Trust operators)
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("support") // superadmin | support | read_only
+  name         String?
+  isActive     Boolean  @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+// Organizations (users/companies)
+model Organization {
+  id                     String    @id @default(uuid())
+  name                   String
+  email                  String    @unique
+  passwordHash           String    @map("password_hash")
+  organizationId         String?   @map("organization_id") // Linked org ID from AAV/control plane
+  stripeCustomerId       String?   @map("stripe_customer_id")
+  stripeSubscriptionId   String?   @map("stripe_subscription_id")
+  plan                   String    @default("sandbox") // sandbox | builder | scale
+  planStatus             String    @default("active") // active | past_due | canceled | trialing
+  planPeriodEnd          DateTime? @map("plan_period_end")
+  monthlyEscrowVolumeCents Int     @default(0) @map("monthly_escrow_volume_cents")
+  monthlyVolumeResetAt   DateTime? @map("monthly_volume_reset_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  apiKeys              ApiKey[]
+  escrowAccounts       EscrowAccount[]
+  spendingPolicies     SpendingPolicy[]
+  spendRequests        SpendRequest[]
+  approvals            Approval[]
+  auditEvents          AuditEvent[]
+  webhooks             Webhook[]
+  members              OrgMember[]
+  notificationSettings NotificationSettings?
+  aavConfiguration     AAVConfiguration?
+  agentCertificates    AgentCertificate[]
+
+  @@map("organizations")
+}
+
+// Organization Members (RBAC)
+model OrgMember {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  email     String
+  role      String   @default("developer") // owner | finance_admin | developer | read_only
+  status    String   @default("active") // active | pending | removed
+  invitedBy String?  @map("invited_by")
+  inviteToken String? @unique @map("invite_token")
+  inviteExpiresAt DateTime? @map("invite_expires_at")
+  joinedAt  DateTime? @map("joined_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, email])
+  @@map("org_members")
+}
+
+// Notification Settings
+model NotificationSettings {
+  id                    String   @id @default(uuid())
+  orgId                 String   @unique @map("org_id")
+  emailEnabled          Boolean  @default(true) @map("email_enabled")
+  emailRecipientsMode   String   @default("finance_and_owner") @map("email_recipients_mode") // finance_and_owner | all_members | custom
+  slackEnabled          Boolean  @default(false) @map("slack_enabled")
+  slackWebhookUrl       String?  @map("slack_webhook_url")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("notification_settings")
+}
+
+// AAV (Agent Authority Vault) Configuration
+model AAVConfiguration {
+  id                     String    @id @default(uuid())
+  orgId                  String    @unique @map("org_id")
+  
+  // AAV Connection
+  aavEndpoint            String?   @map("aav_endpoint")           // AAV API endpoint
+  aavPublicKey           String?   @map("aav_public_key")         // For JWT/signature verification
+  aavApiKey              String?   @map("aav_api_key")            // For AAV API calls (encrypted)
+  
+  // Default behavior
+  defaultEnforcementMode String    @default("none") @map("default_enforcement_mode") // none | warn | strict
+  
+  // Status
+  isConfigured           Boolean   @default(false) @map("is_configured")
+  lastVerifiedAt         DateTime? @map("last_verified_at")
+  
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("aav_configurations")
+}
+
+// API Keys
+model ApiKey {
+  id          String    @id @default(uuid())
+  orgId       String    @map("org_id")
+  keyHash     String    @map("key_hash")
+  keyPrefix   String    @map("key_prefix")
+  keyType     String    @map("key_type") // live | test | agent
+  label       String?
+  permissions String    @default("[]")
+  lastUsedAt  DateTime? @map("last_used_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendRequests SpendRequest[]
+
+  @@map("api_keys")
+}
+
+// Escrow Accounts
+model EscrowAccount {
+  id                    String   @id @default(uuid())
+  orgId                 String   @map("org_id")
+  agentId               String?  @map("agent_id") // agt_ format, links escrow to specific agent
+  name                  String
+  description           String?
+  balanceCents          Int      @default(0) @map("balance_cents")
+  currency              String   @default("usd")
+  status                String   @default("active") // active | paused | depleted | closed
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  totalFundedCents      Int      @default(0) @map("total_funded_cents")
+  totalSpentCents       Int      @default(0) @map("total_spent_cents")
+  totalDeniedCents      Int      @default(0) @map("total_denied_cents")
+  metadata              String   @default("{}")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  
+  // AAV Integration - Full configuration as JSON for flexibility
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array of AAV agent IDs
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array of AAV grant IDs
+  aavEnforcementMode    String   @default("none") @map("aav_enforcement_mode") // none | warn | strict | verify | log_only
+  aavApiKey             String?  @map("aav_api_key")                          // Encrypted AAV API key for server-to-server calls
+  aavRequireCertificate Boolean  @default(false) @map("aav_require_certificate")  // If true, every spend must include certificate_id
+  aavLastVerifiedAt     DateTime? @map("aav_last_verified_at")                // Last successful AAV verification
+
+  // Relations
+  organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendingPolicies SpendingPolicy[]
+  spendRequests    SpendRequest[]
+  auditEvents      AuditEvent[]
+  dailyTracking    DailySpendTracking[]
+  weeklyTracking   WeeklySpendTracking[]
+  monthlyTracking  MonthlySpendTracking[]
+  fundingEvents    FundingEvent[]
+
+  @@map("escrow_accounts")
+}
+
+// Funding Events (tracks Stripe payments)
+model FundingEvent {
+  id                    String   @id @default(uuid())
+  orgId                 String   @map("org_id")
+  escrowId              String   @map("escrow_id")
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  stripeSessionId       String?  @map("stripe_session_id")
+  stripeRefundId        String?  @map("stripe_refund_id")
+  amountCents           Int      @map("amount_cents")
+  currency              String   @default("usd")
+  status                String   @default("pending") // pending | succeeded | failed | refunded
+  type                  String   @default("funding") // funding | refund
+  metadata              String   @default("{}")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@map("funding_events")
+}
+
+// Spending Policies (Fiduciary Policies)
+model SpendingPolicy {
+  id                      String   @id @default(uuid())
+  escrowId                String   @map("escrow_id")
+  orgId                   String   @map("org_id")
+  name                    String
+  purpose                 String?  // Free-form text describing the trust mandate purpose
+  status                  String   @default("draft") // draft | active | archived
+  isActive                Boolean  @default(true) @map("is_active")
+  lockedAt                DateTime? @map("locked_at")
+  lockedBy                String?  @map("locked_by")
+  
+  // Amount limits
+  perTransactionLimitCents Int?    @map("per_transaction_limit_cents")
+  dailyLimitCents          Int?    @map("daily_limit_cents")
+  weeklyLimitCents         Int?    @map("weekly_limit_cents")
+  monthlyLimitCents        Int?    @map("monthly_limit_cents")
+  
+  // Vendor controls (stored as JSON strings)
+  allowedVendors    String  @default("[]") @map("allowed_vendors")
+  blockedVendors    String  @default("[]") @map("blocked_vendors")
+  vendorMatchMode   String  @default("exact") @map("vendor_match_mode") // exact | contains | regex
+  
+  // Category controls
+  allowedCategories String  @default("[]") @map("allowed_categories")
+  blockedCategories String  @default("[]") @map("blocked_categories")
+  
+  // Time controls
+  activeDays        String  @default("[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"]") @map("active_days")
+  activeHoursStart  String? @map("active_hours_start")
+  activeHoursEnd    String? @map("active_hours_end")
+  activeTimezone    String  @default("America/Denver") @map("active_timezone")
+  
+  // Approval controls
+  autoApproveUnderCents   Int?   @map("auto_approve_under_cents")
+  requireHumanAboveCents  Int?   @map("require_human_above_cents")
+  approvalTimeoutMinutes  Int    @default(60) @map("approval_timeout_minutes")
+  
+  // AAV Integration (overrides escrow-level if set)
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array
+  aavEnforcementMode    String?  @map("aav_enforcement_mode")                 // null = inherit from escrow
+  aavRequiredAutonomyLevel Int?  @map("aav_required_autonomy_level")          // Minimum AAV autonomy level (1-4)
+  aavRequiredActions    String   @default("[]") @map("aav_required_actions")  // JSON array of required AAV actions
+  aavMapVendors         Boolean  @default(false) @map("aav_map_vendors")      // Sync approved_vendors from AAV grant
+  aavMapLimits          Boolean  @default(false) @map("aav_map_limits")       // Use AAV limits as additional ceiling
+  
+  // ARL Reputation Integration
+  minReputationScore    Int?     @map("min_reputation_score")                  // 0-100, deny if agent score below this
+  reputationSpendingBoost Boolean @default(false) @map("reputation_spending_boost") // If true, Platinum agents get 2x auto_approve
+  
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization   Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount  EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  spendRequests  SpendRequest[] @relation("DenialRule")
+
+  @@map("spending_policies")
+}
+
+// Spend Requests
+model SpendRequest {
+  id             String   @id @default(uuid())
+  escrowId       String   @map("escrow_id")
+  orgId          String   @map("org_id")
+  apiKeyId       String?  @map("api_key_id")
+  agentId        String?  @map("agent_id") // agt_ format
+  
+  // Request details
+  amountCents    Int      @map("amount_cents")
+  currency       String   @default("usd")
+  vendor         String
+  category       String?
+  description    String?
+  idempotencyKey String?  @unique @map("idempotency_key")
+  
+  // Resolution
+  status         String   @default("pending") // pending | approved | denied | expired | cancelled
+  resolvedAt     DateTime? @map("resolved_at")
+  resolvedBy     String?  @map("resolved_by")
+  denialReason   String?  @map("denial_reason")
+  denialRuleId   String?  @map("denial_rule_id")
+  
+  // Rule evaluation snapshot (stored as JSON string)
+  rulesEvaluated    String @default("[]") @map("rules_evaluated")
+  balanceBeforeCents Int?  @map("balance_before_cents")
+  balanceAfterCents  Int?  @map("balance_after_cents")
+  
+  // Stripe fields
+  stripeTransferId  String? @map("stripe_transfer_id")
+  stripePaymentId   String? @map("stripe_payment_id")
+  
+  // AAV Integration (captured at request time)
+  aavAgentId            String?  @map("aav_agent_id")           // Agent ID from AAV claim
+  aavGrantId            String?  @map("aav_grant_id")           // Grant ID used for authorization
+  aavCertificateId      String?  @map("aav_certificate_id")     // Certificate ID presented by agent
+  aavVerificationStatus String?  @map("aav_verification_status") // verified | unverified | bypassed | denied
+  aavVerificationId     String?  @map("aav_verification_id")    // verif_... from AAV response
+  aavAutonomyLevel      Int?     @map("aav_autonomy_level")     // 1-4 from AAV response
+  aavResult             String?  @map("aav_result")             // authorized | denied | approval_pending | etc
+  aavDailySpend         String?  @map("aav_daily_spend")        // JSON: { used, limit, currency }
+  aavCheckedAt          DateTime? @map("aav_checked_at")        // When AAV was verified
+  denialSource          String?  @map("denial_source")          // aav | policy | balance | account | key
+  
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization  Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount EscrowAccount   @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  apiKey        ApiKey?         @relation(fields: [apiKeyId], references: [id])
+  denialRule    SpendingPolicy? @relation("DenialRule", fields: [denialRuleId], references: [id])
+  approvals     Approval[]
+
+  @@map("spend_requests")
+  @@index([agentId])
+}
+
+// Approvals
+model Approval {
+  id              String    @id @default(uuid())
+  spendRequestId  String    @map("spend_request_id")
+  orgId           String    @map("org_id")
+  status          String    @default("pending") // pending | approved | denied | expired
+  requestedAt     DateTime  @default(now()) @map("requested_at")
+  expiresAt       DateTime? @map("expires_at")
+  decidedBy       String?   @map("decided_by")
+  decidedAt       DateTime? @map("decided_at")
+  decisionNote    String?   @map("decision_note")
+  notificationSent Boolean  @default(false) @map("notification_sent")
+
+  // Relations
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendRequest  SpendRequest @relation(fields: [spendRequestId], references: [id], onDelete: Cascade)
+
+  @@map("approvals")
+}
+
+// Audit Events
+model AuditEvent {
+  id         String   @id @default(uuid())
+  orgId      String   @map("org_id")
+  escrowId   String?  @map("escrow_id")
+  eventType  String   @map("event_type")
+  actorType  String   @map("actor_type") // human | agent | system
+  actorId    String?  @map("actor_id")
+  details    String   // JSON string
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount EscrowAccount? @relation(fields: [escrowId], references: [id])
+
+  @@map("audit_events")
+}
+
+// Webhooks
+model Webhook {
+  id              String    @id @default(uuid())
+  orgId           String    @map("org_id")
+  url             String
+  events          String    @default("[]") // JSON string array
+  secret          String
+  isActive        Boolean   @default(true) @map("is_active")
+  lastTriggeredAt DateTime? @map("last_triggered_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
+  @@map("webhooks")
+}
+
+// Webhook Deliveries (for tracking delivery attempts and retries)
+model WebhookDelivery {
+  id            String    @id @default(uuid())
+  webhookId     String    @map("webhook_id")
+  eventId       String    @map("event_id") // evt_XXXXXXXXXXXX
+  eventType     String    @map("event_type")
+  payload       String    // JSON string
+  status        String    @default("pending") // pending | success | failed
+  attemptCount  Int       @default(0) @map("attempt_count")
+  lastAttemptAt DateTime? @map("last_attempt_at")
+  nextAttemptAt DateTime? @map("next_attempt_at")
+  errorMessage  String?   @map("error_message")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_deliveries")
+}
+
+// Daily Spend Tracking
+model DailySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  date            DateTime
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, date])
+  @@map("daily_spend_tracking")
+}
+
+// Weekly Spend Tracking
+model WeeklySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  weekStart       DateTime @map("week_start")
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, weekStart])
+  @@map("weekly_spend_tracking")
+}
+
+// Monthly Spend Tracking
+model MonthlySpendTracking {
+  id              Int      @id @default(autoincrement())
+  escrowId        String   @map("escrow_id")
+  monthStart      DateTime @map("month_start")
+  totalSpentCents Int      @default(0) @map("total_spent_cents")
+  transactionCount Int     @default(0) @map("transaction_count")
+
+  // Relations
+  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@unique([escrowId, monthStart])
+  @@map("monthly_spend_tracking")
+}
+
+
+// Blog Post
+model BlogPost {
+  id                  String    @id @default(uuid())
+  title               String
+  slug                String    @unique
+  content             String    // Markdown content
+  contentHtml         String    @map("content_html") // Pre-rendered HTML
+  excerpt             String?   // Max 155 chars
+  status              String    @default("draft") // draft | published | archived
+  
+  // Author info (stored as JSON)
+  authorName          String    @map("author_name")
+  authorBio           String?   @map("author_bio")
+  authorAvatarUrl     String?   @map("author_avatar_url")
+  
+  // Cover image
+  coverImageUrl       String?   @map("cover_image_url")
+  coverImageAlt       String?   @map("cover_image_alt")
+  
+  // Categorization
+  tags                String    @default("[]") // JSON array
+  category            String?
+  
+  // SEO fields (stored as JSON for flexibility)
+  seoMetaTitle        String?   @map("seo_meta_title")
+  seoMetaDescription  String?   @map("seo_meta_description")
+  seoCanonicalUrl     String?   @map("seo_canonical_url")
+  seoOgTitle          String?   @map("seo_og_title")
+  seoOgDescription    String?   @map("seo_og_description")
+  seoOgImage          String?   @map("seo_og_image")
+  seoOgType           String?   @default("article") @map("seo_og_type")
+  seoTwitterCard      String?   @default("summary_large_image") @map("seo_twitter_card")
+  seoTwitterTitle     String?   @map("seo_twitter_title")
+  seoTwitterDescription String? @map("seo_twitter_description")
+  seoTwitterImage     String?   @map("seo_twitter_image")
+  seoKeywords         String?   @map("seo_keywords") // JSON array
+  seoRobots           String?   @default("index, follow") @map("seo_robots")
+  seoStructuredData   String?   @map("seo_structured_data") // JSON-LD
+  
+  // Computed fields
+  readingTimeMinutes  Int       @default(0) @map("reading_time_minutes")
+  wordCount           Int       @default(0) @map("word_count")
+  
+  // Timestamps
+  publishedAt         DateTime? @map("published_at")
+  scheduledAt         DateTime? @map("scheduled_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  
+  // Stats
+  views               Int       @default(0)
+  isFeatured          Boolean   @default(false) @map("is_featured")
+  relatedPosts        String    @default("[]") @map("related_posts") // JSON array of slugs
+  
+  @@map("blog_posts")
+}
+
+// Admin API Keys (for Kit and other automation)
+model AdminApiKey {
+  id          String    @id @default(uuid())
+  label       String    @default("Admin Key") // e.g., "Kit Operations", "Blog Publisher"
+  description String?
+  keyHash     String    @unique @map("key_hash")
+  keyPrefix   String    @map("key_prefix") // e.g., "ss_admin_abc..."
+  scopes      String    @default("[\"*\"]") // JSON array: ["health", "blog", "metrics", "audit", "keys", "*"]
+  isActive    Boolean   @default(true) @map("is_active")
+  lastUsedAt  DateTime? @map("last_used_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  @@map("admin_api_keys")
+}
+
+// Error Log for admin monitoring
+model ErrorLog {
+  id          String   @id @default(uuid())
+  timestamp   DateTime @default(now())
+  level       String   // error, warn
+  message     String
+  endpoint    String?
+  stack       String?
+  requestId   String?  @map("request_id")
+  metadata    String?  // JSON for extra context
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@index([timestamp])
+  @@map("error_logs")
+}
+
+// Feedback Items (inline reactions, milestone feedback, error clarity, pulse checks)
+model FeedbackItem {
+  id              String   @id @default(uuid())
+  type            String   // inline_reaction | milestone_feedback | error_clarity | doc_feedback | pulse_check
+  sentiment       String?  // negative | neutral | good | great
+  npsScore        Int?     @map("nps_score") // 1-10 for pulse checks
+  note            String?
+  page            String?  // URL path where feedback was given
+  endpoint        String?  // API endpoint (for error feedback)
+  errorCode       String?  @map("error_code")
+  milestone       String?  // e.g., "first_escrow_created"
+  useCases        String?  @map("use_cases") // JSON array for pulse checks
+  orgId           String   @map("org_id")
+  userId          String?  @map("user_id")
+  isAcknowledged  Boolean  @default(false) @map("is_acknowledged")
+  adminNotes      String?  @map("admin_notes")
+  convertedTo     String?  @map("converted_to") // req_... if converted to feature request
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  @@index([orgId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("feedback_items")
+}
+
+// Feature Requests (public votable board)
+model FeatureRequest {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  category      String   // api | sdk | dashboard | integrations | docs | billing | other
+  status        String   @default("new") // new | under_review | planned | in_progress | shipped | declined
+  statusNote    String?  @map("status_note")
+  voteCount     Int      @default(1) @map("vote_count")
+  voters        String   @default("[]") // JSON array of user IDs
+  submittedByUserId   String?  @map("submitted_by_user_id")
+  submittedByOrgId    String   @map("submitted_by_org_id")
+  submittedByOrgName  String?  @map("submitted_by_org_name")
+  isAnonymous   Boolean  @default(false) @map("is_anonymous")
+  comments      String   @default("[]") // JSON array of comments
+  statusHistory String   @default("[]") @map("status_history") // JSON array
+  isPinned      Boolean  @default(false) @map("is_pinned")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  @@index([status])
+  @@index([category])
+  @@index([voteCount])
+  @@index([createdAt])
+  @@map("feature_requests")
+}
+
+// User Pulse Check tracking (to enforce 14-day cadence)
+model UserPulseTracking {
+  id              String    @id @default(uuid())
+  orgId           String    @map("org_id")
+  userId          String?   @map("user_id")
+  lastPulseShownAt DateTime? @map("last_pulse_shown_at")
+  lastPulseCompletedAt DateTime? @map("last_pulse_completed_at")
+  milestonesShown String    @default("[]") @map("milestones_shown") // JSON array of milestone names
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  @@unique([orgId, userId])
+  @@map("user_pulse_tracking")
+}
+
+// Agent Certificate Mappings (agent_id → certificate_id for AAV verification)
+model AgentCertificate {
+  id              String   @id @default(uuid())
+  orgId           String   @map("org_id")
+  agentId         String   @map("agent_id")    // agt_ + 24 hex
+  certificateId   String   @map("certificate_id") // cert_...
+  mappedAt        DateTime @default(now()) @map("mapped_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, agentId])
+  @@index([agentId])
+  @@map("agent_certificates")
+}
+
+// Cross-Tool Event Log (for internal event receiver/emitter)
+model CrossToolEvent {
+  id          String   @id @default(uuid())
+  orgId       String?  @map("org_id")
+  source      String   // safe_spend, aav, arl
+  eventType   String   @map("event_type")
+  agentId     String?  @map("agent_id") // agt_ format
+  payload     String   // JSON
+  status      String   @default("received") // received | processed | failed
+  processedAt DateTime? @map("processed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([eventType])
+  @@index([orgId])
+  @@map("cross_tool_events")
+}
+
+// Cached ARL Reputation Scores
+model ReputationCache {
+  id          String   @id @default(uuid())
+  agentId     String   @unique @map("agent_id") // agt_ format
+  score       Int      // 0-100
+  tier        String?  // bronze | silver | gold | platinum
+  lastCheckedAt DateTime @map("last_checked_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([agentId])
+  @@map("reputation_cache")
+}
