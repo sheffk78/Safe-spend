@@ -314,17 +314,17 @@ router.get('/metrics/activity', requireAdminScope('metrics'), async (req, res) =
         
         const auditEvents = await prisma.auditEvent.findMany({
             where: {
-                timestamp: { gte: sinceDate }
+                createdAt: { gte: sinceDate }
             },
-            orderBy: { timestamp: 'desc' },
+            orderBy: { createdAt: 'desc' },
             take: Math.min(parseInt(limit), 200)
         });
         
         const events = auditEvents.map(e => ({
-            timestamp: e.timestamp.toISOString(),
+            timestamp: e.createdAt.toISOString(),
             type: e.eventType,
-            org_id: e.organizationId,
-            details: e.metadata ? JSON.parse(e.metadata) : {}
+            org_id: e.orgId,
+            details: e.details ? JSON.parse(e.details) : {}
         }));
         
         res.json({ events });
@@ -347,9 +347,10 @@ router.get('/metrics/stripe', requireAdminScope('metrics'), async (req, res) => 
     try {
         // This would integrate with Stripe API in production
         // For now, return basic data from our records
-        const stripeFundings = await prisma.escrowFunding.findMany({
+        const stripeFundings = await prisma.fundingEvent.findMany({
             where: {
-                status: 'completed',
+                status: 'succeeded',
+                type: 'funding',
                 createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
             }
         });
@@ -391,19 +392,19 @@ router.get('/audit', requireAdminScope('audit'), async (req, res) => {
         
         const where = {};
         
-        if (org_id) where.organizationId = org_id;
+        if (org_id) where.orgId = org_id;
         if (event_type) where.eventType = event_type;
         if (actor_type) where.actorType = actor_type;
         if (since || until) {
-            where.timestamp = {};
-            if (since) where.timestamp.gte = new Date(since);
-            if (until) where.timestamp.lte = new Date(until);
+            where.createdAt = {};
+            if (since) where.createdAt.gte = new Date(since);
+            if (until) where.createdAt.lte = new Date(until);
         }
         
         const [events, total] = await Promise.all([
             prisma.auditEvent.findMany({
                 where,
-                orderBy: { timestamp: 'desc' },
+                orderBy: { createdAt: 'desc' },
                 skip: parseInt(offset),
                 take: Math.min(parseInt(limit), 500)
             }),
@@ -413,14 +414,14 @@ router.get('/audit', requireAdminScope('audit'), async (req, res) => {
         res.json({
             events: events.map(e => ({
                 id: e.id,
-                timestamp: e.timestamp.toISOString(),
+                timestamp: e.createdAt.toISOString(),
                 event_type: e.eventType,
-                organization_id: e.organizationId,
+                organization_id: e.orgId,
                 actor_type: e.actorType,
                 actor_id: e.actorId,
-                resource_type: e.resourceType,
-                resource_id: e.resourceId,
-                metadata: e.metadata ? JSON.parse(e.metadata) : {}
+                escrow_id: e.escrowId,
+                details: e.details ? JSON.parse(e.details) : {},
+                ip_address: e.ipAddress
             })),
             pagination: {
                 total,
