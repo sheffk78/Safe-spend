@@ -7,6 +7,13 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. Part o
 **Current Phase:** Ready for External Deployment
 **Last Updated:** March 27, 2026
 
+### Recent Completions (March 27, 2026)
+- ✅ Core Functionality Testing (73/73 tests)
+- ✅ Feedback System (inline reactions, feature requests, pulse checks, admin dashboard)
+- ✅ AAV Integration V2 (server-to-server verification, dual-limits, denial_source)
+- ✅ P1: Dashboard UI Integration (AAV API Key, Require Certificate in escrow modal)
+- ✅ P1: AAV Webhook Events (aav.verification_passed/denied/failed)
+
 ---
 
 ## User Personas
