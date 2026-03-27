@@ -374,50 +374,106 @@ model UserPulseTracking {
 
 ---
 
-### AAV Integration (Completed - March 24, 2026)
+### AAV Integration V2 (Enhanced - March 27, 2026)
 
 #### Overview
-Deep integration with Agent Authority Vault (AAV) to tie Safe-Spend escrows and policies directly to AAV grants. This adds agent-level authorization on top of existing policy-based controls, creating a two-layer security model.
+Enhanced AAV integration with server-to-server API verification, dual-limit enforcement, and comprehensive Dashboard UI. This adds real-time AAV /verify calls on top of local agent authorization.
 
-#### Schema Changes
-| Model | New Fields |
-|-------|------------|
-| **EscrowAccount** | `aav_enabled`, `authorized_agent_ids`, `aav_grant_ids`, `aav_enforcement_mode` |
-| **SpendingPolicy** | `aav_enabled`, `authorized_agent_ids`, `aav_grant_ids`, `aav_enforcement_mode` |
-| **SpendRequest** | `aav_agent_id`, `aav_grant_id`, `aav_verification_status` |
-| **AAVConfiguration** (NEW) | Org-level AAV connection settings (endpoint, public key, default mode) |
+#### New Features (V2)
 
-#### Rules Engine Enhancement
-- **Step 2.5: AAV Agent Authorization** added after escrow validation, before idempotency check
-- Rules cascade is now 14 steps (was 13)
-- Enforcement modes:
-  - `none`: No AAV check performed
-  - `warn`: Log unauthorized but allow (for gradual rollout)
-  - `strict`: Deny unauthorized agents
+##### Server-to-Server AAV Verification
+- Real HTTP calls to AAV `/verify` endpoint with 3-second timeout
+- Requires `aav_api_key` (aav_live_sk_...) on escrow account
+- Fail-closed (`verify` mode) or fail-open (`log_only` mode) on timeout/errors
 
-#### API Endpoints
-- `POST /api/v1/escrow-accounts` - Now accepts AAV fields
-- `POST /api/v1/policies` - Now accepts AAV fields
-- `POST /api/v1/spend` - Extracts AAV claims from headers or body
-- `GET/PUT /api/v1/settings/aav` - AAV configuration management
+##### Enhanced Schema Fields
+| Model | New Fields (V2) |
+|-------|-----------------|
+| **EscrowAccount** | `aav_api_key`, `aav_require_certificate`, `aav_last_verified_at` |
+| **SpendingPolicy** | `aav_required_autonomy_level`, `aav_required_actions`, `aav_map_vendors`, `aav_map_limits` |
+| **SpendRequest** | `aav_certificate_id`, `aav_verification_id`, `aav_autonomy_level`, `aav_result`, `aav_daily_spend`, `aav_checked_at`, `denial_source` |
 
-#### Headers for Agent Identity
-| Header | Purpose |
-|--------|---------|
-| `X-AAV-Agent-Id` | Agent identifier from AAV |
-| `X-AAV-Grant-Id` | Time-bound grant ID from AAV |
-| `X-AAV-Signature` | Optional signature for verification |
+##### Enforcement Modes (Updated)
+| Mode | Behavior |
+|------|----------|
+| `none` | No AAV check performed |
+| `log_only` | Check AAV but allow even if denied (for testing/rollout) |
+| `verify` | Require AAV authorization - deny if check fails (fail-closed) |
 
-#### Frontend Updates
-- Policy wizard Step 3 (Restrictions) now includes "Agent Authorization (AAV Integration)" section
-- Toggle to enable AAV verification
-- Inputs for authorized agent IDs and grant IDs
-- Enforcement mode dropdown
-- Step 4 (Review) shows AAV configuration summary
+##### Dual-Limit Enforcement
+When `aav_map_limits: true` on policy:
+- Safe-Spend and AAV limits are compared
+- **Stricter limit wins** (lower of the two)
+- Sources tracked: `per_transaction_limit_source`, `daily_limit_source`
 
-#### Files Created/Modified
-- `/app/backend/prisma/schema.prisma` - AAV fields added
-- `/app/backend/src/services/aav-service.js` (NEW)
+##### Certificate Requirement
+When `aav_require_certificate: true` on escrow:
+- Agents must present `aav_certificate_id` with every spend
+- Denied in `verify` mode, warned in `log_only` mode
+
+##### denial_source Field
+Differentiates where denial originated:
+- `aav` - Agent Authority Vault denied
+- `policy` - Safe-Spend policy rule denied
+- `balance` - Insufficient escrow balance
+- `account` - Escrow account issue (paused/closed)
+- `key` - API key validation issue
+
+#### New API Fields
+
+##### POST /v1/escrow-accounts
+```json
+{
+  "aav_enabled": true,
+  "aav_enforcement_mode": "verify",
+  "aav_api_key": "aav_live_sk_...",
+  "aav_require_certificate": false,
+  "authorized_agent_ids": ["agent_..."],
+  "aav_grant_ids": ["grant_..."]
+}
+```
+
+##### POST /v1/policies
+```json
+{
+  "aav_required_autonomy_level": 3,
+  "aav_required_actions": ["purchase_service"],
+  "aav_map_vendors": true,
+  "aav_map_limits": true
+}
+```
+
+##### POST /v1/spend
+```json
+{
+  "aav_agent_id": "agent_...",
+  "aav_grant_id": "grant_...",
+  "aav_certificate_id": "cert_..."
+}
+```
+
+#### Dashboard UI Components
+- `EscrowAAVConfig` - AAV configuration card for escrow accounts
+- `PolicyAAVConfig` - AAV settings section for policies
+- `AAVVerificationBadge` - Status badge for spend requests
+- `AAVDetailsPanel` - Full AAV details in spend request detail view
+
+#### Files Created/Modified (V2)
+- `/app/backend/src/services/aav-api-service.js` (NEW) - AAV /verify API client
+- `/app/backend/src/services/rules-engine.js` - Enhanced Step 2.5 with API verification
+- `/app/backend/src/routes/spend.js` - AAV API call before rules engine
+- `/app/backend/src/routes/escrow-accounts.js` - New AAV fields
+- `/app/backend/src/routes/policies.js` - New AAV policy fields
+- `/app/backend/prisma/schema.prisma` - Enhanced AAV schema
+- `/app/frontend/src/components/AAVComponents.js` (NEW) - Dashboard UI
+
+#### Test Coverage
+- `/app/test_reports/iteration_27.json` - 26/26 tests passed
+- Enforcement modes, certificate requirements, denial sources validated
+
+---
+
+### AAV Integration V1 (Original - March 24, 2026)
 - `/app/backend/src/services/rules-engine.js` - Step 2.5 added
 - `/app/backend/src/routes/aav-settings.js` (NEW)
 - `/app/backend/src/routes/spend.js` - AAV claims extraction
