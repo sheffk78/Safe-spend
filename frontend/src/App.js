@@ -29,6 +29,7 @@ import DocsWebhooks from "@/pages/docs/DocsWebhooks";
 import DocsIntegrations from "@/pages/docs/DocsIntegrations";
 import DocsTrustLaw from "@/pages/docs/DocsTrustLaw";
 import DocsSDKs from "@/pages/docs/DocsSDKs";
+import DocsAAVIntegration from "@/pages/docs/DocsAAVIntegration";
 
 // Dashboard
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -112,6 +113,7 @@ function App() {
                         <Route path="webhooks" element={<DocsWebhooks />} />
                         <Route path="integrations" element={<DocsIntegrations />} />
                         <Route path="sdks" element={<DocsSDKs />} />
+                        <Route path="aav-integration" element={<DocsAAVIntegration />} />
                     </Route>
 
                     {/* Blog routes */}

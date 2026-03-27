@@ -10,7 +10,8 @@ import {
     ArrowLeft,
     ExternalLink,
     Scale,
-    Package
+    Package,
+    Shield
 } from 'lucide-react';
 
 const navigation = [
@@ -40,6 +41,7 @@ const navigation = [
             { name: 'TypeScript SDK', href: '/docs/sdks#typescript-sdk', icon: Package },
             { name: 'LangChain', href: '/docs/sdks#langchain', icon: Puzzle },
             { name: 'MCP Server', href: '/docs/sdks#mcp-server', icon: Puzzle },
+            { name: 'AAV Integration', href: '/docs/aav-integration', icon: Shield },
         ]
     },
     {
