@@ -2058,3 +2058,78 @@ Implemented image upload functionality for the blog CMS.
 - Images stored in `/app/backend/uploads/blog-images/`
 - Filenames: `{timestamp}_{random}.{ext}` (prevents collisions)
 - Served via `/api/uploads/blog-images/{filename}`
+
+
+---
+
+### Rate Limiting for Non-Spend Endpoints (Completed - March 27, 2026)
+
+#### Overview
+Added comprehensive rate limiting to all API endpoints to prevent abuse and ensure fair usage.
+
+#### Rate Limit Tiers
+
+| Endpoint Category       | Rate Limit               | Scope                    |
+|------------------------|--------------------------|--------------------------|
+| Auth (login/signup)    | 5 req/15min per IP       | IP address               |
+| Spend Requests         | 60 req/min per key       | API key (always active)  |
+| API Key Creation       | 10 req/hour per org      | Organization             |
+| Exports                | 10 req/5min per org      | Organization             |
+| Standard API (reads)   | 100 req/min per key      | API key                  |
+| Write Operations       | 30 req/min per key       | API key                  |
+| Public API (blog)      | 30 req/min per IP        | IP address               |
+| Admin API              | 120 req/min per key      | Admin key                |
+| Global (fallback)      | 1000 req/min per IP      | IP address               |
+
+#### Route-to-Limiter Mapping
+
+**Standard API Limiter (100 req/min):**
+- `/api/v1/escrow-accounts` - List/get escrow accounts
+- `/api/v1/policies` - List/get spending policies
+- `/api/v1/approvals` - List/get approvals
+- `/api/v1/audit` - Query audit events
+- `/api/v1/subscription` - Subscription status
+
+**Write Limiter (30 req/min):**
+- `/api/v1/webhooks` - Webhook management
+- `/api/v1/team` - Team member management
+- `/api/v1/settings/aav` - AAV configuration
+
+**Special Limiters:**
+- `/api/v1/auth` - Auth rate limiter (5 req/15min)
+- `/api/v1/spend` - Spend rate limiter (60 req/min, never skipped)
+- `/api/v1/api-keys` - Key creation limiter (10 req/hour)
+- `/api/v1/exports` - Export limiter (10 req/5min)
+
+**Public Limiter (30 req/min):**
+- `/api/blog/*` - Public blog API
+- `/blog/*` - Blog pages
+
+**Admin Limiter (120 req/min):**
+- `/api/admin/*` - All admin endpoints
+
+#### Implementation Details
+
+**Headers Returned (in production):**
+- `RateLimit-Limit`: Maximum requests allowed
+- `RateLimit-Remaining`: Requests remaining in window
+- `RateLimit-Reset`: Seconds until window resets
+
+**Response on Limit Exceeded (429):**
+```json
+{
+  "error": "rate_limit_exceeded",
+  "message": "Too many requests. Please try again later.",
+  "retry_after": 45,
+  "request_id": "req_abc123"
+}
+```
+
+**Files Changed:**
+- `/app/backend/src/middleware/rate-limit.js` - Added new rate limiters
+- `/app/backend/src/server.js` - Applied rate limiters to routes
+
+**Notes:**
+- Rate limiting is skipped in development mode (except spend requests)
+- Spend rate limiter is always active to prevent financial abuse
+- All rate limit events are logged for security monitoring

@@ -10,7 +10,17 @@ const { logger, events } = require('./lib/logger');
 
 // Middleware
 const { requestIdMiddleware } = require('./middleware/request-id');
-const { globalRateLimiter, authRateLimiter } = require('./middleware/rate-limit');
+const { 
+    globalRateLimiter, 
+    authRateLimiter, 
+    spendRateLimiter, 
+    keyCreationRateLimiter, 
+    exportRateLimiter,
+    standardApiRateLimiter,
+    writeRateLimiter,
+    publicApiRateLimiter,
+    adminApiRateLimiter
+} = require('./middleware/rate-limit');
 const { errorHandler, notFoundHandler } = require('./middleware/error-handler');
 
 // Routes
@@ -146,24 +156,44 @@ app.get('/api/health', async (req, res) => {
 });
 
 // ============================================
-// API Routes
+// API Routes (with specific rate limiters)
 // ============================================
 
-// Apply auth rate limiter to auth routes
+// Auth routes - strict rate limiting (prevent brute force)
 app.use('/api/v1/auth', authRateLimiter, authRoutes);
 
-// Other API v1 routes
-app.use('/api/v1/escrow-accounts', escrowAccountsRoutes);
-app.use('/api/v1/policies', policiesRoutes);
-app.use('/api/v1/spend', spendRoutes);
-app.use('/api/v1/approvals', approvalsRoutes);
-app.use('/api/v1/audit', auditRoutes);
-app.use('/api/v1/webhooks', webhooksRoutes);
-app.use('/api/v1/api-keys', apiKeysRoutes);
-app.use('/api/v1/subscription', subscriptionRoutes);
-app.use('/api/v1/team', teamRoutes);
-app.use('/api/v1/exports', exportsRoutes);
-app.use('/api/v1/settings/aav', aavSettingsRoutes);
+// Escrow accounts - standard API rate limit for reads, write limit for creates
+app.use('/api/v1/escrow-accounts', standardApiRateLimiter, escrowAccountsRoutes);
+
+// Policies - standard API rate limit
+app.use('/api/v1/policies', standardApiRateLimiter, policiesRoutes);
+
+// Spend requests - special rate limit (more restrictive)
+app.use('/api/v1/spend', spendRateLimiter, spendRoutes);
+
+// Approvals - standard API rate limit
+app.use('/api/v1/approvals', standardApiRateLimiter, approvalsRoutes);
+
+// Audit - standard API rate limit
+app.use('/api/v1/audit', standardApiRateLimiter, auditRoutes);
+
+// Webhooks - write rate limit (creating webhooks)
+app.use('/api/v1/webhooks', writeRateLimiter, webhooksRoutes);
+
+// API Keys - key creation rate limit
+app.use('/api/v1/api-keys', keyCreationRateLimiter, apiKeysRoutes);
+
+// Subscription - standard rate limit
+app.use('/api/v1/subscription', standardApiRateLimiter, subscriptionRoutes);
+
+// Team - write rate limit (invites, removals)
+app.use('/api/v1/team', writeRateLimiter, teamRoutes);
+
+// Exports - export rate limit (resource intensive)
+app.use('/api/v1/exports', exportRateLimiter, exportsRoutes);
+
+// AAV Settings - write rate limit
+app.use('/api/v1/settings/aav', writeRateLimiter, aavSettingsRoutes);
 
 // ============================================
 // Static File Serving (Uploaded Images)
@@ -175,29 +205,29 @@ app.use('/api/uploads/blog-images', express.static(path.join(__dirname, '../uplo
 // Admin Routes (Separate auth system)
 // ============================================
 app.use('/api/admin/auth', authRateLimiter, adminAuthRoutes);
-app.use('/api/admin/orgs', adminOrgsRoutes);
+app.use('/api/admin/orgs', adminApiRateLimiter, adminOrgsRoutes);
 
 // Admin API v1 (Internal automation - NOT for public documentation)
-app.use('/api/admin/v1', adminApiV1Routes);
+app.use('/api/admin/v1', adminApiRateLimiter, adminApiV1Routes);
 
 // Admin Analytics (Charts and metrics)
-app.use('/api/admin/analytics', adminAnalyticsRoutes);
+app.use('/api/admin/analytics', adminApiRateLimiter, adminAnalyticsRoutes);
 
 // ============================================
 // Blog Routes
 // ============================================
 
-// Public blog API endpoints
-app.use('/api/blog', blogPublicRoutes);
+// Public blog API endpoints - public rate limit
+app.use('/api/blog', publicApiRateLimiter, blogPublicRoutes);
 
-// Server-rendered blog pages (SEO-friendly HTML)
+// Server-rendered blog pages (SEO-friendly HTML) - public rate limit
 // Must be before the 404 handler
-app.use('/blog', blogPagesRoutes);
+app.use('/blog', publicApiRateLimiter, blogPagesRoutes);
 
 // ============================================
 // New Unified Admin API (with scopes)
 // ============================================
-app.use('/api/admin', adminApiRoutes);
+app.use('/api/admin', adminApiRateLimiter, adminApiRoutes);
 
 // ============================================
 // Error Handling

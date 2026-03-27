@@ -2,7 +2,21 @@
  * Rate Limiting Middleware
  * Safe-Spend Production Hardening
  * 
- * Implements rate limiting for auth, spend, key creation, and global endpoints.
+ * Implements rate limiting for various endpoint categories:
+ * 
+ * | Endpoint Category       | Rate Limit               | Scope                    |
+ * |------------------------|--------------------------|--------------------------|
+ * | Auth (login/signup)    | 5 req/15min per IP       | IP address               |
+ * | Spend Requests         | 60 req/min per key       | API key (always active)  |
+ * | API Key Creation       | 10 req/hour per org      | Organization             |
+ * | Exports                | 10 req/5min per org      | Organization             |
+ * | Standard API (reads)   | 100 req/min per key      | API key                  |
+ * | Write Operations       | 30 req/min per key       | API key                  |
+ * | Public API (blog)      | 30 req/min per IP        | IP address               |
+ * | Admin API              | 120 req/min per key      | Admin key                |
+ * | Global (fallback)      | 1000 req/min per IP      | IP address               |
+ * 
+ * Note: All rate limiters except spendRateLimiter are skipped in development mode.
  */
 
 const rateLimit = require('express-rate-limit');
@@ -132,6 +146,75 @@ const exportRateLimiter = rateLimit({
 });
 
 /**
+ * Standard API rate limiter - 100 requests per minute per API key
+ * For standard read endpoints (escrow accounts, policies, audit, etc.)
+ */
+const standardApiRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 100, // 100 requests per minute
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: apiKeyKeyGenerator,
+    handler: rateLimitHandler,
+    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
+});
+
+/**
+ * Write operations rate limiter - 30 requests per minute per API key
+ * For create/update/delete operations (more restrictive than reads)
+ */
+const writeRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // 30 writes per minute
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: apiKeyKeyGenerator,
+    handler: rateLimitHandler,
+    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
+});
+
+/**
+ * Public API rate limiter - 30 requests per minute per IP
+ * For public endpoints like blog
+ */
+const publicApiRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // 30 requests per minute per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: rateLimitHandler,
+    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
+});
+
+/**
+ * Admin API rate limiter - 120 requests per minute per admin key
+ * For admin console operations
+ */
+const adminApiRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 120, // 120 requests per minute
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        // Use admin key ID if available
+        if (req.adminKey?.id) {
+            return `admin:${req.adminKey.id}`;
+        }
+        return req.ip;
+    },
+    handler: rateLimitHandler,
+    skip: () => config.isDev || process.env.NODE_ENV === 'test',
+    validate: { 
+        xForwardedForHeader: false,
+        // Disable IPv6 key generator validation - we handle IPv6 via req.ip
+        keyGeneratorIpFallback: false 
+    },
+});
+
+/**
  * Global rate limiter - 200 requests per minute per IP
  */
 const globalRateLimiter = rateLimit({
@@ -156,4 +239,8 @@ module.exports = {
     keyCreationRateLimiter,
     exportRateLimiter,
     globalRateLimiter,
+    standardApiRateLimiter,
+    writeRateLimiter,
+    publicApiRateLimiter,
+    adminApiRateLimiter,
 };
