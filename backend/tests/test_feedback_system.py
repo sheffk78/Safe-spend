@@ -12,7 +12,7 @@ import os
 import time
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://build-instructions-4.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://agent-vault-demo.preview.emergentagent.com').rstrip('/')
 ADMIN_API_KEY = "ss_admin_12a29bce42c6462deb6d36cc3f4412d3"
 
 

@@ -505,6 +505,398 @@ const DocsAAVIntegration = () => {
                     <p className="text-ss-text-secondary text-sm">Get your AAV API key and manage agent grants</p>
                 </a>
             </div>
+
+            {/* ================================================= */}
+            {/* AGENT ID SECTION                                  */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="agent-id">Agent ID (agt_ format)</DocsHeading>
+            
+            <DocsText>
+                Every AI agent interacting with Safe-Spend is identified by a unique <InlineCode>agent_id</InlineCode> in 
+                the format <InlineCode>agt_</InlineCode> followed by 24 hexadecimal characters. 
+                Agent IDs are used to link escrows, track spend history, and enable AAV/ARL integrations.
+            </DocsText>
+
+            <Callout type="info" title="Format Reference">
+                <InlineCode>agt_1a2b3c4d5e6f7890abcdef12</InlineCode> &mdash; always lowercase hex after the <InlineCode>agt_</InlineCode> prefix.
+            </Callout>
+
+            <DocsHeading level={3} id="agent-id-usage">Using agent_id</DocsHeading>
+            
+            <DocsList items={[
+                <><strong className="text-ss-text">Spend Requests</strong>: Pass <InlineCode>agent_id</InlineCode> in the body of POST /v1/spend. Required when AAV_ENABLED=true.</>,
+                <><strong className="text-ss-text">Escrow Accounts</strong>: Pass <InlineCode>agent_id</InlineCode> when creating an escrow to link it to a specific agent. If set, only that agent can spend from it.</>,
+                <><strong className="text-ss-text">Agent-scoped queries</strong>: Use GET /v1/agents/:agent_id/escrow-accounts and /spend-history to query by agent.</>
+            ]} />
+
+            <CodeBlock
+                language="bash"
+                title="Create agent-linked escrow"
+                code={`curl -X POST https://api.safe-spend.dev/v1/escrow-accounts \\
+  -H "Authorization: Bearer sk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Agent Alpha Budget",
+    "agent_id": "agt_1a2b3c4d5e6f7890abcdef12",
+    "aav_enabled": true
+  }'`}
+            />
+
+            <CodeBlock
+                language="bash"
+                title="Spend with agent_id"
+                code={`curl -X POST https://api.safe-spend.dev/v1/spend \\
+  -H "Authorization: Bearer sk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "escrow_id": "esc_...",
+    "amount_cents": 4999,
+    "vendor": "cloud-provider",
+    "agent_id": "agt_1a2b3c4d5e6f7890abcdef12"
+  }'`}
+            />
+
+            {/* Agent-scoped endpoints */}
+            <DocsHeading level={3} id="agent-endpoints">Agent-Scoped Endpoints</DocsHeading>
+
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/escrow-accounts" />
+            <DocsText>
+                Returns all escrow accounts linked to the specified agent, either by direct <InlineCode>agent_id</InlineCode> or 
+                through the <InlineCode>authorized_agent_ids</InlineCode> list.
+            </DocsText>
+
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/spend-history" />
+            <DocsText>
+                Paginated spend request history for a specific agent. Supports <InlineCode>?status=</InlineCode>, 
+                <InlineCode>?limit=</InlineCode>, and <InlineCode>?offset=</InlineCode> query parameters.
+            </DocsText>
+
+            {/* ================================================= */}
+            {/* CERTIFICATE MAPPING SECTION                        */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="certificate-mapping">Certificate Mapping</DocsHeading>
+            
+            <DocsText>
+                Certificate mappings link an <InlineCode>agent_id</InlineCode> to an AAV <InlineCode>certificate_id</InlineCode>. 
+                When a spend request includes an <InlineCode>agent_id</InlineCode>, Safe-Spend automatically looks up the 
+                certificate and includes it in the AAV verification call.
+            </DocsText>
+
+            <ApiEndpoint method="POST" path="/v1/agent-certificates" />
+            <CodeBlock
+                language="json"
+                title="Request body"
+                code={`{
+  "agent_id": "agt_1a2b3c4d5e6f7890abcdef12",
+  "certificate_id": "cert_abc123def456"
+}`}
+            />
+
+            <ApiEndpoint method="GET" path="/v1/agent-certificates/{agent_id}" />
+            <DocsText>Returns the certificate mapping for an agent.</DocsText>
+
+            <ApiEndpoint method="DELETE" path="/v1/agent-certificates/{agent_id}" />
+            <DocsText>Removes the certificate mapping.</DocsText>
+
+            {/* ================================================= */}
+            {/* AUTHORITY VERIFICATION (STEP 0) SECTION            */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="authority-verification">Authority Verification (Step 0)</DocsHeading>
+            
+            <DocsText>
+                When <InlineCode>AAV_ENABLED=true</InlineCode> and a spend request includes an <InlineCode>agent_id</InlineCode>, 
+                Safe-Spend runs <strong className="text-ss-text">Step 0: Authority Verification</strong> before the 13-step 
+                rules engine. This step calls AAV's <InlineCode>/api/v1/verify</InlineCode> endpoint.
+            </DocsText>
+
+            <Callout type="warning" title="Fail-Closed by Default">
+                For financial operations, Safe-Spend defaults to <strong>fail-closed</strong>. If AAV is unreachable, 
+                the spend is denied rather than allowed through.
+            </Callout>
+
+            <DocsHeading level={3} id="verification-flow">Verification Flow</DocsHeading>
+            <DocsList items={[
+                <><strong className="text-ss-text">authorized: true</strong> &rarr; Proceed to Step 1 (rules engine)</>,
+                <><strong className="text-ss-text">denied</strong> &rarr; Deny with reason "Authority verification failed: &#123;reason&#125;"</>,
+                <><strong className="text-ss-text">approval_required</strong> &rarr; Hold as pending_approval with note "Awaiting AAV authority approval"</>,
+                <><strong className="text-ss-text">unreachable</strong> &rarr; Deny (fail-closed for financial operations)</>
+            ]} />
+
+            <DocsText>
+                The authority verification result appears in <InlineCode>rules_evaluated</InlineCode> with:
+            </DocsText>
+            <CodeBlock
+                language="json"
+                title="Authority verification in rules_evaluated"
+                code={`{
+  "rule": "authority_verification",
+  "passed": true,
+  "source": "aav",
+  "verification_id": "verif_..."
+}`}
+            />
+
+            <DocsHeading level={3} id="rules-engine-14-steps">Updated Rules Engine (Steps 0-13)</DocsHeading>
+            <DocsList ordered items={[
+                <><strong className="text-ss-text">Step 0</strong>: Authority Verification (AAV) &mdash; skipped when AAV not configured</>,
+                <><strong className="text-ss-text">Step 1</strong>: Key Validation</>,
+                <><strong className="text-ss-text">Step 2</strong>: Escrow Account Check</>,
+                <><strong className="text-ss-text">Step 2.5</strong>: AAV Agent Authorization (escrow-level)</>,
+                <><strong className="text-ss-text">Step 3</strong>: Idempotency Check</>,
+                <><strong className="text-ss-text">Step 3.5</strong>: Reputation Check (ARL) &mdash; skipped when min_reputation_score not set</>,
+                <><strong className="text-ss-text">Step 4</strong>: Balance Check</>,
+                <><strong className="text-ss-text">Step 5</strong>: Per-Transaction Limit</>,
+                <><strong className="text-ss-text">Step 6</strong>: Daily Cap</>,
+                <><strong className="text-ss-text">Step 7</strong>: Weekly Cap</>,
+                <><strong className="text-ss-text">Step 8</strong>: Monthly Cap</>,
+                <><strong className="text-ss-text">Step 9</strong>: Vendor Check</>,
+                <><strong className="text-ss-text">Step 10</strong>: Category Check</>,
+                <><strong className="text-ss-text">Step 11</strong>: Time Window Check</>,
+                <><strong className="text-ss-text">Step 12</strong>: Approval Threshold (with reputation boost)</>,
+                <><strong className="text-ss-text">Step 13</strong>: Execute</>
+            ]} />
+
+            {/* ================================================= */}
+            {/* ARL REPUTATION SECTION                             */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="arl-reputation">ARL Reputation Integration</DocsHeading>
+            
+            <DocsText>
+                The Agent Reputation Ledger (ARL) tracks agent trustworthiness based on their spending history. 
+                Safe-Spend integrates with ARL in two ways:
+            </DocsText>
+
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
+                <div className="bg-ss-surface p-5 rounded-lg border border-[rgba(255,255,255,0.06)]">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                        </div>
+                        <h4 className="font-semibold text-ss-text">Outcome Reporting</h4>
+                    </div>
+                    <p className="text-ss-text-secondary text-sm">
+                        After every spend (approved, denied, expired), Safe-Spend reports the outcome to ARL asynchronously. 
+                        This builds the agent's reputation score over time.
+                    </p>
+                </div>
+                <div className="bg-ss-surface p-5 rounded-lg border border-[rgba(255,255,255,0.06)]">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-yellow-400" />
+                        </div>
+                        <h4 className="font-semibold text-ss-text">Reputation Gating</h4>
+                    </div>
+                    <p className="text-ss-text-secondary text-sm">
+                        Spending policies can require a minimum reputation score and grant Platinum-tier agents 
+                        2x auto-approve limits.
+                    </p>
+                </div>
+            </div>
+
+            <DocsHeading level={3} id="arl-env">Environment Variables</DocsHeading>
+            <CodeBlock
+                language="bash"
+                title="ARL Configuration"
+                code={`ARL_API_URL="https://repledger.agentictrust.app"
+ARL_API_KEY="arl_your_key_here"
+ARL_ENABLED="true"   # Set to "true" to enable`}
+            />
+
+            <DocsHeading level={3} id="reputation-policy">Reputation Policy Fields</DocsHeading>
+            <DocsText>
+                Add these fields to your spending policy to enable reputation-based controls:
+            </DocsText>
+            <CodeBlock
+                language="json"
+                title="Policy with reputation fields"
+                code={`{
+  "escrow_id": "esc_...",
+  "name": "Reputation-gated policy",
+  "min_reputation_score": 50,
+  "reputation_spending_boost": true,
+  "auto_approve_under_cents": 10000,
+  ...
+}`}
+            />
+            <DocsList items={[
+                <><InlineCode>min_reputation_score</InlineCode> (0-100): Deny if agent score is below this threshold.</>,
+                <><InlineCode>reputation_spending_boost</InlineCode> (bool): If true, Platinum agents (score &ge; 90) get 2x the <InlineCode>auto_approve_under_cents</InlineCode> limit.</>
+            ]} />
+
+            <DocsHeading level={3} id="arl-tiers">Reputation Tiers</DocsHeading>
+            <div className="overflow-x-auto mb-8">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="border-b border-[rgba(255,255,255,0.06)]">
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Tier</th>
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Score Range</th>
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Boost</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-ss-text-secondary">
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Bronze</td><td className="py-2 px-4">0-49</td><td className="py-2 px-4">None</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Silver</td><td className="py-2 px-4">50-74</td><td className="py-2 px-4">None</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Gold</td><td className="py-2 px-4">75-89</td><td className="py-2 px-4">None</td></tr>
+                        <tr><td className="py-2 px-4 text-yellow-400 font-semibold">Platinum</td><td className="py-2 px-4">90-100</td><td className="py-2 px-4">2x auto-approve limit</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {/* ================================================= */}
+            {/* CROSS-TOOL EVENTS SECTION                          */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="cross-tool-events">Cross-Tool Events</DocsHeading>
+            
+            <DocsText>
+                Safe-Spend emits and receives cross-tool events for integration with AAV and ARL. 
+                Events use a standard envelope format for inter-service communication.
+            </DocsText>
+
+            <DocsHeading level={3} id="event-envelope">Event Envelope</DocsHeading>
+            <CodeBlock
+                language="json"
+                title="Cross-tool event format"
+                code={`{
+  "id": "evt_at_a1b2c3d4e5f6",
+  "source": "safe_spend",
+  "event_type": "safe_spend.spend.approved",
+  "org_id": "org_...",
+  "uaid": "agt_...",
+  "timestamp": "2026-03-27T12:00:00.000Z",
+  "data": {
+    "spend_request_id": "spr_...",
+    "escrow_id": "esc_...",
+    "amount_cents": 4999,
+    "vendor": "cloud-provider",
+    "rules_evaluated": [...]
+  }
+}`}
+            />
+
+            <DocsHeading level={3} id="emitted-events">Emitted Event Types</DocsHeading>
+            <div className="overflow-x-auto mb-8">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="border-b border-[rgba(255,255,255,0.06)]">
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Event Type</th>
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Trigger</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-ss-text-secondary">
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.approved</InlineCode></td><td className="py-2 px-4">Spend approved</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.denied</InlineCode></td><td className="py-2 px-4">Spend denied by rules engine</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.expired</InlineCode></td><td className="py-2 px-4">Pending spend expired</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.paused</InlineCode></td><td className="py-2 px-4">Escrow paused</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.closed</InlineCode></td><td className="py-2 px-4">Escrow closed</td></tr>
+                        <tr><td className="py-2 px-4"><InlineCode>safe_spend.escrow.funded</InlineCode></td><td className="py-2 px-4">Escrow funded</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <DocsHeading level={3} id="internal-events-endpoint">Receiving Internal Events</DocsHeading>
+            <ApiEndpoint method="POST" path="/v1/internal/events" />
+            <DocsText>
+                Receives events from AAV and ARL via HMAC-SHA256 authenticated requests. 
+                The signature is sent in the <InlineCode>X-AgenticTrust-Signature</InlineCode> header.
+            </DocsText>
+
+            <DocsText>Accepted event types:</DocsText>
+            <DocsList items={[
+                <><InlineCode>aav.grant.revoked</InlineCode>: Pauses linked escrow accounts</>,
+                <><InlineCode>aav.grant.created</InlineCode>: Logs event (auto-provision coming soon)</>,
+                <><InlineCode>arl.score.changed</InlineCode>: Updates cached reputation scores</>
+            ]} />
+
+            {/* ================================================= */}
+            {/* ORGANIZATION LINKING                                */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="org-linking">Organization Linking</DocsHeading>
+            
+            <DocsText>
+                Link your Safe-Spend account to an AAV organization to enable cross-platform features.
+            </DocsText>
+
+            <ApiEndpoint method="POST" path="/v1/org/link" />
+            <CodeBlock
+                language="json"
+                title="Link organization"
+                code={`{
+  "link_token": "lnk_..."
+}
+
+// Response:
+{
+  "linked": true,
+  "organization_id": "org_..."
+}`}
+            />
+
+            {/* ================================================= */}
+            {/* CONTROL PLANE API                                  */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="control-plane">Control Plane API</DocsHeading>
+            
+            <DocsText>
+                These read-only endpoints are consumed by the Agentic Trust control plane 
+                (<InlineCode>agentictrust.app</InlineCode>) for Agent Card data and dashboard statistics.
+            </DocsText>
+
+            <ApiEndpoint method="GET" path="/v1/control-plane/org/{org_id}/summary" />
+            <CodeBlock
+                language="json"
+                title="Org summary response"
+                code={`{
+  "tool": "safe_spend",
+  "org_id": "org_...",
+  "total_balance_cents": 500000,
+  "active_escrows": 3,
+  "spends_today": 15,
+  "spends_this_week": 72,
+  "denial_rate_7d": 0.05
+}`}
+            />
+
+            <ApiEndpoint method="GET" path="/v1/control-plane/agents/{agent_id}/card-data" />
+            <CodeBlock
+                language="json"
+                title="Agent card-data response"
+                code={`{
+  "tool": "safe_spend",
+  "agent_id": "agt_...",
+  "financial": {
+    "has_funded_escrow": true,
+    "escrow_status": "active",
+    "escrow_count": 1,
+    "remaining_balance_available": true
+  }
+}`}
+            />
+
+            {/* ================================================= */}
+            {/* ID FORMAT REFERENCE                                 */}
+            {/* ================================================= */}
+            <DocsHeading level={2} id="id-formats">ID Format Reference</DocsHeading>
+            <div className="overflow-x-auto mb-8">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="border-b border-[rgba(255,255,255,0.06)]">
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Entity</th>
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Prefix</th>
+                            <th className="text-left py-3 px-4 text-ss-text font-semibold">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-ss-text-secondary">
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Agent</td><td className="py-2 px-4"><InlineCode>agt_</InlineCode></td><td className="py-2 px-4">agt_1a2b3c4d5e6f7890abcdef12</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Organization</td><td className="py-2 px-4"><InlineCode>org_</InlineCode></td><td className="py-2 px-4">org_7kawbu8xm1q6</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Escrow Account</td><td className="py-2 px-4"><InlineCode>esc_</InlineCode></td><td className="py-2 px-4">esc_94lfhqfhvvg2</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Spend Request</td><td className="py-2 px-4"><InlineCode>spr_</InlineCode></td><td className="py-2 px-4">spr_a1b2c3d4e5f6</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Policy</td><td className="py-2 px-4"><InlineCode>pol_</InlineCode></td><td className="py-2 px-4">pol_x9y8z7w6v5u4</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Certificate</td><td className="py-2 px-4"><InlineCode>cert_</InlineCode></td><td className="py-2 px-4">cert_abc123def456</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Cross-tool Event</td><td className="py-2 px-4"><InlineCode>evt_at_</InlineCode></td><td className="py-2 px-4">evt_at_a1b2c3d4e5f6</td></tr>
+                        <tr><td className="py-2 px-4">Link Token</td><td className="py-2 px-4"><InlineCode>lnk_</InlineCode></td><td className="py-2 px-4">lnk_test123456789012</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

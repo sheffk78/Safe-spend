@@ -1,6 +1,6 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const { generateId } = require('../utils/ids');
+const { generateId, validateAgentId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
 const { spendRateLimiter } = require('../middleware/rate-limit');
 const { evaluateSpendRequest } = require('../services/rules-engine');
@@ -10,6 +10,8 @@ const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('..
 const { sendApprovalNotification } = require('../services/approval-notification-service');
 const { extractAAVClaims } = require('../services/aav-service');
 const aavApiService = require('../services/aav-api-service');
+const { reportSpendApproved, reportSpendDenied } = require('../services/arl-service');
+const { emitSpendApproved, emitSpendDenied } = require('../services/cross-tool-events');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -34,18 +36,27 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             category,
             description,
             idempotency_key,
-            aav_agent_id,        // AAV agent identifier
-            aav_grant_id,        // AAV grant identifier
-            aav_certificate_id,  // AAV certificate (new per spec)
+            agent_id,              // New: agt_ format agent identifier
+            aav_agent_id,          // AAV agent identifier (legacy)
+            aav_grant_id,          // AAV grant identifier
+            aav_certificate_id,    // AAV certificate (new per spec)
             metadata = {}
         } = req.body;
+        
+        // Validate agent_id format if provided
+        if (agent_id && !validateAgentId(agent_id)) {
+            return res.status(400).json({
+                error: 'invalid_agent_id',
+                message: 'agent_id must be in agt_ + 24 hex characters format (e.g. agt_1a2b3c4d5e6f7890abcdef12)'
+            });
+        }
         
         // Extract AAV claims from headers or body
         const aavClaims = extractAAVClaims(req);
         
         // If body has AAV fields but headers didn't, use body values
-        if (!aavClaims.agent_id && aav_agent_id) {
-            aavClaims.agent_id = aav_agent_id;
+        if (!aavClaims.agent_id && (aav_agent_id || agent_id)) {
+            aavClaims.agent_id = aav_agent_id || agent_id;
             aavClaims.grant_id = aav_grant_id;
             aavClaims.source = 'body';
         }
@@ -53,6 +64,24 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         // Add certificate_id from body if not in headers
         if (!aavClaims.certificate_id && aav_certificate_id) {
             aavClaims.certificate_id = aav_certificate_id;
+        }
+        
+        // Auto-lookup certificate_id from agent certificate mapping
+        if (!aavClaims.certificate_id && (agent_id || aavClaims.agent_id)) {
+            const lookupAgentId = agent_id || aavClaims.agent_id;
+            try {
+                const certMapping = await prisma.agentCertificate.findUnique({
+                    where: {
+                        orgId_agentId: {
+                            orgId: req.org.id,
+                            agentId: lookupAgentId
+                        }
+                    }
+                });
+                if (certMapping) {
+                    aavClaims.certificate_id = certMapping.certificateId;
+                }
+            } catch {}
         }
         
         // Fallback to API key's AAV settings if set
@@ -184,26 +213,65 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             activeDays: parseJson(p.activeDays, ['mon', 'tue', 'wed', 'thu', 'fri'])
         }));
         
-        // === AAV API VERIFICATION ===
-        // If AAV is enabled and has an API key, call AAV /verify endpoint
+        // === AAV AUTHORITY VERIFICATION (Step 0) ===
+        // If AAV_ENABLED globally AND agent_id is present, do authority verification
+        const aavEnabled = process.env.AAV_ENABLED === 'true';
         let aavApiResult = null;
-        if (escrowAccount.aavEnabled && escrowAccount.aavApiKey) {
+        
+        if (aavEnabled && (agent_id || aavClaims.agent_id)) {
             const enforcementMode = escrowAccount.aavEnforcementMode || 'verify';
             
-            // Only make API call if enforcement is active
+            if (enforcementMode !== 'none') {
+                // Use global AAV config or escrow-level API key
+                const aavApiKey = escrowAccount.aavApiKey || process.env.AAV_API_KEY;
+                const aavApiUrl = process.env.AAV_API_URL || 'https://agentauthority.dev';
+                
+                if (aavApiKey) {
+                    aavApiResult = await aavApiService.verifyWithAAV({
+                        aavApiKey,
+                        certificateId: aavClaims.certificate_id,
+                        agentId: agent_id || aavClaims.agent_id,
+                        amountDollars: validatedAmountCents / 100,
+                        currency: currency.toUpperCase(),
+                        vendor,
+                        description,
+                        requestedAction: 'spend'
+                    });
+                    
+                    // Queue AAV webhooks based on result
+                    if (aavApiResult) {
+                        const aavEventData = buildAAVEventData(
+                            { id: idempotency_key || 'pending', escrowId: escrow_id, orgId: req.org.id, amountCents: validatedAmountCents, currency, vendor, aavAgentId: agent_id || aavClaims.agent_id, aavGrantId: aavClaims.grant_id, aavCertificateId: aavClaims.certificate_id, aavVerificationStatus: aavApiResult.success ? (aavApiResult.authorized ? 'verified' : 'denied') : 'error' },
+                            escrowAccount,
+                            aavApiResult
+                        );
+                        
+                        if (!aavApiResult.success) {
+                            queueWebhooks(req.org.id, 'aav.verification_failed', aavEventData);
+                        } else if (aavApiResult.authorized) {
+                            queueWebhooks(req.org.id, 'aav.verification_passed', aavEventData);
+                        } else {
+                            queueWebhooks(req.org.id, 'aav.verification_denied', aavEventData);
+                        }
+                    }
+                }
+            }
+        } else if (escrowAccount.aavEnabled && escrowAccount.aavApiKey) {
+            // Legacy: escrow-level AAV verification
+            const enforcementMode = escrowAccount.aavEnforcementMode || 'verify';
+            
             if (enforcementMode !== 'none') {
                 aavApiResult = await aavApiService.verifyWithAAV({
                     aavApiKey: escrowAccount.aavApiKey,
                     certificateId: aavClaims.certificate_id,
                     agentId: aavClaims.agent_id,
-                    amountDollars: validatedAmountCents / 100, // Convert cents to dollars
+                    amountDollars: validatedAmountCents / 100,
                     currency: currency.toUpperCase(),
                     vendor,
                     description,
                     requestedAction: 'purchase_service'
                 });
                 
-                // Queue AAV webhooks based on result
                 if (aavApiResult) {
                     const aavEventData = buildAAVEventData(
                         { id: idempotency_key || 'pending', escrowId: escrow_id, orgId: req.org.id, amountCents: validatedAmountCents, currency, vendor, aavAgentId: aavClaims.agent_id, aavGrantId: aavClaims.grant_id, aavCertificateId: aavClaims.certificate_id, aavVerificationStatus: aavApiResult.success ? (aavApiResult.authorized ? 'verified' : 'denied') : 'error' },
@@ -212,12 +280,10 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     );
                     
                     if (!aavApiResult.success) {
-                        // AAV API error (timeout, unreachable)
                         queueWebhooks(req.org.id, 'aav.verification_failed', aavEventData);
                     } else if (aavApiResult.authorized) {
                         queueWebhooks(req.org.id, 'aav.verification_passed', aavEventData);
                     } else {
-                        // AAV denied (denied, approval_pending, etc.)
                         queueWebhooks(req.org.id, 'aav.verification_denied', aavEventData);
                     }
                 }
@@ -241,6 +307,18 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             })
         ]);
         
+        // Fetch ARL reputation score if needed (for reputation policies)
+        const { getReputationScore, ARL_ENABLED: arlEnabled } = require('../services/arl-service');
+        let reputationScore = null;
+        const effectiveAgentId = agent_id || aavClaims?.agent_id;
+        
+        if (arlEnabled && effectiveAgentId) {
+            const reputationData = await getReputationScore(effectiveAgentId);
+            if (reputationData) {
+                reputationScore = reputationData.score;
+            }
+        }
+
         // Build evaluation context
         const context = {
             org: req.org,
@@ -256,12 +334,14 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 vendor,
                 category,
                 description,
-                idempotencyKey: idempotency_key
+                idempotencyKey: idempotency_key,
+                agentId: agent_id || null
             },
             currentTime,
             existingRequest,
-            aavClaims,      // AAV claims for agent authorization
-            aavApiResult    // Result from AAV /verify API call (if made)
+            aavClaims,
+            aavApiResult,
+            reputationScore
         };
         
         // Run the 13-step rules engine
@@ -285,6 +365,7 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 apiKeyId: req.apiKey?.id,
+                agentId: agent_id || null,
                 amountCents: validatedAmountCents,
                 currency,
                 vendor,
@@ -310,6 +391,23 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 aavDailySpend: aavApiResult?.dailySpend ? JSON.stringify(aavApiResult.dailySpend) : null,
                 aavCheckedAt: aavApiResult?.success ? new Date() : null
             });
+            
+            // ARL outcome reporting (async, fire-and-forget)
+            const effectiveAgentId = agent_id || aavClaims?.agent_id;
+            if (effectiveAgentId) {
+                const denyingRule = result.rulesEvaluated.find(r => !r.passed)?.rule || denialSource;
+                reportSpendDenied(effectiveAgentId, denyingRule);
+            }
+            
+            // Cross-tool event emission (async)
+            emitSpendDenied(req.org.id, effectiveAgentId, {
+                spend_request_id: deniedRequest.id,
+                escrow_id: escrow_id,
+                amount_cents: validatedAmountCents,
+                vendor,
+                denial_reason: result.denialReason,
+                rules_evaluated: result.rulesEvaluated
+            }).catch(() => {});
             
             // Track consecutive denials for runaway detection
             const trackerKey = escrow_id;
@@ -378,6 +476,7 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     escrowId: escrow_id,
                     orgId: req.org.id,
                     apiKeyId: req.apiKey?.id,
+                    agentId: agent_id || null,
                     amountCents: amount_cents,
                     currency,
                     vendor,
@@ -498,6 +597,7 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                         escrowId: escrow_id,
                         orgId: req.org.id,
                         apiKeyId: req.apiKey?.id,
+                        agentId: agent_id || null,
                         amountCents: amount_cents,
                         currency,
                         vendor,
@@ -595,6 +695,21 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 updatedEscrow,
                 result.rulesEvaluated
             ));
+            
+            // ARL outcome reporting (async, fire-and-forget)
+            const effectiveAgentIdApproved = agent_id || aavClaims?.agent_id;
+            if (effectiveAgentIdApproved) {
+                reportSpendApproved(effectiveAgentIdApproved);
+            }
+            
+            // Cross-tool event emission (async)
+            emitSpendApproved(req.org.id, effectiveAgentIdApproved, {
+                spend_request_id: spendRequest.id,
+                escrow_id: escrow_id,
+                amount_cents: amount_cents,
+                vendor,
+                rules_evaluated: result.rulesEvaluated
+            }).catch(() => {});
         
             res.status(201).json({
                 ...formatSpendRequest(spendRequest),
@@ -737,6 +852,7 @@ async function createDeniedSpendRequest(data) {
             escrowId: data.escrowId,
             orgId: data.orgId,
             apiKeyId: data.apiKeyId,
+            agentId: data.agentId || null,
             amountCents: data.amountCents,
             currency: data.currency || 'usd',
             vendor: data.vendor,
@@ -804,6 +920,7 @@ function formatSpendRequest(sr) {
     return {
         id: sr.id,
         escrow_id: sr.escrowId,
+        agent_id: sr.agentId,
         amount_cents: sr.amountCents,
         currency: sr.currency,
         vendor: sr.vendor,
@@ -815,6 +932,7 @@ function formatSpendRequest(sr) {
         resolved_by: sr.resolvedBy,
         denial_reason: sr.denialReason,
         denial_rule_id: sr.denialRuleId,
+        denial_source: sr.denialSource,
         rules_evaluated: parseJson(sr.rulesEvaluated, []),
         balance_before_cents: sr.balanceBeforeCents,
         balance_after_cents: sr.balanceAfterCents,

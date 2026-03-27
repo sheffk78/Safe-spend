@@ -23,7 +23,7 @@ sys.path.insert(0, '/app/sdks/python')
 from safespend import SafeSpendClient
 from safespend.errors import ValidationError, SafeSpendError
 
-API_URL = "https://build-instructions-4.preview.emergentagent.com/api/v1"
+API_URL = "https://agent-vault-demo.preview.emergentagent.com/api/v1"
 
 def log(message, status="INFO"):
     colors = {
@@ -150,7 +150,7 @@ def test_sdk_basic_operations(setup: TestSetup) -> bool:
         # Initialize client
         client = SafeSpendClient(
             api_key=setup.api_key,
-            base_url="https://build-instructions-4.preview.emergentagent.com"
+            base_url="https://agent-vault-demo.preview.emergentagent.com"
         )
         
         # Test 1.1: Get balance
@@ -221,7 +221,7 @@ def test_sdk_error_handling(setup: TestSetup) -> bool:
     try:
         client = SafeSpendClient(
             api_key=setup.api_key,
-            base_url="https://build-instructions-4.preview.emergentagent.com"
+            base_url="https://agent-vault-demo.preview.emergentagent.com"
         )
         
         # Test 2.1: Invalid amount
@@ -288,7 +288,7 @@ def test_langchain_integration(setup: TestSetup) -> bool:
         # Initialize client
         client = SafeSpendClient(
             api_key=setup.api_key,
-            base_url="https://build-instructions-4.preview.emergentagent.com"
+            base_url="https://agent-vault-demo.preview.emergentagent.com"
         )
         
         # Create toolkit

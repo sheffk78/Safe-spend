@@ -392,7 +392,7 @@ class RulesEngineAPITester:
 def main():
     # Get backend URL from environment or use default
     import os
-    backend_url = os.getenv('REACT_APP_BACKEND_URL', 'https://build-instructions-4.preview.emergentagent.com')
+    backend_url = os.getenv('REACT_APP_BACKEND_URL', 'https://agent-vault-demo.preview.emergentagent.com')
     
     print(f"Safe-Spend Rules Engine Tester")
     print(f"Backend URL: {backend_url}")

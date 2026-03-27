@@ -42,6 +42,7 @@ const navigation = [
             { name: 'LangChain', href: '/docs/sdks#langchain', icon: Puzzle },
             { name: 'MCP Server', href: '/docs/sdks#mcp-server', icon: Puzzle },
             { name: 'AAV Integration', href: '/docs/aav-integration', icon: Shield },
+            { name: 'ARL Reputation', href: '/docs/aav-integration#arl-reputation', icon: Shield },
         ]
     },
     {
@@ -51,9 +52,12 @@ const navigation = [
             { name: 'Escrow Accounts', href: '/docs/api#escrow', icon: Code },
             { name: 'Spending Policies', href: '/docs/api#policies', icon: Code },
             { name: 'Spend Requests', href: '/docs/api#spend', icon: Code },
+            { name: 'Agents', href: '/docs/api#agents', icon: Code },
+            { name: 'Agent Certificates', href: '/docs/api#certificates', icon: Code },
             { name: 'Approvals', href: '/docs/api#approvals', icon: Code },
             { name: 'Audit Log', href: '/docs/api#audit', icon: Code },
             { name: 'Webhooks API', href: '/docs/api#webhooks', icon: Code },
+            { name: 'Control Plane', href: '/docs/api#control-plane', icon: Code },
         ]
     },
     {

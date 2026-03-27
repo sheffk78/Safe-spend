@@ -25,7 +25,7 @@ import sys
 import time
 from datetime import datetime
 
-API_URL = "https://build-instructions-4.preview.emergentagent.com/api/v1"
+API_URL = "https://agent-vault-demo.preview.emergentagent.com/api/v1"
 
 def log(message, status="INFO"):
     colors = {

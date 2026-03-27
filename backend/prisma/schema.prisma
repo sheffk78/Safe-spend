@@ -31,6 +31,7 @@ model Organization {
   name                   String
   email                  String    @unique
   passwordHash           String    @map("password_hash")
+  organizationId         String?   @map("organization_id") // Linked org ID from AAV/control plane
   stripeCustomerId       String?   @map("stripe_customer_id")
   stripeSubscriptionId   String?   @map("stripe_subscription_id")
   plan                   String    @default("sandbox") // sandbox | builder | scale
@@ -52,6 +53,7 @@ model Organization {
   members              OrgMember[]
   notificationSettings NotificationSettings?
   aavConfiguration     AAVConfiguration?
+  agentCertificates    AgentCertificate[]
 
   @@map("organizations")
 }
@@ -145,6 +147,7 @@ model ApiKey {
 model EscrowAccount {
   id                    String   @id @default(uuid())
   orgId                 String   @map("org_id")
+  agentId               String?  @map("agent_id") // agt_ format, links escrow to specific agent
   name                  String
   description           String?
   balanceCents          Int      @default(0) @map("balance_cents")
@@ -250,6 +253,10 @@ model SpendingPolicy {
   aavMapVendors         Boolean  @default(false) @map("aav_map_vendors")      // Sync approved_vendors from AAV grant
   aavMapLimits          Boolean  @default(false) @map("aav_map_limits")       // Use AAV limits as additional ceiling
   
+  // ARL Reputation Integration
+  minReputationScore    Int?     @map("min_reputation_score")                  // 0-100, deny if agent score below this
+  reputationSpendingBoost Boolean @default(false) @map("reputation_spending_boost") // If true, Platinum agents get 2x auto_approve
+  
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -268,6 +275,7 @@ model SpendRequest {
   escrowId       String   @map("escrow_id")
   orgId          String   @map("org_id")
   apiKeyId       String?  @map("api_key_id")
+  agentId        String?  @map("agent_id") // agt_ format
   
   // Request details
   amountCents    Int      @map("amount_cents")
@@ -595,4 +603,53 @@ model UserPulseTracking {
   
   @@unique([orgId, userId])
   @@map("user_pulse_tracking")
+}
+
+// Agent Certificate Mappings (agent_id → certificate_id for AAV verification)
+model AgentCertificate {
+  id              String   @id @default(uuid())
+  orgId           String   @map("org_id")
+  agentId         String   @map("agent_id")    // agt_ + 24 hex
+  certificateId   String   @map("certificate_id") // cert_...
+  mappedAt        DateTime @default(now()) @map("mapped_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, agentId])
+  @@index([agentId])
+  @@map("agent_certificates")
+}
+
+// Cross-Tool Event Log (for internal event receiver/emitter)
+model CrossToolEvent {
+  id          String   @id @default(uuid())
+  orgId       String?  @map("org_id")
+  source      String   // safe_spend, aav, arl
+  eventType   String   @map("event_type")
+  agentId     String?  @map("agent_id") // agt_ format
+  payload     String   // JSON
+  status      String   @default("received") // received | processed | failed
+  processedAt DateTime? @map("processed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([eventType])
+  @@index([orgId])
+  @@map("cross_tool_events")
+}
+
+// Cached ARL Reputation Scores
+model ReputationCache {
+  id          String   @id @default(uuid())
+  agentId     String   @unique @map("agent_id") // agt_ format
+  score       Int      // 0-100
+  tier        String?  // bronze | silver | gold | platinum
+  lastCheckedAt DateTime @map("last_checked_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([agentId])
+  @@map("reputation_cache")
 }

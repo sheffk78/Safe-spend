@@ -1,8 +1,9 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const { generateId } = require('../utils/ids');
+const { generateId, validateAgentId } = require('../utils/ids');
 const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 const { queueWebhooks } = require('../services/webhook-service');
+const { emitEscrowFunded, emitEscrowPaused, emitEscrowClosed } = require('../services/cross-tool-events');
 const stripeService = require('../services/stripe-service');
 const { isStripeConfigured } = require('../lib/stripe');
 
@@ -21,6 +22,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             description, 
             currency = 'usd', 
             metadata = {},
+            agent_id,
             // AAV fields (legacy + new spec)
             aav_enabled = false,
             authorized_agent_ids = [],
@@ -32,6 +34,14 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
         
         if (!name) {
             return res.status(400).json({ error: 'Name is required' });
+        }
+        
+        // Validate agent_id format if provided
+        if (agent_id && !validateAgentId(agent_id)) {
+            return res.status(400).json({
+                error: 'invalid_agent_id',
+                message: 'agent_id must be in agt_ + 24 hex characters format'
+            });
         }
         
         // Validate AAV enforcement mode (support both old and new modes)
@@ -47,6 +57,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             data: {
                 id: escrowId,
                 orgId: req.org.id,
+                agentId: agent_id || null,
                 name,
                 description,
                 currency,
@@ -229,6 +240,13 @@ router.post('/:id/fund', requireAuth, requireOwnerKey, async (req, res) => {
             balance_after_cents: updated.balanceCents
         });
         
+        // Cross-tool event
+        emitEscrowFunded(req.org.id, escrow.agentId, {
+            escrow_id: escrow.id,
+            amount_cents,
+            balance_after_cents: updated.balanceCents
+        }).catch(() => {});
+        
         res.json({
             message: 'Account funded successfully',
             escrow: formatEscrowAccount(updated)
@@ -381,6 +399,12 @@ router.post('/:id/pause', requireAuth, requireOwnerKey, async (req, res) => {
             balance_cents: updated.balanceCents
         });
         
+        // Cross-tool event
+        emitEscrowPaused(req.org.id, escrow.agentId, {
+            escrow_id: escrow.id,
+            balance_cents: updated.balanceCents
+        }).catch(() => {});
+        
         res.json(formatEscrowAccount(updated));
     } catch (error) {
         console.error('Pause escrow error:', error);
@@ -516,6 +540,12 @@ router.post('/:id/close', requireAuth, requireOwnerKey, async (req, res) => {
             refunded_amount_cents: refundInfo.refundedAmount,
         });
         
+        // Cross-tool event
+        emitEscrowClosed(req.org.id, escrow.agentId, {
+            escrow_id: escrow.id,
+            remaining_balance_cents: escrow.balanceCents
+        }).catch(() => {});
+        
         res.json({
             ...formatEscrowAccount(updated),
             refund: refundInfo.refundId ? {
@@ -535,6 +565,7 @@ router.post('/:id/close', requireAuth, requireOwnerKey, async (req, res) => {
 function formatEscrowAccount(escrow) {
     return {
         id: escrow.id,
+        agent_id: escrow.agentId,
         name: escrow.name,
         description: escrow.description,
         balance_cents: escrow.balanceCents,

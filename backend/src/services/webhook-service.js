@@ -34,7 +34,14 @@ const SUPPORTED_EVENTS = [
     // AAV Integration Events
     'aav.verification_passed',
     'aav.verification_denied',
-    'aav.verification_failed'
+    'aav.verification_failed',
+    // Cross-tool events
+    'safe_spend.spend.approved',
+    'safe_spend.spend.denied',
+    'safe_spend.spend.expired',
+    'safe_spend.escrow.paused',
+    'safe_spend.escrow.closed',
+    'safe_spend.escrow.funded'
 ];
 
 const MAX_RETRY_ATTEMPTS = 10;

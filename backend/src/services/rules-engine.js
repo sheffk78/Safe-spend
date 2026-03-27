@@ -1,14 +1,16 @@
 /**
  * Safe-Spend Rules Engine
  * 
- * Implements the 14-step spend validation cascade.
+ * Implements the 15-step spend validation cascade (0-13).
  * This is the core IP of Safe-Spend - deterministic, auditable spending control.
  * 
  * Evaluation Order:
+ * 0. AUTHORITY VERIFICATION (AAV - only when AAV_ENABLED + agent_id present)
  * 1. KEY VALIDATION
  * 2. ESCROW ACCOUNT CHECK
- * 2.5. AAV AGENT AUTHORIZATION (NEW)
+ * 2.5. AAV AGENT AUTHORIZATION (legacy escrow-level)
  * 3. IDEMPOTENCY CHECK
+ * 3.5. REPUTATION CHECK (ARL - only when min_reputation_score set)
  * 4. BALANCE CHECK
  * 5. PER-TRANSACTION LIMIT
  * 6. DAILY CAP CHECK
@@ -17,7 +19,7 @@
  * 9. VENDOR CHECK
  * 10. CATEGORY CHECK
  * 11. TIME WINDOW CHECK
- * 12. APPROVAL THRESHOLD CHECK
+ * 12. APPROVAL THRESHOLD CHECK (+ reputation boost)
  * 13. EXECUTE
  */
 
@@ -66,12 +68,32 @@ const aavApiService = require('./aav-api-service');
  */
 
 /**
- * Main evaluation function - runs all 14 steps
+ * Main evaluation function - runs all steps (0-13)
  * @param {EvaluationContext} context - All data needed for evaluation
  * @returns {EvaluationResult}
  */
 function evaluateSpendRequest(context) {
     const rulesEvaluated = [];
+    
+    // Step 0: AUTHORITY VERIFICATION (AAV global check)
+    // Only runs when AAV_ENABLED=true AND agent_id is present in the request
+    const aavGlobalEnabled = process.env.AAV_ENABLED === 'true';
+    if (aavGlobalEnabled && context.request.agentId && context.aavApiResult) {
+        const authVerifyResult = evaluateAuthorityVerification(context);
+        rulesEvaluated.push(authVerifyResult);
+        if (!authVerifyResult.passed) {
+            if (authVerifyResult.metadata?.pending_approval) {
+                return {
+                    status: 'pending_approval',
+                    rulesEvaluated,
+                    requiresApproval: true,
+                    approvalTimeoutMinutes: 60,
+                    denialReason: authVerifyResult.reason
+                };
+            }
+            return createDenialResult(rulesEvaluated, authVerifyResult.reason, authVerifyResult.rule_id);
+        }
+    }
     
     // Step 1: KEY VALIDATION
     const keyResult = validateKey(context);
@@ -87,7 +109,7 @@ function evaluateSpendRequest(context) {
         return createDenialResult(rulesEvaluated, escrowResult.reason, escrowResult.rule_id);
     }
     
-    // Step 2.5: AAV AGENT AUTHORIZATION
+    // Step 2.5: AAV AGENT AUTHORIZATION (legacy escrow-level check)
     const aavResult = checkAAVAuthorization(context);
     rulesEvaluated.push(aavResult);
     if (!aavResult.passed) {
@@ -104,6 +126,16 @@ function evaluateSpendRequest(context) {
             rulesEvaluated,
             existingRequest: context.existingRequest
         };
+    }
+    
+    // Step 3.5: REPUTATION CHECK (ARL)
+    // Only runs when a policy has min_reputation_score set
+    const reputationResult = checkReputation(context);
+    if (reputationResult) {
+        rulesEvaluated.push(reputationResult);
+        if (!reputationResult.passed) {
+            return createDenialResult(rulesEvaluated, reputationResult.reason, reputationResult.rule_id);
+        }
     }
     
     // Step 4: BALANCE CHECK
@@ -186,6 +218,132 @@ function evaluateSpendRequest(context) {
     return {
         status: 'approved',
         rulesEvaluated
+    };
+}
+
+/**
+ * Step 0: AUTHORITY VERIFICATION (AAV Global)
+ * Only runs when AAV_ENABLED=true AND the spend request includes agent_id.
+ * Evaluates the result from the AAV /verify API call.
+ */
+function evaluateAuthorityVerification(context) {
+    const { aavApiResult } = context;
+    
+    if (!aavApiResult) {
+        // No AAV API call was made — fail-closed for financial operations
+        return {
+            rule: 'authority_verification',
+            passed: false,
+            reason: 'Authority verification failed: AAV verification not performed',
+            source: 'aav'
+        };
+    }
+    
+    if (!aavApiResult.success) {
+        // AAV was unreachable — default fail-closed
+        return {
+            rule: 'authority_verification',
+            passed: false,
+            reason: `Authority verification failed: ${aavApiResult.error || 'AAV unreachable'}`,
+            source: 'aav',
+            metadata: { error: aavApiResult.error }
+        };
+    }
+    
+    if (aavApiResult.authorized) {
+        return {
+            rule: 'authority_verification',
+            passed: true,
+            reason: 'Authority verification passed',
+            source: 'aav',
+            verification_id: aavApiResult.verificationId
+        };
+    }
+    
+    // Check if approval_required
+    if (aavApiResult.result === 'approval_required' || aavApiResult.result === 'approval_pending') {
+        return {
+            rule: 'authority_verification',
+            passed: false,
+            reason: 'Awaiting AAV authority approval',
+            source: 'aav',
+            metadata: { pending_approval: true, verification_id: aavApiResult.verificationId }
+        };
+    }
+    
+    // Denied by AAV
+    return {
+        rule: 'authority_verification',
+        passed: false,
+        reason: `Authority verification failed: ${aavApiResult.denialReason || 'Denied by authority'}`,
+        source: 'aav',
+        verification_id: aavApiResult.verificationId
+    };
+}
+
+/**
+ * Step 3.5: REPUTATION CHECK (ARL)
+ * Only runs when a policy has min_reputation_score set.
+ * Returns null if no reputation check is needed.
+ */
+function checkReputation(context) {
+    const { policies, request } = context;
+    
+    // Find any policy that has min_reputation_score set
+    const reputationPolicy = policies.find(p => p.minReputationScore != null && p.minReputationScore > 0);
+    
+    if (!reputationPolicy) return null; // No reputation check needed
+    
+    // We need an agent_id for reputation checks
+    if (!request.agentId) {
+        return {
+            rule: 'reputation_check',
+            rule_id: reputationPolicy.id,
+            passed: true,
+            reason: 'Reputation check skipped: no agent_id on request'
+        };
+    }
+    
+    // If ARL is not enabled, skip
+    if (process.env.ARL_ENABLED !== 'true') {
+        return {
+            rule: 'reputation_check',
+            rule_id: reputationPolicy.id,
+            passed: true,
+            reason: 'Reputation check skipped: ARL not enabled'
+        };
+    }
+    
+    // Note: Actual score check happens async in the route handler
+    // The context may include a pre-fetched reputation score
+    const reputationScore = context.reputationScore;
+    
+    if (reputationScore === null || reputationScore === undefined) {
+        // No score available — pass through (ARL might be unreachable)
+        return {
+            rule: 'reputation_check',
+            rule_id: reputationPolicy.id,
+            passed: true,
+            reason: 'Reputation check skipped: score unavailable'
+        };
+    }
+    
+    if (reputationScore < reputationPolicy.minReputationScore) {
+        return {
+            rule: 'reputation_check',
+            rule_id: reputationPolicy.id,
+            passed: false,
+            reason: `Agent reputation (${reputationScore}) below policy minimum (${reputationPolicy.minReputationScore})`,
+            metadata: { score: reputationScore, min: reputationPolicy.minReputationScore }
+        };
+    }
+    
+    return {
+        rule: 'reputation_check',
+        rule_id: reputationPolicy.id,
+        passed: true,
+        reason: `Agent reputation score (${reputationScore}) meets minimum (${reputationPolicy.minReputationScore})`,
+        metadata: { score: reputationScore, min: reputationPolicy.minReputationScore }
     };
 }
 
@@ -1084,17 +1242,30 @@ function checkApprovalThreshold(context) {
     let requiresApproval = false;
     let approvalTimeoutMinutes = 60;
     let triggeringPolicy = null;
+    let reputationBoostApplied = false;
     
     for (const policy of policies) {
-        const autoApproveUnder = policy.autoApproveUnderCents;
+        let autoApproveUnder = policy.autoApproveUnderCents;
         const requireHumanAbove = policy.requireHumanAboveCents;
+        
+        // Reputation boost: if policy has reputationSpendingBoost=true
+        // and agent has Platinum tier (score >= 90), double the auto-approve limit
+        if (policy.reputationSpendingBoost && context.reputationScore >= 90 && autoApproveUnder) {
+            autoApproveUnder = autoApproveUnder * 2;
+            reputationBoostApplied = true;
+        }
         
         // If amount is above require_human_above_cents, require approval
         if (requireHumanAbove !== null && requireHumanAbove !== undefined) {
-            if (amount > requireHumanAbove) {
+            // Also apply reputation boost to human approval threshold
+            let effectiveHumanAbove = requireHumanAbove;
+            if (policy.reputationSpendingBoost && context.reputationScore >= 90) {
+                effectiveHumanAbove = requireHumanAbove * 2;
+            }
+            
+            if (amount > effectiveHumanAbove) {
                 requiresApproval = true;
                 triggeringPolicy = policy;
-                // Use the strictest (shortest) timeout
                 if (policy.approvalTimeoutMinutes && policy.approvalTimeoutMinutes < approvalTimeoutMinutes) {
                     approvalTimeoutMinutes = policy.approvalTimeoutMinutes;
                 }
@@ -1105,7 +1276,6 @@ function checkApprovalThreshold(context) {
         // it might require approval (unless another policy auto-approves)
         if (autoApproveUnder !== null && autoApproveUnder !== undefined) {
             if (amount > autoApproveUnder) {
-                // This policy doesn't auto-approve, check if human approval required
                 if (!requiresApproval && requireHumanAbove !== null && amount > requireHumanAbove) {
                     requiresApproval = true;
                     triggeringPolicy = policy;
@@ -1118,14 +1288,15 @@ function checkApprovalThreshold(context) {
         return {
             rule: 'approval_threshold_check',
             rule_id: triggeringPolicy?.id,
-            passed: true, // The check itself passes, but requires human approval
+            passed: true,
             requiresApproval: true,
             reason: `Amount exceeds auto-approve threshold, requires human approval`,
             metadata: {
                 amount_cents: amount,
                 requires_approval: true,
                 approvalTimeoutMinutes,
-                policy_name: triggeringPolicy?.name
+                policy_name: triggeringPolicy?.name,
+                reputation_boost_applied: reputationBoostApplied
             }
         };
     }
@@ -1134,8 +1305,10 @@ function checkApprovalThreshold(context) {
         rule: 'approval_threshold_check',
         passed: true,
         requiresApproval: false,
-        reason: 'Auto-approved based on thresholds',
-        metadata: { amount_cents: amount }
+        reason: reputationBoostApplied 
+            ? 'Auto-approved (Reputation boost applied - Platinum tier)' 
+            : 'Auto-approved based on thresholds',
+        metadata: { amount_cents: amount, reputation_boost_applied: reputationBoostApplied }
     };
 }
 

@@ -186,6 +186,65 @@ def handle_webhook():
                 </div>
             </div>
 
+            {/* AAV & Cross-tool Events */}
+            <div className="space-y-6 mb-10">
+                <div>
+                    <h4 className="font-semibold text-ss-text mb-2">AAV Verification Events</h4>
+                    <div className="bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] overflow-hidden">
+                        <table className="w-full text-sm">
+                            <tbody>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>aav.verification_passed</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">AAV authority verification passed</td>
+                                </tr>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>aav.verification_denied</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">AAV authority verification denied</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 px-4"><InlineCode>aav.verification_failed</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">AAV verification failed (unreachable/error)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 className="font-semibold text-ss-text mb-2">Cross-Tool Events</h4>
+                    <div className="bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] overflow-hidden">
+                        <table className="w-full text-sm">
+                            <tbody>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.spend.approved</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: spend approved</td>
+                                </tr>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.spend.denied</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: spend denied</td>
+                                </tr>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.spend.expired</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: spend expired</td>
+                                </tr>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.escrow.paused</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow paused</td>
+                                </tr>
+                                <tr className="border-b border-[rgba(255,255,255,0.03)]">
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.escrow.closed</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow closed</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 px-4"><InlineCode>safe_spend.escrow.funded</InlineCode></td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow funded</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <DocsHeading level={2} id="subscribing">Subscribing to Events</DocsHeading>
 
             <DocsText>

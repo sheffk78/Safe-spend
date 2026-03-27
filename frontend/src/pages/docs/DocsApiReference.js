@@ -114,7 +114,8 @@ const DocsApiReference = () => {
             
             <ParamTable params={[
                 { name: 'name', type: 'string', required: true, description: 'Account name' },
-                { name: 'description', type: 'string', required: false, description: 'Account description' }
+                { name: 'description', type: 'string', required: false, description: 'Account description' },
+                { name: 'agent_id', type: 'string', required: false, description: 'Agent ID (agt_ format). Links escrow to a specific agent.' }
             ]} />
 
             <CodeBlock 
@@ -122,6 +123,7 @@ const DocsApiReference = () => {
                 title="Response"
                 code={`{
   "id": "esc_9f3k2m",
+  "agent_id": "agt_1a2b3c4d5e6f7890abcdef12",
   "name": "Marketing Agent Budget",
   "description": "Budget for marketing automation agent",
   "balance_cents": 0,
@@ -157,7 +159,7 @@ const DocsApiReference = () => {
             <DocsHeading level={2} id="policies">Spending Policies</DocsHeading>
 
             <DocsText>
-                Policies define the rules that govern spending from an escrow account. Each policy is evaluated in a 13-step validation cascade.
+                Policies define the rules that govern spending from an escrow account. Each policy is evaluated in a 14-step validation cascade (steps 0-13). New fields include <InlineCode>min_reputation_score</InlineCode> and <InlineCode>reputation_spending_boost</InlineCode> for ARL reputation integration.
             </DocsText>
 
             <DocsHeading level={3}>Create Policy</DocsHeading>
@@ -210,6 +212,7 @@ const DocsApiReference = () => {
                 { name: 'vendor', type: 'string', required: true, description: 'Vendor/merchant name' },
                 { name: 'category', type: 'string', required: false, description: 'Spending category' },
                 { name: 'description', type: 'string', required: false, description: 'Description of the spend' },
+                { name: 'agent_id', type: 'string', required: false, description: 'Agent ID (agt_ format). Required when AAV_ENABLED=true.' },
                 { name: 'idempotency_key', type: 'string', required: false, description: 'Unique key to prevent duplicates' },
                 { name: 'metadata', type: 'object', required: false, description: 'Additional metadata' }
             ]} />
@@ -257,6 +260,45 @@ const DocsApiReference = () => {
 
             <DocsHeading level={3}>List Spend Requests</DocsHeading>
             <ApiEndpoint method="GET" path="/v1/spend" description="List all spend requests" />
+
+            {/* Agent Endpoints */}
+            <DocsHeading level={2} id="agents">Agent Endpoints</DocsHeading>
+
+            <DocsText>
+                Query escrow accounts and spend history scoped to a specific agent.
+            </DocsText>
+
+            <DocsHeading level={3}>List Agent Escrow Accounts</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/escrow-accounts" description="List escrow accounts linked to this agent" />
+
+            <DocsHeading level={3}>Agent Spend History</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/spend-history" description="Paginated spend history for this agent" />
+
+            <ParamTable params={[
+                { name: 'limit', type: 'integer', required: false, description: 'Results per page (default: 50)' },
+                { name: 'offset', type: 'integer', required: false, description: 'Offset for pagination' },
+                { name: 'status', type: 'string', required: false, description: 'Filter by status (approved, denied, pending)' }
+            ]} />
+
+            {/* Certificate Mapping */}
+            <DocsHeading level={2} id="certificates">Agent Certificates</DocsHeading>
+
+            <DocsText>
+                Map agent IDs to AAV certificate IDs for authority verification.
+            </DocsText>
+
+            <DocsHeading level={3}>Create Certificate Mapping</DocsHeading>
+            <ApiEndpoint method="POST" path="/v1/agent-certificates" description="Create or update a certificate mapping" />
+            <ParamTable params={[
+                { name: 'agent_id', type: 'string', required: true, description: 'Agent ID (agt_ format)' },
+                { name: 'certificate_id', type: 'string', required: true, description: 'AAV certificate ID (cert_ format)' }
+            ]} />
+
+            <DocsHeading level={3}>Get Certificate Mapping</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/agent-certificates/{agent_id}" description="Get certificate mapping for an agent" />
+
+            <DocsHeading level={3}>Delete Certificate Mapping</DocsHeading>
+            <ApiEndpoint method="DELETE" path="/v1/agent-certificates/{agent_id}" description="Remove certificate mapping" />
 
             {/* Approvals */}
             <DocsHeading level={2} id="approvals">Approvals</DocsHeading>
@@ -360,6 +402,45 @@ const DocsApiReference = () => {
 
             <DocsHeading level={3}>Test Webhook</DocsHeading>
             <ApiEndpoint method="POST" path="/v1/webhooks/:id/test" description="Send a test event to the webhook" />
+
+            {/* Control Plane */}
+            <DocsHeading level={2} id="control-plane">Control Plane API</DocsHeading>
+
+            <DocsText>
+                Read-only endpoints consumed by the Agentic Trust control plane for Agent Card data and org dashboards.
+            </DocsText>
+
+            <DocsHeading level={3}>Organization Summary</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/control-plane/org/{org_id}/summary" description="Aggregated org statistics" />
+
+            <DocsHeading level={3}>Agent Card Data</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/control-plane/agents/{agent_id}/card-data" description="Agent financial card for control plane" />
+
+            {/* Organization Linking */}
+            <DocsHeading level={2} id="org-linking">Organization Linking</DocsHeading>
+
+            <DocsText>
+                Link your Safe-Spend account to an AAV organization for cross-platform features.
+            </DocsText>
+
+            <DocsHeading level={3}>Link Organization</DocsHeading>
+            <ApiEndpoint method="POST" path="/v1/org/link" description="Link to an AAV organization using a link token" />
+            <ParamTable params={[
+                { name: 'link_token', type: 'string', required: true, description: 'Link token (lnk_ format) from AAV' }
+            ]} />
+
+            <DocsHeading level={3}>Get Link Status</DocsHeading>
+            <ApiEndpoint method="GET" path="/v1/org/link" description="Check if organization is linked" />
+
+            {/* Internal Events */}
+            <DocsHeading level={2} id="internal-events">Internal Events</DocsHeading>
+
+            <DocsText>
+                Receives cross-tool events from AAV and ARL via HMAC-SHA256 authenticated requests.
+            </DocsText>
+
+            <DocsHeading level={3}>Receive Internal Event</DocsHeading>
+            <ApiEndpoint method="POST" path="/v1/internal/events" description="Receive cross-tool events (HMAC auth)" />
         </div>
     );
 };

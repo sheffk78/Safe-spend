@@ -42,7 +42,10 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             aav_required_autonomy_level,  // 1-4
             aav_required_actions = [],
             aav_map_vendors = false,
-            aav_map_limits = false
+            aav_map_limits = false,
+            // ARL Reputation fields
+            min_reputation_score,
+            reputation_spending_boost = false
         } = req.body;
         
         if (!escrow_id || !name) {
@@ -113,7 +116,10 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 aavRequiredAutonomyLevel: aav_required_autonomy_level || null,
                 aavRequiredActions: JSON.stringify(aav_required_actions),
                 aavMapVendors: aav_map_vendors,
-                aavMapLimits: aav_map_limits
+                aavMapLimits: aav_map_limits,
+                // ARL Reputation
+                minReputationScore: min_reputation_score != null ? parseInt(min_reputation_score) : null,
+                reputationSpendingBoost: reputation_spending_boost
             }
         });
         
@@ -684,6 +690,9 @@ function formatPolicy(policy) {
         aav_required_actions: JSON.parse(policy.aavRequiredActions || '[]'),
         aav_map_vendors: policy.aavMapVendors || false,
         aav_map_limits: policy.aavMapLimits || false,
+        // ARL Reputation fields
+        min_reputation_score: policy.minReputationScore,
+        reputation_spending_boost: policy.reputationSpendingBoost || false,
         metadata: JSON.parse(policy.metadata || '{}'),
         created_at: policy.createdAt,
         updated_at: policy.updatedAt

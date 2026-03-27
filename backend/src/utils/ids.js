@@ -14,7 +14,10 @@ const ID_PREFIXES = {
     webhook: 'whk_',
     webhookDelivery: 'dlv_',
     event: 'evt_',
-    orgMember: 'mbr_'
+    orgMember: 'mbr_',
+    agentCertificate: 'acrt_',
+    crossToolEvent: 'evt_at_',
+    reputationCache: 'rep_'
 };
 
 /**
@@ -87,11 +90,32 @@ function generateWebhookSecret() {
     return `whsec_${generateRandomString(32)}`;
 }
 
+/**
+ * Validate agent_id format: agt_ + 24 hex characters
+ * @param {string} agentId
+ * @returns {boolean}
+ */
+function validateAgentId(agentId) {
+    if (!agentId) return false;
+    return /^agt_[0-9a-f]{24}$/.test(agentId);
+}
+
+/**
+ * Generate a hex string
+ * @param {number} length
+ * @returns {string}
+ */
+function generateHex(length = 12) {
+    return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
+}
+
 module.exports = {
     ID_PREFIXES,
     generateId,
     generateApiKey,
     hashApiKey,
     generateRandomString,
-    generateWebhookSecret
+    generateWebhookSecret,
+    validateAgentId,
+    generateHex
 };

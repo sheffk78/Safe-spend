@@ -56,6 +56,13 @@ const errorLogService = require('./services/error-log-service');
 const feedbackRoutes = require('./routes/feedback');
 const adminFeedbackRoutes = require('./routes/admin-feedback');
 
+// New Integration Routes
+const agentRoutes = require('./routes/agents');
+const agentCertificatesRoutes = require('./routes/agent-certificates');
+const internalEventsRoutes = require('./routes/internal-events');
+const orgLinkRoutes = require('./routes/org-link');
+const controlPlaneRoutes = require('./routes/control-plane');
+
 // Validate environment at startup
 validateEnvironment();
 const config = getConfig();
@@ -201,6 +208,21 @@ app.use('/api/v1/settings/aav', writeRateLimiter, aavSettingsRoutes);
 
 // Feedback - standard rate limit (has internal rate limiting too)
 app.use('/api/v1/feedback', standardApiRateLimiter, feedbackRoutes);
+
+// Agent-scoped endpoints
+app.use('/api/v1/agents', standardApiRateLimiter, agentRoutes);
+
+// Agent certificate mappings
+app.use('/api/v1/agent-certificates', writeRateLimiter, agentCertificatesRoutes);
+
+// Internal cross-tool events
+app.use('/api/v1/internal/events', internalEventsRoutes);
+
+// Organization linking
+app.use('/api/v1/org', writeRateLimiter, orgLinkRoutes);
+
+// Control Plane API (for agentictrust.app)
+app.use('/api/v1/control-plane', standardApiRateLimiter, controlPlaneRoutes);
 
 // ============================================
 // Static File Serving (Uploaded Images)

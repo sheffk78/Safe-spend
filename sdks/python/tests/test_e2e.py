@@ -17,7 +17,7 @@ from safespend.errors import SafeSpendError, AuthenticationError, ValidationErro
 # Configuration
 API_KEY = "sk_test_zfg1u4wlxibyzagxp7oxkg2u"
 ESCROW_ID = "esc_bkxnao6ul6xs"
-BASE_URL = "https://build-instructions-4.preview.emergentagent.com"
+BASE_URL = "https://agent-vault-demo.preview.emergentagent.com"
 
 def test_sdk_e2e():
     """Run end-to-end tests."""
