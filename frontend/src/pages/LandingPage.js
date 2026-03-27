@@ -164,11 +164,11 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                 <ArrowRight size={18} />
                             </Link>
                             <Link
-                                to="/docs"
+                                to="/playground"
                                 className="px-8 py-3.5 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.04)] text-ss-text font-semibold rounded-lg transition-all duration-200"
-                                data-testid="hero-cta-secondary"
+                                data-testid="hero-cta-playground"
                             >
-                                Read the Docs
+                                Try the API Playground →
                             </Link>
                         </div>
                     </div>

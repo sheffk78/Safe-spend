@@ -19,7 +19,8 @@ const Navbar = () => {
         { label: 'Features', href: '#features' },
         { label: 'How It Works', href: '#how-it-works' },
         { label: 'Pricing', href: '#pricing' },
-        { label: 'Docs', href: '/docs' }
+        { label: 'Docs', href: '/docs' },
+        { label: 'Playground', href: '/playground' }
     ];
 
     const handleNavClick = (href) => {

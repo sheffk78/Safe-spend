@@ -43,8 +43,11 @@ import ApprovalDetailPage from "@/pages/dashboard/ApprovalDetailPage";
 import ApiKeysPage from "@/pages/dashboard/ApiKeysPage";
 import AuditLogPage from "@/pages/dashboard/AuditLogPage";
 import WebhooksPage from "@/pages/dashboard/WebhooksPage";
-import PlaygroundPage from "@/pages/dashboard/PlaygroundPage";
+import DashboardPlaygroundPage from "@/pages/dashboard/PlaygroundPage";
 import PricingPage from "@/pages/dashboard/PricingPage";
+
+// Public Playground
+import PublicPlaygroundPage from "@/pages/PlaygroundPage";
 import { SettingsPage } from "@/pages/dashboard/PlaceholderPages";
 import TeamPage from "@/pages/dashboard/TeamPage";
 import ExportsPage from "@/pages/dashboard/ExportsPage";
@@ -110,6 +113,9 @@ function App() {
                     <Route path="/blog" element={<BlogIndexPage />} />
                     <Route path="/blog/:slug" element={<BlogPostPage />} />
 
+                    {/* Public Playground */}
+                    <Route path="/playground" element={<PublicPlaygroundPage />} />
+
                     {/* Protected dashboard routes */}
                     <Route
                         path="/dashboard"
@@ -126,7 +132,7 @@ function App() {
                         <Route path="transactions/:id" element={<TransactionDetailPage />} />
                         <Route path="approvals" element={<ApprovalsPage />} />
                         <Route path="approvals/:id" element={<ApprovalDetailPage />} />
-                        <Route path="playground" element={<PlaygroundPage />} />
+                        <Route path="playground" element={<DashboardPlaygroundPage />} />
                         <Route path="keys" element={<ApiKeysPage />} />
                         <Route path="webhooks" element={<WebhooksPage />} />
                         <Route path="audit" element={<AuditLogPage />} />
