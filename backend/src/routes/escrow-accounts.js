@@ -21,19 +21,21 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             description, 
             currency = 'usd', 
             metadata = {},
-            // AAV fields
+            // AAV fields (legacy + new spec)
             aav_enabled = false,
             authorized_agent_ids = [],
             aav_grant_ids = [],
-            aav_enforcement_mode = 'none'
+            aav_enforcement_mode = 'none',
+            aav_api_key,
+            aav_require_certificate = false
         } = req.body;
         
         if (!name) {
             return res.status(400).json({ error: 'Name is required' });
         }
         
-        // Validate AAV enforcement mode
-        const validModes = ['none', 'warn', 'strict'];
+        // Validate AAV enforcement mode (support both old and new modes)
+        const validModes = ['none', 'warn', 'strict', 'verify', 'log_only'];
         if (!validModes.includes(aav_enforcement_mode)) {
             return res.status(400).json({ 
                 error: `Invalid aav_enforcement_mode. Must be one of: ${validModes.join(', ')}` 
@@ -49,11 +51,13 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 description,
                 currency,
                 metadata: JSON.stringify(metadata),
-                // AAV fields
+                // AAV fields - full spec
                 aavEnabled: aav_enabled,
                 authorizedAgentIds: JSON.stringify(authorized_agent_ids),
                 aavGrantIds: JSON.stringify(aav_grant_ids),
-                aavEnforcementMode: aav_enforcement_mode
+                aavEnforcementMode: aav_enforcement_mode,
+                aavApiKey: aav_api_key || null,
+                aavRequireCertificate: aav_require_certificate
             }
         });
         
@@ -539,11 +543,14 @@ function formatEscrowAccount(escrow) {
         total_funded_cents: escrow.totalFundedCents,
         total_spent_cents: escrow.totalSpentCents,
         total_denied_cents: escrow.totalDeniedCents,
-        // AAV fields
+        // AAV fields - full spec
         aav_enabled: escrow.aavEnabled,
         authorized_agent_ids: JSON.parse(escrow.authorizedAgentIds || '[]'),
         aav_grant_ids: JSON.parse(escrow.aavGrantIds || '[]'),
         aav_enforcement_mode: escrow.aavEnforcementMode,
+        aav_api_key_configured: !!escrow.aavApiKey, // Don't expose actual key
+        aav_require_certificate: escrow.aavRequireCertificate || false,
+        aav_last_verified_at: escrow.aavLastVerifiedAt,
         metadata: JSON.parse(escrow.metadata || '{}'),
         created_at: escrow.createdAt,
         updated_at: escrow.updatedAt

@@ -34,11 +34,15 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             require_human_above_cents,
             approval_timeout_minutes = 60,
             metadata = {},
-            // AAV fields
+            // AAV fields - full spec
             aav_enabled = false,
             authorized_agent_ids = [],
             aav_grant_ids = [],
-            aav_enforcement_mode = null  // null = inherit from escrow
+            aav_enforcement_mode = null,  // null = inherit from escrow
+            aav_required_autonomy_level,  // 1-4
+            aav_required_actions = [],
+            aav_map_vendors = false,
+            aav_map_limits = false
         } = req.body;
         
         if (!escrow_id || !name) {
@@ -47,12 +51,20 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
         
         // Validate AAV enforcement mode if provided
         if (aav_enforcement_mode !== null) {
-            const validModes = ['none', 'warn', 'strict'];
+            const validModes = ['none', 'warn', 'strict', 'verify', 'log_only'];
             if (!validModes.includes(aav_enforcement_mode)) {
                 return res.status(400).json({ 
                     error: `Invalid aav_enforcement_mode. Must be one of: ${validModes.join(', ')}` 
                 });
             }
+        }
+        
+        // Validate autonomy level
+        if (aav_required_autonomy_level !== undefined && 
+            (aav_required_autonomy_level < 1 || aav_required_autonomy_level > 4)) {
+            return res.status(400).json({
+                error: 'aav_required_autonomy_level must be between 1 and 4'
+            });
         }
         
         // Verify escrow account exists and belongs to org
@@ -93,11 +105,15 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
                 requireHumanAboveCents: require_human_above_cents,
                 approvalTimeoutMinutes: approval_timeout_minutes,
                 metadata: JSON.stringify(metadata),
-                // AAV fields
+                // AAV fields - full spec
                 aavEnabled: aav_enabled,
                 authorizedAgentIds: JSON.stringify(authorized_agent_ids),
                 aavGrantIds: JSON.stringify(aav_grant_ids),
-                aavEnforcementMode: aav_enforcement_mode
+                aavEnforcementMode: aav_enforcement_mode,
+                aavRequiredAutonomyLevel: aav_required_autonomy_level || null,
+                aavRequiredActions: JSON.stringify(aav_required_actions),
+                aavMapVendors: aav_map_vendors,
+                aavMapLimits: aav_map_limits
             }
         });
         
@@ -659,11 +675,15 @@ function formatPolicy(policy) {
         auto_approve_under_cents: policy.autoApproveUnderCents,
         require_human_above_cents: policy.requireHumanAboveCents,
         approval_timeout_minutes: policy.approvalTimeoutMinutes,
-        // AAV fields
+        // AAV fields - full spec
         aav_enabled: policy.aavEnabled,
         authorized_agent_ids: JSON.parse(policy.authorizedAgentIds || '[]'),
         aav_grant_ids: JSON.parse(policy.aavGrantIds || '[]'),
         aav_enforcement_mode: policy.aavEnforcementMode,
+        aav_required_autonomy_level: policy.aavRequiredAutonomyLevel,
+        aav_required_actions: JSON.parse(policy.aavRequiredActions || '[]'),
+        aav_map_vendors: policy.aavMapVendors || false,
+        aav_map_limits: policy.aavMapLimits || false,
         metadata: JSON.parse(policy.metadata || '{}'),
         created_at: policy.createdAt,
         updated_at: policy.updatedAt

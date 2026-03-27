@@ -158,11 +158,14 @@ model EscrowAccount {
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
   
-  // AAV Integration
+  // AAV Integration - Full configuration as JSON for flexibility
   aavEnabled            Boolean  @default(false) @map("aav_enabled")
   authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array of AAV agent IDs
   aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array of AAV grant IDs
-  aavEnforcementMode    String   @default("none") @map("aav_enforcement_mode") // none | warn | strict
+  aavEnforcementMode    String   @default("none") @map("aav_enforcement_mode") // none | warn | strict | verify | log_only
+  aavApiKey             String?  @map("aav_api_key")                          // Encrypted AAV API key for server-to-server calls
+  aavRequireCertificate Boolean  @default(false) @map("aav_require_certificate")  // If true, every spend must include certificate_id
+  aavLastVerifiedAt     DateTime? @map("aav_last_verified_at")                // Last successful AAV verification
 
   // Relations
   organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -242,6 +245,10 @@ model SpendingPolicy {
   authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array
   aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array
   aavEnforcementMode    String?  @map("aav_enforcement_mode")                 // null = inherit from escrow
+  aavRequiredAutonomyLevel Int?  @map("aav_required_autonomy_level")          // Minimum AAV autonomy level (1-4)
+  aavRequiredActions    String   @default("[]") @map("aav_required_actions")  // JSON array of required AAV actions
+  aavMapVendors         Boolean  @default(false) @map("aav_map_vendors")      // Sync approved_vendors from AAV grant
+  aavMapLimits          Boolean  @default(false) @map("aav_map_limits")       // Use AAV limits as additional ceiling
   
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
@@ -289,7 +296,14 @@ model SpendRequest {
   // AAV Integration (captured at request time)
   aavAgentId            String?  @map("aav_agent_id")           // Agent ID from AAV claim
   aavGrantId            String?  @map("aav_grant_id")           // Grant ID used for authorization
-  aavVerificationStatus String?  @map("aav_verification_status") // verified | unverified | bypassed
+  aavCertificateId      String?  @map("aav_certificate_id")     // Certificate ID presented by agent
+  aavVerificationStatus String?  @map("aav_verification_status") // verified | unverified | bypassed | denied
+  aavVerificationId     String?  @map("aav_verification_id")    // verif_... from AAV response
+  aavAutonomyLevel      Int?     @map("aav_autonomy_level")     // 1-4 from AAV response
+  aavResult             String?  @map("aav_result")             // authorized | denied | approval_pending | etc
+  aavDailySpend         String?  @map("aav_daily_spend")        // JSON: { used, limit, currency }
+  aavCheckedAt          DateTime? @map("aav_checked_at")        // When AAV was verified
+  denialSource          String?  @map("denial_source")          // aav | policy | balance | account | key
   
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")

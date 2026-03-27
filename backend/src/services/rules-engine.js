@@ -27,6 +27,7 @@ const {
     checkAgentAuthorization, 
     getEffectiveEnforcementMode 
 } = require('./aav-service');
+const aavApiService = require('./aav-api-service');
 
 /**
  * Rule result structure
@@ -283,6 +284,10 @@ function validateEscrowAccount(context) {
 /**
  * Step 2.5: AAV AGENT AUTHORIZATION
  * Verifies the requesting agent has AAV-issued authority to use this escrow/policy
+ * 
+ * This step now includes TWO checks:
+ * 1. Local authorization (agent_id/grant_id in allowed lists)
+ * 2. Real-time AAV /verify API call (if aav_api_key is configured)
  */
 function checkAAVAuthorization(context) {
     const { escrowAccount, policies, aavClaims } = context;
@@ -300,6 +305,13 @@ function checkAAVAuthorization(context) {
     // Get enforcement mode (escrow-level or policy-level override)
     const enforcementMode = getEffectiveEnforcementMode(escrowAccount, policies);
     
+    // Map old enforcement modes to new spec
+    // none -> skip entirely
+    // warn -> log_only (allow even if denied)
+    // strict -> verify (fail closed)
+    // verify -> verify (new spec mode)
+    // log_only -> log_only (new spec mode)
+    
     if (enforcementMode === 'none') {
         return {
             rule: 'aav_authorization',
@@ -312,9 +324,36 @@ function checkAAVAuthorization(context) {
     // Extract agent identity from AAV claims
     const agentId = aavClaims?.agent_id;
     const grantId = aavClaims?.grant_id;
+    const certificateId = aavClaims?.certificate_id;
     const verified = aavClaims?.verified || false;
     
-    // Check authorization
+    // Check if certificate is required
+    if (escrowAccount.aavRequireCertificate && !certificateId) {
+        if (enforcementMode === 'log_only' || enforcementMode === 'warn') {
+            return {
+                rule: 'aav_authorization',
+                passed: true,
+                reason: 'Certificate required but not provided (log_only mode - allowed)',
+                metadata: {
+                    enforcement_mode: enforcementMode,
+                    warning: 'aav_certificate_required',
+                    require_certificate: true
+                }
+            };
+        }
+        return {
+            rule: 'aav_authorization',
+            passed: false,
+            reason: 'AAV certificate required but not provided',
+            denial_source: 'aav',
+            metadata: {
+                enforcement_mode: enforcementMode,
+                require_certificate: true
+            }
+        };
+    }
+    
+    // First do local authorization check (agent_id/grant_id in lists)
     const authResult = checkAgentAuthorization(
         agentId, 
         grantId, 
@@ -322,17 +361,24 @@ function checkAAVAuthorization(context) {
         policies
     );
     
+    // If we have AAV API verification result from async step, use it
+    if (context.aavApiResult) {
+        return processAAVApiResult(context.aavApiResult, enforcementMode, agentId, grantId, certificateId);
+    }
+    
+    // Otherwise, use local authorization result
     if (!authResult.authorized) {
-        if (enforcementMode === 'warn') {
+        if (enforcementMode === 'warn' || enforcementMode === 'log_only') {
             // Log but allow (for gradual rollout)
             return {
                 rule: 'aav_authorization',
                 passed: true,
-                reason: 'Agent not authorized (warning mode - allowed)',
+                reason: 'Agent not authorized (log_only mode - allowed)',
                 metadata: { 
-                    enforcement_mode: 'warn',
+                    enforcement_mode: enforcementMode,
                     agent_id: agentId,
                     grant_id: grantId,
+                    certificate_id: certificateId,
                     authorized: false,
                     verification_status: verified ? 'verified' : 'unverified',
                     warning: authResult.reason
@@ -340,15 +386,17 @@ function checkAAVAuthorization(context) {
             };
         }
         
-        // Strict mode - deny
+        // Strict/verify mode - deny
         return {
             rule: 'aav_authorization',
             passed: false,
             reason: authResult.reason,
+            denial_source: 'aav',
             metadata: {
-                enforcement_mode: 'strict',
+                enforcement_mode: enforcementMode,
                 agent_id: agentId,
                 grant_id: grantId,
+                certificate_id: certificateId,
                 authorized_agents: authResult.authorizedAgents || [],
                 authorized_grants: authResult.authorizedGrants || []
             }
@@ -363,9 +411,128 @@ function checkAAVAuthorization(context) {
             enforcement_mode: enforcementMode,
             agent_id: agentId,
             grant_id: grantId,
+            certificate_id: certificateId,
             matched_on: authResult.matchedOn,
             policy_id: authResult.policyId,
             verification_status: verified ? 'verified' : 'unverified'
+        }
+    };
+}
+
+/**
+ * Process AAV API verification result
+ * Called when async AAV /verify call has completed
+ */
+function processAAVApiResult(aavApiResult, enforcementMode, agentId, grantId, certificateId) {
+    const isLogOnly = enforcementMode === 'log_only' || enforcementMode === 'warn';
+    
+    // Handle errors (timeout, unreachable)
+    if (!aavApiResult.success) {
+        if (isLogOnly) {
+            return {
+                rule: 'aav_authorization',
+                passed: true,
+                reason: `AAV verification failed (${aavApiResult.error}) - log_only mode, allowed`,
+                metadata: {
+                    enforcement_mode: enforcementMode,
+                    aav_error: aavApiResult.error,
+                    aav_message: aavApiResult.message,
+                    response_time_ms: aavApiResult.responseTime,
+                    warning: 'aav_verification_failed'
+                }
+            };
+        }
+        // Verify mode - fail closed
+        return {
+            rule: 'aav_authorization',
+            passed: false,
+            reason: `AAV: ${aavApiResult.message}`,
+            denial_source: 'aav',
+            metadata: {
+                enforcement_mode: enforcementMode,
+                aav_error: aavApiResult.error,
+                response_time_ms: aavApiResult.responseTime
+            }
+        };
+    }
+    
+    // Handle AAV denial
+    if (!aavApiResult.authorized && aavApiService.isDeniedResult(aavApiResult.result)) {
+        if (isLogOnly) {
+            return {
+                rule: 'aav_authorization',
+                passed: true,
+                reason: `AAV denied (${aavApiResult.result}: ${aavApiResult.denialReason}) - log_only mode, allowed`,
+                metadata: {
+                    enforcement_mode: enforcementMode,
+                    verification_id: aavApiResult.verificationId,
+                    agent_id: aavApiResult.agentId,
+                    grant_id: aavApiResult.grantId,
+                    aav_result: aavApiResult.result,
+                    denial_reason: aavApiResult.denialReason,
+                    warning: 'aav_denied'
+                }
+            };
+        }
+        return {
+            rule: 'aav_authorization',
+            passed: false,
+            reason: `AAV: ${aavApiResult.denialReason || aavApiResult.result}`,
+            denial_source: 'aav',
+            metadata: {
+                enforcement_mode: enforcementMode,
+                verification_id: aavApiResult.verificationId,
+                agent_id: aavApiResult.agentId,
+                grant_id: aavApiResult.grantId,
+                aav_result: aavApiResult.result,
+                denial_reason: aavApiResult.denialReason
+            }
+        };
+    }
+    
+    // Handle approval_pending
+    if (aavApiService.isApprovalPendingResult(aavApiResult.result)) {
+        if (isLogOnly) {
+            return {
+                rule: 'aav_authorization',
+                passed: true,
+                reason: 'AAV approval pending - log_only mode, allowed',
+                metadata: {
+                    enforcement_mode: enforcementMode,
+                    verification_id: aavApiResult.verificationId,
+                    aav_result: 'approval_pending',
+                    warning: 'aav_approval_pending'
+                }
+            };
+        }
+        return {
+            rule: 'aav_authorization',
+            passed: false,
+            reason: 'AAV: Agent requires human approval from AAV',
+            denial_source: 'aav',
+            metadata: {
+                enforcement_mode: enforcementMode,
+                verification_id: aavApiResult.verificationId,
+                aav_result: 'approval_pending'
+            }
+        };
+    }
+    
+    // Success - AAV authorized
+    return {
+        rule: 'aav_authorization',
+        passed: true,
+        reason: `AAV authorized (${aavApiResult.verificationId})`,
+        metadata: {
+            enforcement_mode: enforcementMode,
+            verification_id: aavApiResult.verificationId,
+            agent_id: aavApiResult.agentId || agentId,
+            grant_id: aavApiResult.grantId || grantId,
+            certificate_id: certificateId,
+            autonomy_level: aavApiResult.autonomyLevel,
+            aav_result: aavApiResult.result,
+            daily_spend: aavApiResult.dailySpend,
+            response_time_ms: aavApiResult.responseTime
         }
     };
 }

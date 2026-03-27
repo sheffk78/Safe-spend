@@ -1,0 +1,115 @@
+{
+  "summary": "AAV (Agent Authority Vault) Integration V2 testing completed. All 26 backend tests passed. Verified: escrow accounts with new AAV fields (aav_api_key, aav_require_certificate), policies with new AAV fields (aav_required_autonomy_level, aav_map_vendors, aav_map_limits, aav_required_actions), spend requests with AAV claims (aav_certificate_id, aav_verification_id, denial_source), enforcement modes (verify=fail-closed, log_only=fail-open, none=skip), certificate requirement enforcement, and local agent_id/grant_id authorization check.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_coverage": {
+    "escrow_aav_fields": {
+      "tests": 5,
+      "passed": 5,
+      "details": [
+        "T1.1: Create escrow with all AAV fields (aav_enabled, aav_enforcement_mode, aav_api_key, aav_require_certificate, authorized_agent_ids) - PASS",
+        "T1.2: Create escrow with log_only mode - PASS",
+        "T1.3: Create escrow with verify mode - PASS",
+        "T1.4: AAV API key not exposed in response (only aav_api_key_configured flag) - PASS",
+        "T1.5: Invalid enforcement mode rejected - PASS"
+      ]
+    },
+    "policy_aav_fields": {
+      "tests": 6,
+      "passed": 6,
+      "details": [
+        "T2.1: Create policy with aav_required_autonomy_level - PASS",
+        "T2.2: Create policy with aav_map_vendors - PASS",
+        "T2.3: Create policy with aav_map_limits - PASS",
+        "T2.4: Create policy with aav_required_actions - PASS",
+        "T2.5: Create policy with all AAV fields - PASS",
+        "T2.6: Invalid autonomy level (5) rejected - PASS"
+      ]
+    },
+    "spend_aav_claims": {
+      "tests": 2,
+      "passed": 2,
+      "details": [
+        "T3.1: Spend with aav_certificate_id in body - PASS",
+        "T3.2: Spend response includes aav_agent_id, aav_grant_id, aav_verification_status - PASS"
+      ]
+    },
+    "enforcement_modes": {
+      "tests": 4,
+      "passed": 4,
+      "details": [
+        "T4.1: Verify mode denies unauthorized agent (fail-closed) - PASS",
+        "T4.2: Verify mode allows authorized agent - PASS",
+        "T4.3: Log_only mode allows unauthorized agent with warning (fail-open) - PASS",
+        "T4.4: None mode skips AAV check entirely - PASS"
+      ]
+    },
+    "certificate_requirement": {
+      "tests": 3,
+      "passed": 3,
+      "details": [
+        "T5.1: Certificate required but not provided - denied (verify mode) - PASS",
+        "T5.2: Certificate required and provided - allowed - PASS",
+        "T5.3: Certificate required but log_only mode - allowed with warning - PASS"
+      ]
+    },
+    "denial_source": {
+      "tests": 2,
+      "passed": 2,
+      "details": [
+        "T6.1: denial_source is 'aav' for agent authorization denial - PASS",
+        "T6.2: denial_source is 'policy' for policy limit denial - PASS"
+      ]
+    },
+    "x_aav_headers": {
+      "tests": 2,
+      "passed": 2,
+      "details": [
+        "T7.1: X-AAV-Agent-Id header extracted - PASS",
+        "T7.2: X-AAV-Grant-Id header extracted - PASS"
+      ]
+    },
+    "rules_engine_aav_step": {
+      "tests": 2,
+      "passed": 2,
+      "details": [
+        "T8.1: aav_authorization in rules_evaluated (Step 2.5) - PASS",
+        "T8.2: AAV rule metadata includes enforcement_mode - PASS"
+      ]
+    }
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_aav_integration_v2.py",
+    "/app/test_reports/pytest/pytest_aav_integration_v2.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "AAV API key is properly hidden in responses (only aav_api_key_configured boolean exposed)",
+    "Enforcement modes correctly implemented: verify=fail-closed, log_only=fail-open, none=skip",
+    "Certificate requirement properly enforced based on enforcement mode",
+    "denial_source field correctly differentiates AAV vs policy denials",
+    "Rules engine Step 2.5 (aav_authorization) correctly positioned after escrow_account_check"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_aav_integration_v2.py"
+  ],
+  "success_rate": {
+    "backend": "100% (26/26 tests passed)",
+    "frontend": "N/A (backend only testing requested)"
+  },
+  "test_credentials": {
+    "note": "Tests create unique users via POST /api/v1/auth/signup"
+  },
+  "seed_data_creation": "Tests create and cleanup escrow accounts and policies with AAV settings",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "AAV V2 integration fully tested. Key findings: 1) All new AAV fields work correctly on escrow accounts (aav_api_key, aav_require_certificate) and policies (aav_required_autonomy_level, aav_map_vendors, aav_map_limits, aav_required_actions). 2) Enforcement modes work as expected: verify=fail-closed, log_only=fail-open, none=skip. 3) Certificate requirement is enforced in verify mode but allowed with warning in log_only mode. 4) denial_source field correctly identifies AAV vs policy denials. 5) AAV /verify API calls are MOCKED since no real AAV API key is configured - the system falls back to local agent_id matching.",
+  "mocked_api_note": "AAV /verify endpoint calls are MOCKED - requires real aav_live_sk_... key from agentictrust.app. The mockAAVVerification function in aav-api-service.js can be used for testing. Current implementation falls back to local agent_id/grant_id matching when no AAV API key is configured."
+}

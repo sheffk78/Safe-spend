@@ -9,6 +9,7 @@ const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('
 const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('../services/security-alerts');
 const { sendApprovalNotification } = require('../services/approval-notification-service');
 const { extractAAVClaims } = require('../services/aav-service');
+const aavApiService = require('../services/aav-api-service');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -33,8 +34,9 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             category,
             description,
             idempotency_key,
-            aav_agent_id,      // AAV agent identifier
-            aav_grant_id,      // AAV grant identifier
+            aav_agent_id,        // AAV agent identifier
+            aav_grant_id,        // AAV grant identifier
+            aav_certificate_id,  // AAV certificate (new per spec)
             metadata = {}
         } = req.body;
         
@@ -46,6 +48,21 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             aavClaims.agent_id = aav_agent_id;
             aavClaims.grant_id = aav_grant_id;
             aavClaims.source = 'body';
+        }
+        
+        // Add certificate_id from body if not in headers
+        if (!aavClaims.certificate_id && aav_certificate_id) {
+            aavClaims.certificate_id = aav_certificate_id;
+        }
+        
+        // Fallback to API key's AAV settings if set
+        if (req.apiKey) {
+            if (!aavClaims.agent_id && req.apiKey.aavAgentId) {
+                aavClaims.agent_id = req.apiKey.aavAgentId;
+            }
+            if (!aavClaims.certificate_id && req.apiKey.aavCertificateId) {
+                aavClaims.certificate_id = req.apiKey.aavCertificateId;
+            }
         }
         
         // Check for injection attempts in input fields
@@ -167,6 +184,27 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             activeDays: parseJson(p.activeDays, ['mon', 'tue', 'wed', 'thu', 'fri'])
         }));
         
+        // === AAV API VERIFICATION ===
+        // If AAV is enabled and has an API key, call AAV /verify endpoint
+        let aavApiResult = null;
+        if (escrowAccount.aavEnabled && escrowAccount.aavApiKey) {
+            const enforcementMode = escrowAccount.aavEnforcementMode || 'verify';
+            
+            // Only make API call if enforcement is active
+            if (enforcementMode !== 'none') {
+                aavApiResult = await aavApiService.verifyWithAAV({
+                    aavApiKey: escrowAccount.aavApiKey,
+                    certificateId: aavClaims.certificate_id,
+                    agentId: aavClaims.agent_id,
+                    amountDollars: validatedAmountCents / 100, // Convert cents to dollars
+                    currency: currency.toUpperCase(),
+                    vendor,
+                    description,
+                    requestedAction: 'purchase_service'
+                });
+            }
+        }
+        
         // Get date boundaries for tracking
         const timezone = parsedPolicies[0]?.activeTimezone || 'UTC';
         const { today, weekStart, monthStart } = getDateBoundaries(currentTime, timezone);
@@ -203,7 +241,8 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             },
             currentTime,
             existingRequest,
-            aavClaims  // AAV claims for agent authorization
+            aavClaims,      // AAV claims for agent authorization
+            aavApiResult    // Result from AAV /verify API call (if made)
         };
         
         // Run the 13-step rules engine
@@ -216,6 +255,13 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         
         // Handle denial
         if (result.status === 'denied') {
+            // Find the AAV rule result for denial_source
+            const aavRule = result.rulesEvaluated.find(r => r.rule === 'aav_authorization');
+            const denialSource = aavRule?.denial_source || 
+                (result.denialReason?.includes('AAV') ? 'aav' : 
+                 result.denialReason?.includes('balance') ? 'balance' :
+                 result.denialReason?.includes('escrow') ? 'account' : 'policy');
+            
             const deniedRequest = await createDeniedSpendRequest({
                 escrowId: escrow_id,
                 orgId: req.org.id,
@@ -228,13 +274,22 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 idempotencyKey: idempotency_key,
                 denialReason: result.denialReason,
                 denialRuleId: result.denialRuleId,
+                denialSource,
                 rulesEvaluated: result.rulesEvaluated,
                 balanceBeforeCents: escrowAccount.balanceCents,
                 metadata,
-                // AAV fields
-                aavAgentId: aavClaims?.agent_id,
-                aavGrantId: aavClaims?.grant_id,
-                aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
+                // AAV fields - enhanced
+                aavAgentId: aavClaims?.agent_id || aavApiResult?.agentId,
+                aavGrantId: aavClaims?.grant_id || aavApiResult?.grantId,
+                aavCertificateId: aavClaims?.certificate_id,
+                aavVerificationStatus: aavApiResult?.success ? 
+                    (aavApiResult.authorized ? 'verified' : 'denied') :
+                    (aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null),
+                aavVerificationId: aavApiResult?.verificationId,
+                aavAutonomyLevel: aavApiResult?.autonomyLevel,
+                aavResult: aavApiResult?.result,
+                aavDailySpend: aavApiResult?.dailySpend ? JSON.stringify(aavApiResult.dailySpend) : null,
+                aavCheckedAt: aavApiResult?.success ? new Date() : null
             });
             
             // Track consecutive denials for runaway detection
@@ -674,13 +729,20 @@ async function createDeniedSpendRequest(data) {
             resolvedBy: 'system',
             denialReason: data.denialReason,
             denialRuleId: data.denialRuleId,
+            denialSource: data.denialSource || null,
             rulesEvaluated: JSON.stringify(data.rulesEvaluated || []),
             balanceBeforeCents: data.balanceBeforeCents,
             metadata: JSON.stringify(data.metadata || {}),
-            // AAV fields
+            // AAV fields - enhanced per spec
             aavAgentId: data.aavAgentId || null,
             aavGrantId: data.aavGrantId || null,
-            aavVerificationStatus: data.aavVerificationStatus || null
+            aavCertificateId: data.aavCertificateId || null,
+            aavVerificationStatus: data.aavVerificationStatus || null,
+            aavVerificationId: data.aavVerificationId || null,
+            aavAutonomyLevel: data.aavAutonomyLevel || null,
+            aavResult: data.aavResult || null,
+            aavDailySpend: data.aavDailySpend || null,
+            aavCheckedAt: data.aavCheckedAt || null
         }
     });
 }
