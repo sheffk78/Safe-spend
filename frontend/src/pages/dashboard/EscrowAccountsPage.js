@@ -426,8 +426,11 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
     const [description, setDescription] = useState('');
     const [initialFunding, setInitialFunding] = useState('');
     const [aavEnabled, setAavEnabled] = useState(false);
-    const [aavEnforcementMode, setAavEnforcementMode] = useState('warn');
+    const [aavEnforcementMode, setAavEnforcementMode] = useState('log_only');
     const [agentIdsInput, setAgentIdsInput] = useState('');
+    const [aavApiKey, setAavApiKey] = useState('');
+    const [aavRequireCertificate, setAavRequireCertificate] = useState(false);
+    const [showApiKey, setShowApiKey] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -448,7 +451,9 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                 description,
                 aav_enabled: aavEnabled,
                 aav_enforcement_mode: aavEnabled ? aavEnforcementMode : undefined,
-                authorized_agent_ids: aavEnabled && authorizedAgentIds.length > 0 ? authorizedAgentIds : undefined
+                authorized_agent_ids: aavEnabled && authorizedAgentIds.length > 0 ? authorizedAgentIds : undefined,
+                aav_api_key: aavEnabled && aavApiKey ? aavApiKey : undefined,
+                aav_require_certificate: aavEnabled ? aavRequireCertificate : undefined
             });
             
             // Fund if initial amount provided
@@ -567,29 +572,60 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                     <div className="flex gap-2">
                                         <button
                                             type="button"
-                                            onClick={() => setAavEnforcementMode('warn')}
+                                            onClick={() => setAavEnforcementMode('log_only')}
                                             className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                                                aavEnforcementMode === 'warn'
+                                                aavEnforcementMode === 'log_only'
                                                     ? 'bg-amber-500/20 border border-amber-500/50 text-amber-400'
                                                     : 'bg-ss-elevated border border-[rgba(255,255,255,0.1)] text-ss-text-secondary hover:text-ss-text'
                                             }`}
-                                            data-testid="aav-mode-warn"
+                                            data-testid="aav-mode-log-only"
                                         >
-                                            Warn (Log Only)
+                                            Log Only
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setAavEnforcementMode('strict')}
+                                            onClick={() => setAavEnforcementMode('verify')}
                                             className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                                                aavEnforcementMode === 'strict'
+                                                aavEnforcementMode === 'verify'
                                                     ? 'bg-red-500/20 border border-red-500/50 text-red-400'
                                                     : 'bg-ss-elevated border border-[rgba(255,255,255,0.1)] text-ss-text-secondary hover:text-ss-text'
                                             }`}
-                                            data-testid="aav-mode-strict"
+                                            data-testid="aav-mode-verify"
                                         >
-                                            Strict (Block)
+                                            Verify (Strict)
                                         </button>
                                     </div>
+                                    <p className="text-[11px] text-ss-text-tertiary mt-1">
+                                        {aavEnforcementMode === 'log_only' 
+                                            ? 'Check AAV but allow if unauthorized (for testing)' 
+                                            : 'Require AAV authorization - deny if check fails'}
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-xs font-medium text-ss-text-secondary mb-1.5">
+                                        AAV API Key <span className="text-ss-text-tertiary">(optional)</span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={showApiKey ? 'text' : 'password'}
+                                            value={aavApiKey}
+                                            onChange={(e) => setAavApiKey(e.target.value)}
+                                            placeholder="aav_live_sk_..."
+                                            className="w-full px-3 py-2 pr-10 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-blue-500"
+                                            data-testid="aav-api-key-input"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowApiKey(!showApiKey)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-ss-text-tertiary hover:text-ss-text"
+                                        >
+                                            {showApiKey ? <X size={14} /> : <Key size={14} />}
+                                        </button>
+                                    </div>
+                                    <p className="text-[11px] text-ss-text-tertiary mt-1">
+                                        Get from <a href="https://agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">agentictrust.app</a> for server-to-server verification
+                                    </p>
                                 </div>
                                 
                                 <div>
@@ -600,11 +636,31 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                         type="text"
                                         value={agentIdsInput}
                                         onChange={(e) => setAgentIdsInput(e.target.value)}
-                                        placeholder="agent-1, agent-2, marketing-bot"
+                                        placeholder="agent_xyz123, agent_abc456"
                                         className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-blue-500"
                                         data-testid="authorized-agents-input"
                                     />
-                                    <p className="text-[11px] text-ss-text-tertiary mt-1">Comma-separated list of agent identifiers</p>
+                                    <p className="text-[11px] text-ss-text-tertiary mt-1">Comma-separated list of AAV agent identifiers</p>
+                                </div>
+                                
+                                <div className="flex items-center justify-between py-2">
+                                    <div>
+                                        <span className="text-xs font-medium text-ss-text">Require Certificate</span>
+                                        <p className="text-[11px] text-ss-text-tertiary">Agents must present a valid AAV certificate</p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={aavRequireCertificate}
+                                            onChange={(e) => setAavRequireCertificate(e.target.checked)}
+                                            className="sr-only peer"
+                                            data-testid="aav-require-cert-toggle"
+                                        />
+                                        <div 
+                                            onClick={() => setAavRequireCertificate(!aavRequireCertificate)}
+                                            className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
+                                        ></div>
+                                    </label>
                                 </div>
                             </div>
                         )}

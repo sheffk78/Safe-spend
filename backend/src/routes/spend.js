@@ -5,7 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const { spendRateLimiter } = require('../middleware/rate-limit');
 const { evaluateSpendRequest } = require('../services/rules-engine');
 const { getDateBoundaries } = require('../services/rules-helpers');
-const { queueWebhooks, buildSpendEventData, buildApprovalEventData } = require('../services/webhook-service');
+const { queueWebhooks, buildSpendEventData, buildApprovalEventData, buildAAVEventData } = require('../services/webhook-service');
 const { detectInjection, trackInjectionAttempt, trackRunawayLoop } = require('../services/security-alerts');
 const { sendApprovalNotification } = require('../services/approval-notification-service');
 const { extractAAVClaims } = require('../services/aav-service');
@@ -202,6 +202,25 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     description,
                     requestedAction: 'purchase_service'
                 });
+                
+                // Queue AAV webhooks based on result
+                if (aavApiResult) {
+                    const aavEventData = buildAAVEventData(
+                        { id: idempotency_key || 'pending', escrowId: escrow_id, orgId: req.org.id, amountCents: validatedAmountCents, currency, vendor, aavAgentId: aavClaims.agent_id, aavGrantId: aavClaims.grant_id, aavCertificateId: aavClaims.certificate_id, aavVerificationStatus: aavApiResult.success ? (aavApiResult.authorized ? 'verified' : 'denied') : 'error' },
+                        escrowAccount,
+                        aavApiResult
+                    );
+                    
+                    if (!aavApiResult.success) {
+                        // AAV API error (timeout, unreachable)
+                        queueWebhooks(req.org.id, 'aav.verification_failed', aavEventData);
+                    } else if (aavApiResult.authorized) {
+                        queueWebhooks(req.org.id, 'aav.verification_passed', aavEventData);
+                    } else {
+                        // AAV denied (denied, approval_pending, etc.)
+                        queueWebhooks(req.org.id, 'aav.verification_denied', aavEventData);
+                    }
+                }
             }
         }
         

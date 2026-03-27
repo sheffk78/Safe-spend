@@ -30,7 +30,11 @@ const SUPPORTED_EVENTS = [
     'escrow.funded',
     'escrow.paused',
     'escrow.resumed',
-    'escrow.closed'
+    'escrow.closed',
+    // AAV Integration Events
+    'aav.verification_passed',
+    'aav.verification_denied',
+    'aav.verification_failed'
 ];
 
 const MAX_RETRY_ATTEMPTS = 10;
@@ -133,6 +137,33 @@ function buildApprovalEventData(approval, spendRequest, escrowAccount) {
         category: spendRequest.category,
         status: spendRequest.status,
         approval_expires_at: approval.expiresAt?.toISOString()
+    };
+}
+
+/**
+ * Build AAV verification event data
+ */
+function buildAAVEventData(spendRequest, escrowAccount, aavResult) {
+    return {
+        spend_request_id: spendRequest.id,
+        escrow_id: spendRequest.escrowId,
+        org_id: spendRequest.orgId,
+        amount_cents: spendRequest.amountCents,
+        currency: spendRequest.currency || 'usd',
+        vendor: spendRequest.vendor,
+        aav: {
+            agent_id: aavResult?.agentId || spendRequest.aavAgentId,
+            grant_id: aavResult?.grantId || spendRequest.aavGrantId,
+            certificate_id: spendRequest.aavCertificateId,
+            verification_id: aavResult?.verificationId,
+            verification_status: spendRequest.aavVerificationStatus,
+            autonomy_level: aavResult?.autonomyLevel,
+            result: aavResult?.result,
+            denial_reason: aavResult?.denialReason,
+            response_time_ms: aavResult?.responseTime,
+            error: aavResult?.error
+        },
+        escrow_enforcement_mode: escrowAccount?.aavEnforcementMode
     };
 }
 
@@ -378,6 +409,7 @@ module.exports = {
     buildPayload,
     buildSpendEventData,
     buildApprovalEventData,
+    buildAAVEventData,
     queueWebhooks,
     deliverWebhook,
     processPendingDeliveries,

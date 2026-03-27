@@ -8,7 +8,7 @@
  * if an agent is authorized to perform spending actions.
  */
 
-const logger = require('../lib/logger');
+const { logger } = require('../lib/logger');
 
 const AAV_BASE_URL = 'https://api.agentictrust.app/v1';
 const AAV_TIMEOUT_MS = 3000; // 3 second timeout as per spec
