@@ -1831,3 +1831,112 @@ curl -X POST "$API/api/admin/keys" \
 curl "$API/api/admin/metrics/overview" \
   -H "Authorization: Bearer $ADMIN_KEY"
 ```
+
+
+---
+
+### Admin Dashboard UI (Completed - March 27, 2026)
+
+#### Overview
+Built a comprehensive Admin Dashboard UI using the new API key authentication system. Replaced the legacy email/password admin authentication with the `ss_admin_...` API key format defined in the Admin API spec.
+
+#### Authentication
+- Single input field for admin key (`ss_admin_...` format)
+- Key format validation before API call
+- Session persistence via localStorage
+- Protected routes redirect to login
+
+#### Pages Implemented
+
+**1. Admin Login (`/admin/login`)**
+- API key input with format validation
+- Warning banner for internal access
+- Redirect to dashboard on success
+
+**2. Overview (`/admin`)**
+- Service status pills (Database, Stripe, Uptime)
+- Stats cards (Organizations, Active Escrows, Spend Requests, Pending Approvals, Total Balance, API Keys)
+- Recent Activity feed with event types
+- Quick links to detailed pages
+
+**3. System Health (`/admin/health`)**
+- Database status card with latency
+- Stripe configuration status
+- Application card with version, uptime, memory usage
+- Error log table with time range filters (1h, 6h, 24h, 7d)
+- Expandable error details with stack traces
+
+**4. Blog Manager (`/admin/blog`)**
+- Posts table with status, published date, tags
+- Status filters (All, Published, Draft, Archived)
+- Search functionality
+- Quick actions: View, Publish/Unpublish, Edit, Delete
+- "New Post" navigation to editor
+
+**5. Blog Editor (`/admin/blog/new`, `/admin/blog/edit/:id`)**
+- Title with auto-generated URL slug
+- Subtitle input
+- Full markdown content editor
+- Preview mode toggle
+- Post Settings sidebar:
+  - URL Slug
+  - Author
+  - Cover Image URL
+  - Tags (comma-separated)
+  - Excerpt (with auto-generate option)
+  - SEO Meta Title & Description
+- Save Draft / Publish buttons
+
+**6. Metrics (`/admin/metrics`)**
+- Organizations card with weekly/monthly growth
+- Total Balance and Escrow stats
+- Spend Requests breakdown
+- API Keys by type (live, test, agent)
+- Approval Breakdown with progress bars
+- Stripe Integration status
+
+**7. Audit Log (`/admin/audit`)**
+- Events table with expandable details
+- Filters: Event Type, Actor Type, Organization ID
+- Pagination (50 per page)
+- Event type badges with color coding
+
+**8. Admin Keys (`/admin/keys`)**
+- Keys table with prefix, label, scopes, created, last used
+- Create Key modal with scope selection
+- Scope options: Health, Blog, Metrics, Audit, Keys, Superadmin (*)
+- Revoke key functionality
+- New key display with copy button (shown only once)
+- Help section about admin keys
+
+#### Layout & Navigation
+- Sidebar with navigation items (icons from @heroicons/react)
+- Mobile-responsive with hamburger menu
+- Key label displayed in footer
+- "Back to Site" link
+- Logout button
+
+#### Files Created
+- `/app/frontend/src/pages/admin/AdminLoginPage.js`
+- `/app/frontend/src/pages/admin/AdminOverviewPage.js`
+- `/app/frontend/src/pages/admin/AdminHealthPage.js`
+- `/app/frontend/src/pages/admin/AdminBlogPage.js`
+- `/app/frontend/src/pages/admin/AdminBlogEditorPage.js`
+- `/app/frontend/src/pages/admin/AdminMetricsPage.js`
+- `/app/frontend/src/pages/admin/AdminAuditPage.js`
+- `/app/frontend/src/pages/admin/AdminKeysPage.js`
+- `/app/frontend/src/layouts/AdminLayout.js` (rewritten)
+- `/app/frontend/src/contexts/AdminContext.js` (new API key auth)
+
+#### Files Updated
+- `/app/frontend/src/App.js` - Updated admin routes
+- `/app/frontend/package.json` - Added @heroicons/react
+
+#### Test Results
+- All pages tested via testing_agent_v3_fork (iteration 22)
+- 100% pass rate (login, navigation, CRUD, filters, modals)
+- Bug fixed: Author field displaying [object Object] in editor
+
+#### Access
+- Admin Login: `/admin/login`
+- Admin Dashboard: `/admin` (requires ss_admin_... key)
