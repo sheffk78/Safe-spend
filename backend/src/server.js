@@ -222,7 +222,9 @@ app.use('/api/v1/internal/events', internalEventsRoutes);
 app.use('/api/v1/org', writeRateLimiter, orgLinkRoutes);
 
 // Control Plane API (for agentictrust.app)
-app.use('/api/v1/control-plane', standardApiRateLimiter, controlPlaneRoutes);
+// GET /v1/org/:org_id/summary — mounted directly
+// GET /v1/agents/:agent_id/card-data — added to agents router below
+app.use('/api/v1', standardApiRateLimiter, controlPlaneRoutes);
 
 // ============================================
 // Static File Serving (Uploaded Images)

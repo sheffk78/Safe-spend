@@ -10,7 +10,9 @@
 
 const { logger } = require('../lib/logger');
 
-const AAV_BASE_URL = 'https://api.agentictrust.app/v1';
+const AAV_BASE_URL = process.env.AAV_API_URL 
+    ? `${process.env.AAV_API_URL}/api/v1` 
+    : 'https://agentauthority.dev/api/v1';
 const AAV_TIMEOUT_MS = 3000; // 3 second timeout as per spec
 
 /**

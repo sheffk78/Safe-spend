@@ -11,6 +11,8 @@ const {
     verifyActionToken, 
     sendApprovalNotification 
 } = require('../services/approval-notification-service');
+const { reportSpendExpired } = require('../services/arl-service');
+const { emitSpendExpired } = require('../services/cross-tool-events');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -536,6 +538,20 @@ router.post('/expire-stale', requireOrgAuth, async (req, res) => {
                     updatedSpendRequest,
                     escrow
                 ));
+                
+                // ARL outcome reporting (async, fire-and-forget)
+                const agentId = approval.spendRequest.agentId || approval.spendRequest.aavAgentId;
+                if (agentId) {
+                    reportSpendExpired(agentId);
+                }
+                
+                // Cross-tool event emission
+                emitSpendExpired(approval.orgId, agentId, {
+                    spend_request_id: approval.spendRequestId,
+                    escrow_id: approval.spendRequest.escrowId,
+                    amount_cents: approval.spendRequest.amountCents,
+                    vendor: approval.spendRequest.vendor
+                }).catch(() => {});
                 
                 results.push({ approval_id: approval.id, status: 'expired' });
             } catch (err) {

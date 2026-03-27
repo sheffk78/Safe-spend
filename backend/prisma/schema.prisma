@@ -324,6 +324,7 @@ model SpendRequest {
   approvals     Approval[]
 
   @@map("spend_requests")
+  @@index([agentId])
 }
 
 // Approvals

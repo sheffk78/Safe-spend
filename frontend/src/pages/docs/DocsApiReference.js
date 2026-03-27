@@ -411,10 +411,10 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>Organization Summary</DocsHeading>
-            <ApiEndpoint method="GET" path="/v1/control-plane/org/{org_id}/summary" description="Aggregated org statistics" />
+            <ApiEndpoint method="GET" path="/v1/org/{org_id}/summary" description="Aggregated org statistics" />
 
             <DocsHeading level={3}>Agent Card Data</DocsHeading>
-            <ApiEndpoint method="GET" path="/v1/control-plane/agents/{agent_id}/card-data" description="Agent financial card for control plane" />
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/card-data" description="Agent financial card for control plane" />
 
             {/* Organization Linking */}
             <DocsHeading level={2} id="org-linking">Organization Linking</DocsHeading>

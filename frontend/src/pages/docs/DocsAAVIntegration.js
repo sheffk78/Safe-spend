@@ -841,7 +841,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
                 (<InlineCode>agentictrust.app</InlineCode>) for Agent Card data and dashboard statistics.
             </DocsText>
 
-            <ApiEndpoint method="GET" path="/v1/control-plane/org/{org_id}/summary" />
+            <ApiEndpoint method="GET" path="/v1/org/{org_id}/summary" />
             <CodeBlock
                 language="json"
                 title="Org summary response"
@@ -856,7 +856,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
 }`}
             />
 
-            <ApiEndpoint method="GET" path="/v1/control-plane/agents/{agent_id}/card-data" />
+            <ApiEndpoint method="GET" path="/v1/agents/{agent_id}/card-data" />
             <CodeBlock
                 language="json"
                 title="Agent card-data response"

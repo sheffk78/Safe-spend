@@ -59,8 +59,8 @@ Safe-Spend is a fiat-first escrow and spending-control API for AI agents. The pl
 - `POST /api/v1/internal/events` (HMAC auth)
 - `POST /api/v1/org/link`
 - `GET /api/v1/org/link`
-- `GET /api/v1/control-plane/org/{org_id}/summary`
-- `GET /api/v1/control-plane/agents/{agent_id}/card-data`
+- `GET /api/v1/org/{org_id}/summary` (Control Plane)
+- `GET /api/v1/agents/{agent_id}/card-data` (Control Plane)
 
 ## Database Models (New)
 - `AgentCertificate` — Maps agent_id to certificate_id

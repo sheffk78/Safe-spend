@@ -51,6 +51,14 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             });
         }
         
+        // agent_id is required when AAV integration is enabled
+        if (process.env.AAV_ENABLED === 'true' && !agent_id && !aav_agent_id) {
+            return res.status(400).json({
+                error: 'agent_id_required',
+                message: 'agent_id is required when AAV integration is enabled'
+            });
+        }
+        
         // Extract AAV claims from headers or body
         const aavClaims = extractAAVClaims(req);
         
@@ -195,6 +203,17 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 denial_reason: 'escrow_not_found',
                 error: 'Escrow account not found',
                 rules_evaluated: [{ rule: 'escrow_account_check', passed: false, reason: 'Escrow account not found' }]
+            });
+        }
+        
+        // Agent-scoped escrow enforcement:
+        // If escrow has an agent_id set, only that agent can spend from it
+        if (escrowAccount.agentId && agent_id && escrowAccount.agentId !== agent_id) {
+            return res.status(403).json({
+                status: 'denied',
+                denial_reason: 'agent_mismatch',
+                error: `This escrow is linked to agent ${escrowAccount.agentId} and cannot be used by agent ${agent_id}`,
+                rules_evaluated: [{ rule: 'agent_escrow_check', passed: false, reason: `Escrow linked to ${escrowAccount.agentId}, not ${agent_id}` }]
             });
         }
         
