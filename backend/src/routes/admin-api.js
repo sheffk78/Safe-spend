@@ -14,6 +14,10 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 const adminKeyService = require('../services/admin-key-service');
 const errorLogService = require('../services/error-log-service');
 const blogService = require('../services/blog-service');
@@ -22,6 +26,40 @@ const prisma = new PrismaClient();
 
 // Track server start time for uptime
 const SERVER_START_TIME = Date.now();
+
+// Configure multer for image uploads
+const UPLOAD_DIR = path.join(__dirname, '../../uploads/blog-images');
+
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, UPLOAD_DIR);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = `${Date.now()}_${crypto.randomBytes(8).toString('hex')}`;
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `${uniqueSuffix}${ext}`);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'), false);
+    }
+};
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
 
 // =====================================================
 // MIDDLEWARE
@@ -708,6 +746,116 @@ router.post('/blog/posts/:id/unpublish', requireAdminScope('blog'), async (req, 
                 message: 'Failed to unpublish post'
             }
         });
+    }
+});
+
+// =====================================================
+// BLOG IMAGE ENDPOINTS (scope: blog)
+// =====================================================
+
+/**
+ * POST /admin/blog/images
+ * Upload an image for blog posts
+ */
+router.post('/blog/images', requireAdminScope('blog'), upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ 
+                error: { 
+                    code: 'NO_FILE', 
+                    message: 'No image file provided. Use form field name "image".' 
+                } 
+            });
+        }
+
+        // Build URL from request or env
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+        const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+        const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+        const imageUrl = `${baseUrl}/api/uploads/blog-images/${req.file.filename}`;
+        
+        console.log(`[ADMIN AUDIT] Blog image uploaded: ${req.file.filename} by ${req.adminKey.id}`);
+
+        res.status(201).json({
+            success: true,
+            image: {
+                url: imageUrl,
+                filename: req.file.filename,
+                originalName: req.file.originalname,
+                size: req.file.size,
+                mimeType: req.file.mimetype
+            }
+        });
+    } catch (error) {
+        console.error('Image upload error:', error);
+        res.status(500).json({ 
+            error: { 
+                code: 'UPLOAD_FAILED', 
+                message: error.message || 'Failed to upload image' 
+            } 
+        });
+    }
+});
+
+/**
+ * GET /admin/blog/images
+ * List all uploaded blog images
+ */
+router.get('/blog/images', requireAdminScope('blog'), async (req, res) => {
+    try {
+        const files = fs.readdirSync(UPLOAD_DIR);
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+        const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+        const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+        
+        const images = files
+            .filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f))
+            .map(filename => {
+                const filePath = path.join(UPLOAD_DIR, filename);
+                const stats = fs.statSync(filePath);
+                return {
+                    filename,
+                    url: `${baseUrl}/api/uploads/blog-images/${filename}`,
+                    size: stats.size,
+                    uploadedAt: stats.mtime.toISOString()
+                };
+            })
+            .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        
+        res.json({ images, total: images.length });
+    } catch (error) {
+        console.error('List images error:', error);
+        res.status(500).json({ error: { code: 'LIST_ERROR', message: 'Failed to list images' } });
+    }
+});
+
+/**
+ * DELETE /admin/blog/images/:filename
+ * Delete an uploaded image
+ */
+router.delete('/blog/images/:filename', requireAdminScope('blog'), async (req, res) => {
+    try {
+        const filename = req.params.filename;
+        const filePath = path.join(UPLOAD_DIR, filename);
+        
+        // Security: prevent path traversal
+        const realPath = path.resolve(filePath);
+        if (!realPath.startsWith(path.resolve(UPLOAD_DIR))) {
+            return res.status(400).json({ error: { code: 'INVALID_PATH', message: 'Invalid filename' } });
+        }
+        
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Image not found' } });
+        }
+        
+        fs.unlinkSync(filePath);
+        
+        console.log(`[ADMIN AUDIT] Blog image deleted: ${filename} by ${req.adminKey.id}`);
+        
+        res.json({ success: true, message: 'Image deleted' });
+    } catch (error) {
+        console.error('Delete image error:', error);
+        res.status(500).json({ error: { code: 'DELETE_ERROR', message: 'Failed to delete image' } });
     }
 });
 

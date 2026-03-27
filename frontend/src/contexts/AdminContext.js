@@ -113,9 +113,13 @@ export const AdminProvider = ({ children }) => {
 
     // API fetch helper with auth
     const adminFetch = async (endpoint, options = {}) => {
+        const isFormData = options.body instanceof FormData;
+        
         const headers = {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${adminKey}`,
+            // Only set Content-Type for non-FormData requests
+            // FormData needs browser to set it with boundary
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             ...options.headers
         };
         

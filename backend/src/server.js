@@ -166,6 +166,12 @@ app.use('/api/v1/exports', exportsRoutes);
 app.use('/api/v1/settings/aav', aavSettingsRoutes);
 
 // ============================================
+// Static File Serving (Uploaded Images)
+// ============================================
+const path = require('path');
+app.use('/api/uploads/blog-images', express.static(path.join(__dirname, '../uploads/blog-images')));
+
+// ============================================
 // Admin Routes (Separate auth system)
 // ============================================
 app.use('/api/admin/auth', authRateLimiter, adminAuthRoutes);

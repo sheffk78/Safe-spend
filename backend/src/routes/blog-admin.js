@@ -5,6 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 const blogService = require('../services/blog-service');
 const adminKeyService = require('../services/admin-key-service');
 const { requireAdmin } = require('../middleware/admin-auth');
@@ -13,6 +17,44 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
+
+// Configure multer for image uploads
+const UPLOAD_DIR = path.join(__dirname, '../../uploads/blog-images');
+
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, UPLOAD_DIR);
+    },
+    filename: (req, file, cb) => {
+        // Generate unique filename: timestamp_randomhex.ext
+        const uniqueSuffix = `${Date.now()}_${crypto.randomBytes(8).toString('hex')}`;
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `${uniqueSuffix}${ext}`);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // Accept only images
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'), false);
+    }
+};
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
 
 /**
  * Admin authentication middleware
@@ -199,6 +241,108 @@ router.post('/posts/:id/unpublish', requireAdminAuth, async (req, res) => {
     } catch (error) {
         console.error('Error unpublishing blog post:', error);
         res.status(500).json({ error: 'Failed to unpublish post' });
+    }
+});
+
+/**
+ * POST /api/admin/blog/images
+ * Upload an image for blog posts
+ * Returns the URL to the uploaded image
+ */
+router.post('/images', requireAdminAuth, upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ 
+                error: { 
+                    code: 'NO_FILE', 
+                    message: 'No image file provided' 
+                } 
+            });
+        }
+
+        // Build the public URL for the uploaded image
+        const baseUrl = process.env.REACT_APP_BACKEND_URL || process.env.BASE_URL || '';
+        const imageUrl = `${baseUrl}/api/uploads/blog-images/${req.file.filename}`;
+        
+        console.log(`[BLOG AUDIT] Image uploaded: ${req.file.filename} by ${JSON.stringify(req.adminAuth)}`);
+
+        res.status(201).json({
+            success: true,
+            image: {
+                url: imageUrl,
+                filename: req.file.filename,
+                originalName: req.file.originalname,
+                size: req.file.size,
+                mimeType: req.file.mimetype
+            }
+        });
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        res.status(500).json({ 
+            error: { 
+                code: 'UPLOAD_FAILED', 
+                message: error.message || 'Failed to upload image' 
+            } 
+        });
+    }
+});
+
+/**
+ * GET /api/admin/blog/images
+ * List all uploaded blog images
+ */
+router.get('/images', requireAdminAuth, async (req, res) => {
+    try {
+        const files = fs.readdirSync(UPLOAD_DIR);
+        const baseUrl = process.env.REACT_APP_BACKEND_URL || process.env.BASE_URL || '';
+        
+        const images = files
+            .filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f))
+            .map(filename => {
+                const filePath = path.join(UPLOAD_DIR, filename);
+                const stats = fs.statSync(filePath);
+                return {
+                    filename,
+                    url: `${baseUrl}/api/uploads/blog-images/${filename}`,
+                    size: stats.size,
+                    uploadedAt: stats.mtime.toISOString()
+                };
+            })
+            .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        
+        res.json({ images, total: images.length });
+    } catch (error) {
+        console.error('Error listing images:', error);
+        res.status(500).json({ error: 'Failed to list images' });
+    }
+});
+
+/**
+ * DELETE /api/admin/blog/images/:filename
+ * Delete an uploaded image
+ */
+router.delete('/images/:filename', requireAdminAuth, async (req, res) => {
+    try {
+        const filename = req.params.filename;
+        const filePath = path.join(UPLOAD_DIR, filename);
+        
+        // Security check: prevent path traversal
+        if (!filePath.startsWith(UPLOAD_DIR)) {
+            return res.status(400).json({ error: 'Invalid filename' });
+        }
+        
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'Image not found' });
+        }
+        
+        fs.unlinkSync(filePath);
+        
+        console.log(`[BLOG AUDIT] Image deleted: ${filename} by ${JSON.stringify(req.adminAuth)}`);
+        
+        res.json({ success: true, message: 'Image deleted' });
+    } catch (error) {
+        console.error('Error deleting image:', error);
+        res.status(500).json({ error: 'Failed to delete image' });
     }
 });
 

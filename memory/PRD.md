@@ -2006,3 +2006,55 @@ The demo mode includes a full client-side simulation engine (`simulateDemoReques
 - Public Playground: `/playground` (no authentication required)
 - Demo Mode: Works immediately with simulated data
 - Live Mode: Requires valid API key (`sk_live_*`, `sk_test_*`, or `sk_agent_*`)
+
+
+---
+
+### P1 Items Completed - March 27, 2026
+
+#### 1. "Try in Playground" Links on API Docs
+
+Added interactive playground links to all API endpoint cards in the documentation.
+
+**Changes:**
+- Updated `ApiEndpoint` component in `/app/frontend/src/components/docs/DocsComponents.js`:
+  - Added `playgroundScenario` prop for linking to specific Quick Scenarios
+  - Added green "Try in Playground" button with play icon on each endpoint
+  - Links navigate to `/playground#scenario/{id}` or `/playground#{method}{path}`
+
+**Updated Endpoints with Scenario Links:**
+- POST `/v1/escrow-accounts` → `#scenario/create-escrow`
+- GET `/v1/escrow-accounts/:id` → `#scenario/check-balance`
+- POST `/v1/policies` → `#scenario/set-policy`
+- POST `/v1/spend` → `#scenario/submit-spend`
+- GET `/v1/approvals` → `#scenario/list-approvals`
+- GET `/v1/audit` → `#scenario/view-audit`
+
+#### 2. Blog Image Upload Endpoint
+
+Implemented image upload functionality for the blog CMS.
+
+**Backend Endpoints:**
+- `POST /api/admin/blog/images` - Upload a new image (5MB max, JPEG/PNG/GIF/WebP)
+- `GET /api/admin/blog/images` - List all uploaded images
+- `DELETE /api/admin/blog/images/:filename` - Delete an image
+
+**Frontend UI:**
+- Updated Blog Editor (`/app/frontend/src/pages/admin/AdminBlogEditorPage.js`):
+  - Added drag-and-drop style upload area
+  - File type and size validation (5MB, images only)
+  - Shows upload progress
+  - Preview of uploaded/entered image URL
+  - Clear button to remove image
+
+**Files Changed:**
+- `/app/backend/src/routes/admin-api.js` - Added multer config and 3 image endpoints
+- `/app/backend/src/server.js` - Added static file serving for `/api/uploads/blog-images`
+- `/app/frontend/src/pages/admin/AdminBlogEditorPage.js` - Added image upload UI
+- `/app/frontend/src/contexts/AdminContext.js` - Fixed FormData handling in adminFetch
+- `/app/frontend/src/components/docs/DocsComponents.js` - Added playground links
+
+**Storage:**
+- Images stored in `/app/backend/uploads/blog-images/`
+- Filenames: `{timestamp}_{random}.{ext}` (prevents collisions)
+- Served via `/api/uploads/blog-images/{filename}`

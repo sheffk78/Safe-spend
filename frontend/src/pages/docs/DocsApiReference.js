@@ -110,7 +110,7 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>Create Escrow Account</DocsHeading>
-            <ApiEndpoint method="POST" path="/v1/escrow-accounts" description="Create a new escrow account" />
+            <ApiEndpoint method="POST" path="/v1/escrow-accounts" description="Create a new escrow account" playgroundScenario="create-escrow" />
             
             <ParamTable params={[
                 { name: 'name', type: 'string', required: true, description: 'Account name' },
@@ -135,7 +135,7 @@ const DocsApiReference = () => {
             <ApiEndpoint method="GET" path="/v1/escrow-accounts" description="List all escrow accounts" />
 
             <DocsHeading level={3}>Get Escrow Account</DocsHeading>
-            <ApiEndpoint method="GET" path="/v1/escrow-accounts/:id" description="Get a specific escrow account" />
+            <ApiEndpoint method="GET" path="/v1/escrow-accounts/:id" description="Get a specific escrow account" playgroundScenario="check-balance" />
 
             <DocsHeading level={3}>Fund Escrow Account</DocsHeading>
             <ApiEndpoint method="POST" path="/v1/escrow-accounts/:id/fund" description="Add funds to an escrow account" />
@@ -161,7 +161,7 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>Create Policy</DocsHeading>
-            <ApiEndpoint method="POST" path="/v1/policies" description="Create a new spending policy" />
+            <ApiEndpoint method="POST" path="/v1/policies" description="Create a new spending policy" playgroundScenario="set-policy" />
             
             <ParamTable params={[
                 { name: 'escrow_id', type: 'string', required: true, description: 'Escrow account to attach policy to' },
@@ -201,7 +201,7 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>Create Spend Request</DocsHeading>
-            <ApiEndpoint method="POST" path="/v1/spend" description="Request a disbursement from an escrow account" />
+            <ApiEndpoint method="POST" path="/v1/spend" description="Request a disbursement from an escrow account" playgroundScenario="submit-spend" />
             
             <ParamTable params={[
                 { name: 'escrow_id', type: 'string', required: true, description: 'Escrow account ID' },
@@ -267,7 +267,7 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>List Approvals</DocsHeading>
-            <ApiEndpoint method="GET" path="/v1/approvals" description="List all approval requests" />
+            <ApiEndpoint method="GET" path="/v1/approvals" description="List all approval requests" playgroundScenario="list-approvals" />
 
             <DocsHeading level={3}>Get Approval</DocsHeading>
             <ApiEndpoint method="GET" path="/v1/approvals/:id" description="Get a specific approval" />
@@ -300,7 +300,7 @@ const DocsApiReference = () => {
             </DocsText>
 
             <DocsHeading level={3}>List Audit Events</DocsHeading>
-            <ApiEndpoint method="GET" path="/v1/audit" description="List audit events with optional filters" />
+            <ApiEndpoint method="GET" path="/v1/audit" description="List audit events with optional filters" playgroundScenario="view-audit" />
             
             <ParamTable params={[
                 { name: 'event_type', type: 'string', required: false, description: 'Filter by event type' },

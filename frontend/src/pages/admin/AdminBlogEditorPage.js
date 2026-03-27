@@ -3,7 +3,7 @@
  * Create and edit blog posts with markdown support
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/contexts/AdminContext';
 import {
@@ -12,7 +12,9 @@ import {
     EyeIcon,
     ArrowPathIcon,
     CheckIcon,
-    PhotoIcon
+    PhotoIcon,
+    CloudArrowUpIcon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 
 // Markdown preview (basic)
@@ -69,6 +71,10 @@ const AdminBlogEditorPage = () => {
     const [status, setStatus] = useState('draft');
     const [metaTitle, setMetaTitle] = useState('');
     const [metaDescription, setMetaDescription] = useState('');
+    
+    // Image upload state
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
     // Load post if editing
     useEffect(() => {
@@ -134,6 +140,58 @@ const AdminBlogEditorPage = () => {
             .replace(/\n/g, ' ')
             .trim();
         setExcerpt(plainText.substring(0, 160) + (plainText.length > 160 ? '...' : ''));
+    };
+
+    // Handle image upload
+    const handleImageUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            setError('Only JPEG, PNG, GIF, and WebP images are allowed');
+            return;
+        }
+        
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Image must be smaller than 5MB');
+            return;
+        }
+        
+        setUploading(true);
+        setError(null);
+        
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const res = await adminFetch('/api/admin/blog/images', {
+                method: 'POST',
+                body: formData,
+                // Don't set Content-Type header - browser will set it with boundary
+                headers: {} 
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                setCoverImageUrl(data.image.url);
+                setSuccess('Image uploaded!');
+                setTimeout(() => setSuccess(null), 2000);
+            } else {
+                const errData = await res.json();
+                throw new Error(errData.error?.message || 'Failed to upload image');
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setUploading(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
     };
 
     const handleSave = async (saveStatus = status) => {
@@ -373,23 +431,74 @@ const AdminBlogEditorPage = () => {
 
                             {/* Cover Image */}
                             <div>
-                                <label className="block text-sm text-[#9CA3AF] mb-1">Cover Image URL</label>
-                                <div className="flex gap-2">
+                                <label className="block text-sm text-[#9CA3AF] mb-2">Cover Image</label>
+                                
+                                {/* Upload Button */}
+                                <div className="mb-2">
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                        id="cover-image-upload"
+                                    />
+                                    <label
+                                        htmlFor="cover-image-upload"
+                                        className={`flex items-center justify-center gap-2 w-full px-3 py-3 border-2 border-dashed border-[rgba(255,255,255,0.1)] hover:border-[#10B981] rounded-lg cursor-pointer transition-all ${
+                                            uploading ? 'opacity-50 cursor-not-allowed' : ''
+                                        }`}
+                                    >
+                                        {uploading ? (
+                                            <>
+                                                <ArrowPathIcon className="w-5 h-5 text-[#10B981] animate-spin" />
+                                                <span className="text-sm text-[#9CA3AF]">Uploading...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CloudArrowUpIcon className="w-5 h-5 text-[#6B7280]" />
+                                                <span className="text-sm text-[#6B7280]">Upload Image</span>
+                                            </>
+                                        )}
+                                    </label>
+                                    <p className="text-xs text-[#6B7280] mt-1 text-center">Max 5MB • JPEG, PNG, GIF, WebP</p>
+                                </div>
+                                
+                                {/* Or manual URL */}
+                                <div className="relative">
                                     <input
                                         type="text"
                                         value={coverImageUrl}
                                         onChange={(e) => setCoverImageUrl(e.target.value)}
-                                        placeholder="https://..."
-                                        className="flex-1 px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                        placeholder="Or enter image URL..."
+                                        className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] pr-8"
                                     />
+                                    {coverImageUrl && (
+                                        <button
+                                            onClick={() => setCoverImageUrl('')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#EF4444]"
+                                        >
+                                            <XMarkIcon className="w-4 h-4" />
+                                        </button>
+                                    )}
                                 </div>
+                                
+                                {/* Preview */}
                                 {coverImageUrl && (
-                                    <img 
-                                        src={coverImageUrl} 
-                                        alt="Preview" 
-                                        className="w-full h-24 object-cover rounded-lg mt-2"
-                                        onError={(e) => e.target.style.display = 'none'}
-                                    />
+                                    <div className="relative mt-2">
+                                        <img 
+                                            src={coverImageUrl} 
+                                            alt="Cover Preview" 
+                                            className="w-full h-32 object-cover rounded-lg"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                        <div className="hidden items-center justify-center w-full h-32 bg-[#1A1A1E] rounded-lg text-[#6B7280] text-sm">
+                                            Failed to load image
+                                        </div>
+                                    </div>
                                 )}
                             </div>
 

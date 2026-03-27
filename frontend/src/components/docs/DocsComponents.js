@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertCircle, Info, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertCircle, Info, AlertTriangle, CheckCircle, Play } from 'lucide-react';
 
 // Typography Components
 export const DocsHeading = ({ level = 1, id, children, className = '' }) => {
@@ -105,7 +106,7 @@ export const InlineCode = ({ children }) => (
 );
 
 // API Endpoint Component
-export const ApiEndpoint = ({ method, path, description }) => {
+export const ApiEndpoint = ({ method, path, description, playgroundScenario }) => {
     const methodColors = {
         GET: 'bg-green-500/20 text-green-400',
         POST: 'bg-blue-500/20 text-blue-400',
@@ -114,13 +115,28 @@ export const ApiEndpoint = ({ method, path, description }) => {
         DELETE: 'bg-red-500/20 text-red-400'
     };
 
+    // Generate playground URL based on method and path
+    const playgroundUrl = playgroundScenario 
+        ? `/playground#scenario/${playgroundScenario}`
+        : `/playground#${method}${path}`;
+
     return (
         <div className="flex items-start gap-3 mb-4 p-3 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)]" data-testid={`endpoint-${method.toLowerCase()}-${path.replace(/[/:]/g, '-')}`}>
             <span className={`${methodColors[method]} px-2 py-1 rounded text-xs font-mono font-semibold`}>
                 {method}
             </span>
             <div className="flex-1">
-                <code className="text-ss-text font-mono text-sm">{path}</code>
+                <div className="flex items-center justify-between gap-4">
+                    <code className="text-ss-text font-mono text-sm">{path}</code>
+                    <Link 
+                        to={playgroundUrl}
+                        className="flex items-center gap-1.5 px-2.5 py-1 bg-ss-accent/10 hover:bg-ss-accent/20 text-ss-accent text-xs font-medium rounded transition-all flex-shrink-0"
+                        data-testid={`try-playground-${method.toLowerCase()}-${path.replace(/[/:]/g, '-')}`}
+                    >
+                        <Play size={12} />
+                        Try in Playground
+                    </Link>
+                </div>
                 {description && (
                     <p className="text-ss-text-secondary text-sm mt-1">{description}</p>
                 )}
