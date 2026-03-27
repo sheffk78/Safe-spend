@@ -22,7 +22,8 @@ import {
     ShieldCheck,
     Code2,
     Eye,
-    FileDown
+    FileDown,
+    MessageSquare
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getMyRole } from '@/lib/api';
@@ -47,6 +48,7 @@ const navItems = [
     { label: 'Audit Log', icon: FileText, path: '/dashboard/audit' },
     { label: 'Exports', icon: FileDown, path: '/dashboard/exports' },
     { label: 'Team', icon: Users, path: '/dashboard/team' },
+    { label: 'Give Feedback', icon: MessageSquare, path: '/feedback' },
     { label: 'Pricing & Plans', icon: CreditCard, path: '/dashboard/pricing' },
     { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
 ];

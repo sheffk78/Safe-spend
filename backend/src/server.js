@@ -52,6 +52,10 @@ const blogPagesRoutes = require('./routes/blog-pages');
 const adminApiRoutes = require('./routes/admin-api');
 const errorLogService = require('./services/error-log-service');
 
+// Feedback Routes
+const feedbackRoutes = require('./routes/feedback');
+const adminFeedbackRoutes = require('./routes/admin-feedback');
+
 // Validate environment at startup
 validateEnvironment();
 const config = getConfig();
@@ -195,6 +199,9 @@ app.use('/api/v1/exports', exportRateLimiter, exportsRoutes);
 // AAV Settings - write rate limit
 app.use('/api/v1/settings/aav', writeRateLimiter, aavSettingsRoutes);
 
+// Feedback - standard rate limit (has internal rate limiting too)
+app.use('/api/v1/feedback', standardApiRateLimiter, feedbackRoutes);
+
 // ============================================
 // Static File Serving (Uploaded Images)
 // ============================================
@@ -228,6 +235,9 @@ app.use('/blog', publicApiRateLimiter, blogPagesRoutes);
 // New Unified Admin API (with scopes)
 // ============================================
 app.use('/api/admin', adminApiRateLimiter, adminApiRoutes);
+
+// Admin Feedback (separate for cleaner routing)
+app.use('/api/admin/feedback', adminApiRateLimiter, adminFeedbackRoutes);
 
 // ============================================
 // Error Handling

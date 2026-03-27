@@ -14,6 +14,7 @@ import {
     ChartPieIcon,
     ClipboardDocumentListIcon,
     KeyIcon,
+    ChatBubbleLeftRightIcon,
     ArrowTopRightOnSquareIcon,
     ArrowRightOnRectangleIcon,
     Bars3Icon,
@@ -26,6 +27,7 @@ const navItems = [
     { label: 'Blog Manager', icon: DocumentTextIcon, path: '/admin/blog' },
     { label: 'Metrics', icon: ChartPieIcon, path: '/admin/metrics' },
     { label: 'Audit Log', icon: ClipboardDocumentListIcon, path: '/admin/audit' },
+    { label: 'Feedback', icon: ChatBubbleLeftRightIcon, path: '/admin/feedback' },
     { label: 'Admin Keys', icon: KeyIcon, path: '/admin/keys' },
 ];
 

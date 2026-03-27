@@ -62,6 +62,10 @@ import AdminBlogEditorPage from "@/pages/admin/AdminBlogEditorPage";
 import AdminMetricsPage from "@/pages/admin/AdminMetricsPage";
 import AdminAuditPage from "@/pages/admin/AdminAuditPage";
 import AdminKeysPage from "@/pages/admin/AdminKeysPage";
+import AdminFeedbackPage from "@/pages/admin/AdminFeedbackPage";
+
+// Feedback Page
+import FeedbackPage from "@/pages/FeedbackPage";
 
 // Admin wrapper component that provides AdminContext (API key auth)
 const AdminRoutes = () => (
@@ -77,6 +81,7 @@ const AdminRoutes = () => (
                 <Route path="metrics" element={<AdminMetricsPage />} />
                 <Route path="audit" element={<AdminAuditPage />} />
                 <Route path="keys" element={<AdminKeysPage />} />
+                <Route path="feedback" element={<AdminFeedbackPage />} />
             </Route>
         </Routes>
     </AdminProvider>
@@ -115,6 +120,16 @@ function App() {
 
                     {/* Public Playground */}
                     <Route path="/playground" element={<PublicPlaygroundPage />} />
+
+                    {/* Feature Requests Board (requires auth) */}
+                    <Route
+                        path="/feedback"
+                        element={
+                            <ProtectedRoute>
+                                <FeedbackPage />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     {/* Protected dashboard routes */}
                     <Route

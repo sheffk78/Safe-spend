@@ -515,3 +515,70 @@ model ErrorLog {
   @@index([timestamp])
   @@map("error_logs")
 }
+
+// Feedback Items (inline reactions, milestone feedback, error clarity, pulse checks)
+model FeedbackItem {
+  id              String   @id @default(uuid())
+  type            String   // inline_reaction | milestone_feedback | error_clarity | doc_feedback | pulse_check
+  sentiment       String?  // negative | neutral | good | great
+  npsScore        Int?     @map("nps_score") // 1-10 for pulse checks
+  note            String?
+  page            String?  // URL path where feedback was given
+  endpoint        String?  // API endpoint (for error feedback)
+  errorCode       String?  @map("error_code")
+  milestone       String?  // e.g., "first_escrow_created"
+  useCases        String?  @map("use_cases") // JSON array for pulse checks
+  orgId           String   @map("org_id")
+  userId          String?  @map("user_id")
+  isAcknowledged  Boolean  @default(false) @map("is_acknowledged")
+  adminNotes      String?  @map("admin_notes")
+  convertedTo     String?  @map("converted_to") // req_... if converted to feature request
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  @@index([orgId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("feedback_items")
+}
+
+// Feature Requests (public votable board)
+model FeatureRequest {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  category      String   // api | sdk | dashboard | integrations | docs | billing | other
+  status        String   @default("new") // new | under_review | planned | in_progress | shipped | declined
+  statusNote    String?  @map("status_note")
+  voteCount     Int      @default(1) @map("vote_count")
+  voters        String   @default("[]") // JSON array of user IDs
+  submittedByUserId   String?  @map("submitted_by_user_id")
+  submittedByOrgId    String   @map("submitted_by_org_id")
+  submittedByOrgName  String?  @map("submitted_by_org_name")
+  isAnonymous   Boolean  @default(false) @map("is_anonymous")
+  comments      String   @default("[]") // JSON array of comments
+  statusHistory String   @default("[]") @map("status_history") // JSON array
+  isPinned      Boolean  @default(false) @map("is_pinned")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  @@index([status])
+  @@index([category])
+  @@index([voteCount])
+  @@index([createdAt])
+  @@map("feature_requests")
+}
+
+// User Pulse Check tracking (to enforce 14-day cadence)
+model UserPulseTracking {
+  id              String    @id @default(uuid())
+  orgId           String    @map("org_id")
+  userId          String?   @map("user_id")
+  lastPulseShownAt DateTime? @map("last_pulse_shown_at")
+  lastPulseCompletedAt DateTime? @map("last_pulse_completed_at")
+  milestonesShown String    @default("[]") @map("milestones_shown") // JSON array of milestone names
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  @@unique([orgId, userId])
+  @@map("user_pulse_tracking")
+}
