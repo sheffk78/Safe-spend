@@ -7,6 +7,7 @@
 - Admin Setup Token: `safe-spend-setup-token-change-in-production`
 - Admin API Key: `ss_admin_12a29bce42c6462deb6d36cc3f4412d3`
 - Admin Login: `admin@agentictrust.app` / `SafeSpend2026!` (superadmin)
+- Admin Login: `support@agentictrust.app` / `AdminPass123!` (superadmin)
 
 ## Internal Events
 - HMAC Secret: `safe-spend-internal-events-secret-change-in-production`
