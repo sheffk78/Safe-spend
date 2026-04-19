@@ -14,23 +14,76 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
 
 /**
  * Middleware to require admin authentication
- * Rejects org JWTs and API keys - only admin JWTs are allowed
+ * Supports both admin JWT tokens and ss_admin_ API keys
  */
 async function requireAdmin(req, res, next) {
     try {
+        // First check for X-Admin-Key header (API key auth)
+        const adminKeyHeader = req.headers['x-admin-key'];
+        if (adminKeyHeader && adminKeyHeader.startsWith('ss_admin_')) {
+            const { validateAdminKey } = require('../services/admin-key-service');
+            const keyResult = await validateAdminKey(adminKeyHeader);
+            
+            if (keyResult.error) {
+                return res.status(403).json({
+                    error: 'forbidden',
+                    message: keyResult.error === 'INVALID_KEY' ? 'Invalid admin API key' : keyResult.error,
+                    request_id: req.requestId
+                });
+            }
+            
+            // API key auth successful — create a synthetic admin object
+            req.admin = {
+                id: keyResult.id,
+                email: 'api-key-auth',
+                name: keyResult.label || 'API Key',
+                role: 'superadmin',
+                isActive: true
+            };
+            req.adminKey = keyResult;
+            req.authType = 'admin_key';
+            return next();
+        }
+
+        // Fall back to JWT Bearer token auth
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({
                 error: 'unauthorized',
-                message: 'Missing or invalid authorization header',
+                message: 'Missing or invalid authorization header. Use X-Admin-Key or Authorization: Bearer <token>',
                 request_id: req.requestId
             });
         }
 
         const token = authHeader.substring(7);
 
-        // Reject API keys immediately
+        // Also allow ss_admin_ keys via Bearer header
+        if (token.startsWith('ss_admin_')) {
+            const { validateAdminKey } = require('../services/admin-key-service');
+            const keyResult = await validateAdminKey(token);
+            
+            if (keyResult.error) {
+                return res.status(403).json({
+                    error: 'forbidden',
+                    message: keyResult.error === 'INVALID_KEY' ? 'Invalid admin API key' : keyResult.error,
+                    request_id: req.requestId
+                });
+            }
+            
+            req.admin = {
+                id: keyResult.id,
+                email: 'api-key-auth',
+                name: keyResult.label || 'API Key',
+                role: 'superadmin',
+                isActive: true
+            };
+            req.adminKey = keyResult;
+            req.authType = 'admin_key';
+            return next();
+        }
+
+        // Reject org API keys
         if (token.startsWith('sk_')) {
             return res.status(403).json({
                 error: 'forbidden',

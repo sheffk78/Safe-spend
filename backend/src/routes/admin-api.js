@@ -71,18 +71,25 @@ const upload = multer({
 const requireAdminScope = (requiredScope) => {
     return async (req, res, next) => {
         try {
+            // Check X-Admin-Key header first, then Authorization: Bearer
+            const adminKeyHeader = req.headers['x-admin-key'];
             const authHeader = req.headers.authorization;
             
-            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            let token;
+            if (adminKeyHeader && adminKeyHeader.startsWith('ss_admin_')) {
+                token = adminKeyHeader;
+            } else if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
+            
+            if (!token) {
                 return res.status(401).json({
                     error: {
                         code: 'MISSING_AUTH',
-                        message: 'Authorization header required'
+                        message: 'Admin API key required. Use X-Admin-Key header or Authorization: Bearer'
                     }
                 });
             }
-            
-            const token = authHeader.substring(7);
             
             // Validate admin key and check scope
             const result = await adminKeyService.validateAdminKey(token, requiredScope);

@@ -16,10 +16,10 @@ const requireAdminScope = (requiredScope) => {
     return async (req, res, next) => {
         try {
             const authHeader = req.headers.authorization;
-            const adminKeyHeader = req.headers['x-admin-api-key'];
+            const adminKeyHeader = req.headers['x-admin-key'] || req.headers['x-admin-api-key'];
             
             let token = null;
-            if (adminKeyHeader) {
+            if (adminKeyHeader && adminKeyHeader.startsWith('ss_admin_')) {
                 token = adminKeyHeader;
             } else if (authHeader && authHeader.startsWith('Bearer ')) {
                 token = authHeader.substring(7);
