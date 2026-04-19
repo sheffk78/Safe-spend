@@ -630,10 +630,10 @@ router.get('/blog/posts/:id_or_slug', requireAdminScope('blog'), async (req, res
     try {
         const idOrSlug = req.params.id_or_slug;
         
-        // Try by ID first, then by slug
+        // Try by ID first, then by slug (admin can see any status)
         let post = await blogService.getPostById(idOrSlug);
         if (!post) {
-            post = await blogService.getPublishedPostBySlug(idOrSlug);
+            post = await blogService.getPostBySlug(idOrSlug);
         }
         
         if (!post) {

@@ -439,6 +439,19 @@ async function getPublishedPostBySlug(slug) {
 }
 
 /**
+ * Get any post by slug (admin - no status filter)
+ */
+async function getPostBySlug(slug) {
+    const post = await prisma.blogPost.findUnique({ where: { slug } });
+    
+    if (!post) {
+        return null;
+    }
+    
+    return formatPostResponse(post);
+}
+
+/**
  * List published posts (public)
  */
 async function listPublishedPosts({ page = 1, limit = 10, tag, category, featured } = {}) {
@@ -644,6 +657,7 @@ module.exports = {
     deletePost,
     getPostById,
     getPublishedPostBySlug,
+    getPostBySlug,
     listPublishedPosts,
     listAllPosts,
     getAllTags,
