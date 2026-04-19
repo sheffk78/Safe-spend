@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { Calendar, Clock, User, Tag, ArrowLeft, ChevronLeft, ChevronRight, Rss } from 'lucide-react';
+import { Calendar, Clock, User, Tag, ArrowLeft, ChevronLeft, ChevronRight, Rss, Menu, X } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -19,6 +19,51 @@ const formatDate = (dateStr) => {
         day: 'numeric',
         year: 'numeric'
     });
+};
+
+// Responsive Blog Header
+const BlogHeader = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    return (
+        <header className="border-b border-white/[0.06] bg-[#111113]">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+                <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl shrink-0">
+                    <span className="text-emerald-500">&#9670;</span>
+                    Safe-Spend
+                </Link>
+                {/* Desktop nav */}
+                <nav className="hidden sm:flex items-center gap-8">
+                    <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium">Home</Link>
+                    <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium">Dashboard</Link>
+                    <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium">Docs</Link>
+                    <Link to="/blog" className="text-emerald-500 text-sm font-medium">Blog</Link>
+                    <a href="/api/blog/rss" className="text-zinc-400 hover:text-white" title="RSS Feed">
+                        <Rss size={18} />
+                    </a>
+                </nav>
+                {/* Mobile hamburger */}
+                <button
+                    className="sm:hidden p-2 text-zinc-400 hover:text-white"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    data-testid="blog-mobile-menu-btn"
+                >
+                    {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                </button>
+            </div>
+            {/* Mobile dropdown */}
+            {menuOpen && (
+                <nav className="sm:hidden border-t border-white/[0.06] bg-[#111113] px-4 pb-4 flex flex-col gap-3">
+                    <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Home</Link>
+                    <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Dashboard</Link>
+                    <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Docs</Link>
+                    <Link to="/blog" className="text-emerald-500 text-sm font-medium py-2">Blog</Link>
+                    <a href="/api/blog/rss" className="text-zinc-400 hover:text-white text-sm font-medium py-2 flex items-center gap-2">
+                        <Rss size={16} /> RSS Feed
+                    </a>
+                </nav>
+            )}
+        </header>
+    );
 };
 
 // Blog Index Page
@@ -76,24 +121,7 @@ export const BlogIndexPage = () => {
                 <link rel="alternate" type="application/rss+xml" title="Safe-Spend Blog" href="/api/blog/rss" />
             </Helmet>
             
-            {/* Header */}
-            <header className="border-b border-white/[0.06] bg-[#111113]">
-                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl">
-                        <span className="text-emerald-500">◆</span>
-                        Safe-Spend
-                    </Link>
-                    <nav className="flex items-center gap-8">
-                        <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium">Home</Link>
-                        <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium">Dashboard</Link>
-                        <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium">Docs</Link>
-                        <Link to="/blog" className="text-emerald-500 text-sm font-medium">Blog</Link>
-                        <a href="/api/blog/rss" className="text-zinc-400 hover:text-white" title="RSS Feed">
-                            <Rss size={18} />
-                        </a>
-                    </nav>
-                </div>
-            </header>
+            <BlogHeader />
             
             {/* Hero */}
             <section className="text-center py-16 border-b border-white/[0.06]">
@@ -328,21 +356,7 @@ export const BlogPostPage = () => {
                 )}
             </Helmet>
             
-            {/* Header */}
-            <header className="border-b border-white/[0.06] bg-[#111113]">
-                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl">
-                        <span className="text-emerald-500">◆</span>
-                        Safe-Spend
-                    </Link>
-                    <nav className="flex items-center gap-8">
-                        <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium">Home</Link>
-                        <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium">Dashboard</Link>
-                        <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium">Docs</Link>
-                        <Link to="/blog" className="text-emerald-500 text-sm font-medium">Blog</Link>
-                    </nav>
-                </div>
-            </header>
+            <BlogHeader />
             
             <article className="max-w-3xl mx-auto px-6 py-12">
                 {/* Back Link */}
