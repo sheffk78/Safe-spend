@@ -14,8 +14,13 @@ COPY package.json yarn.lock* package-lock.json* ./
 # Install dependencies
 RUN npm install --production=false
 
-# Copy prisma schema
+# Copy prisma schemas
 COPY prisma ./prisma
+
+# Switch to PostgreSQL schema for production
+RUN if [ -f prisma/schema.postgresql.prisma ]; then \
+      cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
+    fi
 
 # Generate Prisma client
 RUN npx prisma generate
