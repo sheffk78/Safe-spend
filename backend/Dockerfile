@@ -55,5 +55,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8001/api/health || exit 1
 
-# Start command - push schema then start server
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node src/server.js"]
+# Start command - push schema then start server with error logging
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss 2>&1 && echo 'Starting server...' && node src/server.js 2>&1 || (echo 'Server crashed with exit code:' $? && sleep 5 && exit 1)"]
