@@ -14,19 +14,22 @@ COPY package.json yarn.lock* package-lock.json* ./
 # Copy prisma schemas BEFORE npm install (so postinstall hook works)
 COPY prisma ./prisma
 
-# Switch to PostgreSQL schema for production
+# Install dependencies (postinstall: npx prisma generate will find the schema)
+RUN npm install --production=false
+
+# Generate Prisma client with the default schema first
+RUN npx prisma generate
+
+# Copy application source (overwrites prisma/schema.prisma with original)
+COPY . .
+
+# Switch to PostgreSQL schema for production AFTER full copy
 RUN if [ -f prisma/schema.postgresql.prisma ]; then \
       cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
     fi
 
-# Install dependencies (postinstall: npx prisma generate will find the schema)
-RUN npm install --production=false
-
-# Generate Prisma client
+# Re-generate Prisma client with PostgreSQL schema
 RUN npx prisma generate
-
-# Copy application source
-COPY . .
 
 # Production stage
 FROM node:18-alpine AS production

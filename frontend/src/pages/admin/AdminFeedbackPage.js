@@ -6,7 +6,7 @@ import {
   Clock, Filter
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const TYPE_CONFIG = {
   inline_reaction: { label: 'Reaction', color: 'bg-yellow-500/20 text-yellow-400' },

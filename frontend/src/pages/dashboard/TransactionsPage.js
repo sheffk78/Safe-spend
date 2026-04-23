@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import StatusBadge from '@/components/StatusBadge';
 import { ArrowRight, RefreshCw, FileDown } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const TransactionsPage = () => {
     const { token } = useAuth();

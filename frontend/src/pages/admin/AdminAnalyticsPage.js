@@ -11,7 +11,7 @@ import {
     RefreshCw
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const StatCard = ({ title, value, subValue, icon: Icon, color = 'accent' }) => (
     <div className="bg-ss-surface border border-ss-border rounded-lg p-5">

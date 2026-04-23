@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE = import.meta.env.VITE_BACKEND_URL || '';
 
 const PricingPage = () => {
   const navigate = useNavigate();

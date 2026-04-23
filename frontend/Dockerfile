@@ -1,23 +1,23 @@
 # Safe-Spend Frontend Dockerfile
-# React SPA with nginx
+# React SPA with Vite build + nginx serving
 
-# Build stage - use Node 18 LTS for react-scripts@5 compatibility
+# Build stage - use Node 18 LTS
 FROM node:18-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* yarn.lock* ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm ci
 
 # Copy source
 COPY . .
 
 # Build argument for backend URL
-ARG REACT_APP_BACKEND_URL
-ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 # Build the app
 RUN npm run build

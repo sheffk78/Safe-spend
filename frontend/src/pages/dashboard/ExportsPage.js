@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { listEscrowAccounts, getMyRole } from '@/lib/api';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 // Export configuration
 const EXPORT_CONFIG = {

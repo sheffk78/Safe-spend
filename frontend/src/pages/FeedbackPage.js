@@ -5,7 +5,7 @@ import {
   Clock, Rocket, CheckCircle, XCircle, Eye
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const CATEGORIES = [
   { id: 'api', label: 'API', color: 'bg-blue-500/20 text-blue-400' },

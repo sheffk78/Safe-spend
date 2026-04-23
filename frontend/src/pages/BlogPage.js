@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Calendar, Clock, User, Tag, ArrowLeft, ChevronLeft, ChevronRight, Rss, Menu, X } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 // Fetch helper
 const fetchBlog = async (endpoint) => {

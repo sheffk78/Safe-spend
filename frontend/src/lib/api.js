@@ -3,7 +3,7 @@
  * Centralized API calls with auth handling
  */
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('ss_token');
