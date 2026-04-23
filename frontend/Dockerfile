@@ -1,13 +1,13 @@
 # Safe-Spend Frontend Dockerfile
 # React SPA with nginx
 
-# Build stage
-FROM node:20-alpine AS build
+# Build stage - use Node 18 LTS for react-scripts@5 compatibility
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock* package-lock.json* ./
+COPY package.json package-lock.json* yarn.lock* ./
 
 # Install dependencies
 RUN npm install --legacy-peer-deps
@@ -34,9 +34,6 @@ RUN chmod +x /start.sh
 
 # Copy built assets
 COPY --from=build /app/build /usr/share/nginx/html
-
-# Expose port
-EXPOSE 80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

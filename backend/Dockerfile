@@ -1,7 +1,7 @@
 # Safe-Spend Backend Dockerfile
 # Node.js + Express + Prisma + PostgreSQL
 
-FROM node:20-alpine AS base
+FROM node:18-alpine AS base
 
 # Install dependencies needed for Prisma
 RUN apk add --no-cache openssl
@@ -19,17 +19,17 @@ RUN if [ -f prisma/schema.postgresql.prisma ]; then \
       cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
     fi
 
-# Install dependencies (postinstall: npx prisma generate will now find the schema)
+# Install dependencies (postinstall: npx prisma generate will find the schema)
 RUN npm install --production=false
 
-# Generate Prisma client (redundant with postinstall, but explicit for clarity)
+# Generate Prisma client
 RUN npx prisma generate
 
 # Copy application source
 COPY . .
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:18-alpine AS production
 
 RUN apk add --no-cache openssl
 
@@ -52,5 +52,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8001/api/health || exit 1
 
-# Start command - run migrations then start server
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
+# Start command - push schema then start server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node src/server.js"]
