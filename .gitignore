@@ -97,3 +97,5 @@ credentials.json
 .credentials
 .railway/
 backend/prisma/dev.db
+.unison*
+node_modules
