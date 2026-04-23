@@ -8,13 +8,10 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (for layer caching)
 COPY package.json yarn.lock* package-lock.json* ./
 
-# Install dependencies
-RUN npm install --production=false
-
-# Copy prisma schemas
+# Copy prisma schemas BEFORE npm install (so postinstall hook works)
 COPY prisma ./prisma
 
 # Switch to PostgreSQL schema for production
@@ -22,7 +19,10 @@ RUN if [ -f prisma/schema.postgresql.prisma ]; then \
       cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
     fi
 
-# Generate Prisma client
+# Install dependencies (postinstall: npx prisma generate will now find the schema)
+RUN npm install --production=false
+
+# Generate Prisma client (redundant with postinstall, but explicit for clarity)
 RUN npx prisma generate
 
 # Copy application source
