@@ -98,7 +98,7 @@ const spendRateLimiter = rateLimit({
     keyGenerator: apiKeyKeyGenerator,
     handler: rateLimitHandler,
     skip: () => process.env.NODE_ENV === 'test', // Only skip in automated tests
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
 });
 
 /**
@@ -125,6 +125,7 @@ const exportRateLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: orgKeyGenerator,
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
     handler: (req, res) => {
         events.rateLimitExceeded({
             request_id: req.requestId,
