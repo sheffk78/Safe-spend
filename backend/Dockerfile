@@ -44,6 +44,7 @@ COPY --from=base /app/prisma ./prisma
 COPY --from=base /app/src ./src
 COPY --from=base /app/package.json ./
 COPY --from=base /app/start.sh ./start.sh
+RUN chmod +x start.sh
 
 # Set environment
 ENV NODE_ENV=production
