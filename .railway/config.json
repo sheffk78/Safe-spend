@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "/Users/socializerender/.openclaw/workspace/Safe-spend": {
+      "projectPath": "/Users/socializerender/.openclaw/workspace/Safe-spend",
+      "name": "Safe-Spend",
+      "project": "6a667ec8-7daf-4d7a-ae26-f2d4ce34c2e7",
+      "environment": "764453e3-ccbb-45a5-be5c-d18683bf7238",
+      "environmentName": "production",
+      "service": "03001f77-9cda-4cfb-8fad-eb1e360a947a"
+    }
+  }
+}

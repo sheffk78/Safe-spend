@@ -1,8 +1,7 @@
 [build]
-builder = "RAILPACK"
+builder = "DOCKERFILE"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && node src/server.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
