@@ -22,6 +22,9 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 # Build the app
 RUN npm run build
 
+# Verify the build output has correct structure
+RUN ls -la /app/build/assets/ && echo "Build verified" || (echo "Build failed - no assets directory" && exit 1)
+
 # Production stage with nginx
 FROM nginx:alpine AS production
 
