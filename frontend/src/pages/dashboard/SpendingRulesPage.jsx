@@ -307,7 +307,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
     return (
         <div className={`bg-ss-surface rounded-xl border overflow-hidden ${
             isDraft ? 'border-amber-500/50' : 
-            isLocked ? 'border-emerald-500/30' : 
+            isLocked ? 'border-teal-500/30' : 
             'border-[rgba(255,255,255,0.06)]'
         }`} data-testid={`policy-card-${policy.id}`}>
             {/* Draft Banner */}
@@ -331,11 +331,11 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                         isDraft ? 'bg-amber-500/10' : 
-                        isLocked ? 'bg-emerald-500/10' : 
+                        isLocked ? 'bg-teal-500/10' : 
                         'bg-ss-accent/10'
                     }`}>
                         {isLocked ? (
-                            <Lock className="w-5 h-5 text-emerald-400" />
+                            <Lock className="w-5 h-5 text-teal-400" />
                         ) : isDraft ? (
                             <FileText className="w-5 h-5 text-amber-400" />
                         ) : (
@@ -352,7 +352,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                 <div className="flex items-center gap-3">
                     {/* Status Badges */}
                     {isLocked && (
-                        <span className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-xs font-medium text-emerald-400 flex items-center gap-1">
+                        <span className="px-2 py-1 bg-teal-500/10 border border-teal-500/30 rounded text-xs font-medium text-teal-400 flex items-center gap-1">
                             <Lock size={12} />
                             Locked
                         </span>
@@ -515,7 +515,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                             {isDraft && (
                                 <button
                                     onClick={onLock}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-medium transition-all"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-lg text-teal-400 text-xs font-medium transition-all"
                                     data-testid={`lock-btn-${policy.id}`}
                                 >
                                     <Lock size={12} />

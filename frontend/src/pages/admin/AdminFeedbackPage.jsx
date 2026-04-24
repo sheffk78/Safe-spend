@@ -17,8 +17,8 @@ const TYPE_CONFIG = {
 };
 
 const SENTIMENT_COLORS = {
-  great: 'text-emerald-400',
-  good: 'text-emerald-300',
+  great: 'text-teal-400',
+  good: 'text-teal-300',
   neutral: 'text-gray-400',
   negative: 'text-red-400'
 };
@@ -146,7 +146,7 @@ const AdminFeedbackPage = () => {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <RefreshCw className="w-6 h-6 text-emerald-400 animate-spin" />
+        <RefreshCw className="w-6 h-6 text-teal-400 animate-spin" />
       </div>
     );
   }
@@ -169,7 +169,7 @@ const AdminFeedbackPage = () => {
           </button>
           <button
             onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -185,7 +185,7 @@ const AdminFeedbackPage = () => {
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded text-sm transition-colors ${
               activeTab === tab
-                ? 'bg-emerald-600 text-white'
+                ? 'bg-teal-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -211,7 +211,7 @@ const AdminFeedbackPage = () => {
                 </span>
                 {stats.nps.trend && (
                   <span className={`flex items-center text-sm ${
-                    stats.nps.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
+                    stats.nps.trend === 'up' ? 'text-teal-400' : 'text-red-400'
                   }`}>
                     {stats.nps.trend === 'up' ? (
                       <TrendingUp className="w-4 h-4 mr-1" />
@@ -233,7 +233,7 @@ const AdminFeedbackPage = () => {
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-white">{stats.feature_requests.total}</span>
-                <span className="text-emerald-400 text-sm">{stats.feature_requests.new} new</span>
+                <span className="text-teal-400 text-sm">{stats.feature_requests.new} new</span>
               </div>
             </div>
 
@@ -242,18 +242,18 @@ const AdminFeedbackPage = () => {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-gray-400 text-sm">Inline Reactions</span>
                 {stats.inline_reactions.positive_percent >= 70 ? (
-                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  <CheckCircle className="w-5 h-5 text-teal-400" />
                 ) : (
                   <XCircle className="w-5 h-5 text-amber-400" />
                 )}
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-white">{stats.inline_reactions.total}</span>
-                <span className="text-emerald-400 text-sm">{stats.inline_reactions.positive_percent}% positive</span>
+                <span className="text-teal-400 text-sm">{stats.inline_reactions.positive_percent}% positive</span>
               </div>
               <div className="flex gap-2 mt-3">
-                <span className="text-xs text-emerald-400">Great: {stats.inline_reactions.breakdown.great}</span>
-                <span className="text-xs text-emerald-300">Good: {stats.inline_reactions.breakdown.good}</span>
+                <span className="text-xs text-teal-400">Great: {stats.inline_reactions.breakdown.great}</span>
+                <span className="text-xs text-teal-300">Good: {stats.inline_reactions.breakdown.good}</span>
                 <span className="text-xs text-gray-400">Neutral: {stats.inline_reactions.breakdown.neutral}</span>
                 <span className="text-xs text-red-400">Negative: {stats.inline_reactions.breakdown.negative}</span>
               </div>
@@ -270,7 +270,7 @@ const AdminFeedbackPage = () => {
                     <div key={req.id} className="flex items-center gap-3">
                       <span className="text-gray-500 text-sm w-4">{i + 1}.</span>
                       <span className="flex-1 text-gray-300 text-sm truncate">{req.title}</span>
-                      <span className="text-emerald-400 text-sm font-mono">{req.votes}</span>
+                      <span className="text-teal-400 text-sm font-mono">{req.votes}</span>
                     </div>
                   ))}
                 </div>
@@ -377,7 +377,7 @@ const AdminFeedbackPage = () => {
                       {item.note && !item.converted_to && (
                         <button
                           onClick={() => handleConvertToRequest(item.id)}
-                          className="px-3 py-1 text-xs bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded transition-colors flex items-center gap-1"
+                          className="px-3 py-1 text-xs bg-teal-600/20 hover:bg-teal-600/30 text-teal-400 rounded transition-colors flex items-center gap-1"
                         >
                           <ArrowRight className="w-3 h-3" />
                           Request
@@ -403,7 +403,7 @@ const AdminFeedbackPage = () => {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-emerald-400 font-mono text-sm">{request.vote_count} votes</span>
+                    <span className="text-teal-400 font-mono text-sm">{request.vote_count} votes</span>
                     <span className="text-xs text-gray-500">{request.comment_count} comments</span>
                     {request.is_pinned && (
                       <span className="text-xs text-amber-400">📌 Pinned</span>
@@ -425,7 +425,7 @@ const AdminFeedbackPage = () => {
                   <select
                     value={request.status}
                     onChange={(e) => handleUpdateRequestStatus(request.id, e.target.value)}
-                    className="px-3 py-1 text-xs bg-[#0A0A0B] border border-white/6 rounded text-white focus:outline-none focus:border-emerald-500"
+                    className="px-3 py-1 text-xs bg-[#0A0A0B] border border-white/6 rounded text-white focus:outline-none focus:border-teal-500"
                   >
                     <option value="new">New</option>
                     <option value="under_review">Under Review</option>

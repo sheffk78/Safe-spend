@@ -12,7 +12,7 @@ import { getInviteDetails, acceptInvite } from '@/lib/api';
 
 const ROLE_CONFIG = {
     owner: { label: 'Owner', color: 'text-amber-400' },
-    finance_admin: { label: 'Finance Admin', color: 'text-emerald-400' },
+    finance_admin: { label: 'Finance Admin', color: 'text-teal-400' },
     developer: { label: 'Developer', color: 'text-blue-400' },
     read_only: { label: 'Read Only', color: 'text-gray-400' }
 };
@@ -88,8 +88,8 @@ const InviteAcceptPage = () => {
         return (
             <div className="min-h-screen bg-ss-bg flex items-center justify-center p-4">
                 <div className="max-w-md w-full bg-ss-card border border-[rgba(255,255,255,0.06)] rounded-xl p-8 text-center">
-                    <div className="w-16 h-16 bg-emerald-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Check className="w-8 h-8 text-emerald-400" />
+                    <div className="w-16 h-16 bg-teal-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Check className="w-8 h-8 text-teal-400" />
                     </div>
                     <h1 className="text-xl font-semibold text-ss-text mb-2">Welcome to the Team!</h1>
                     <p className="text-ss-text-secondary mb-6">

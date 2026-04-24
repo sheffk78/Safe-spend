@@ -98,7 +98,7 @@ const AdminHealthPage = () => {
     if (loading && !status) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -141,7 +141,7 @@ const AdminHealthPage = () => {
                         }`}>
                             <CircleStackIcon className={`w-6 h-6 ${
                                 status?.services?.database?.status === 'connected'
-                                    ? 'text-[#10B981]'
+                                    ? 'text-[#14B8A6]'
                                     : 'text-[#EF4444]'
                             }`} />
                         </div>
@@ -150,12 +150,12 @@ const AdminHealthPage = () => {
                             <div className="flex items-center gap-2 mt-1">
                                 <div className={`w-2 h-2 rounded-full ${
                                     status?.services?.database?.status === 'connected'
-                                        ? 'bg-[#10B981]'
+                                        ? 'bg-[#14B8A6]'
                                         : 'bg-[#EF4444]'
                                 }`} />
                                 <span className={`text-sm ${
                                     status?.services?.database?.status === 'connected'
-                                        ? 'text-[#10B981]'
+                                        ? 'text-[#14B8A6]'
                                         : 'text-[#EF4444]'
                                 }`}>
                                     {status?.services?.database?.status === 'connected' ? 'Connected' : 'Error'}
@@ -184,7 +184,7 @@ const AdminHealthPage = () => {
                         }`}>
                             <CreditCardIcon className={`w-6 h-6 ${
                                 status?.services?.stripe?.status === 'configured'
-                                    ? 'text-[#10B981]'
+                                    ? 'text-[#14B8A6]'
                                     : 'text-[#6B7280]'
                             }`} />
                         </div>
@@ -193,12 +193,12 @@ const AdminHealthPage = () => {
                             <div className="flex items-center gap-2 mt-1">
                                 <div className={`w-2 h-2 rounded-full ${
                                     status?.services?.stripe?.status === 'configured'
-                                        ? 'bg-[#10B981]'
+                                        ? 'bg-[#14B8A6]'
                                         : 'bg-[#6B7280]'
                                 }`} />
                                 <span className={`text-sm ${
                                     status?.services?.stripe?.status === 'configured'
-                                        ? 'text-[#10B981]'
+                                        ? 'text-[#14B8A6]'
                                         : 'text-[#6B7280]'
                                 }`}>
                                     {status?.services?.stripe?.status === 'configured' ? 'Connected' : 'Not Configured'}
@@ -251,7 +251,7 @@ const AdminHealthPage = () => {
                                     className={`h-full rounded-full transition-all ${
                                         memoryPercent > 80 ? 'bg-[#EF4444]' :
                                         memoryPercent > 60 ? 'bg-[#F59E0B]' :
-                                        'bg-[#10B981]'
+                                        'bg-[#14B8A6]'
                                     }`}
                                     style={{ width: `${memoryPercent}%` }}
                                 />
@@ -281,7 +281,7 @@ const AdminHealthPage = () => {
                                 onClick={() => setTimeRange(range.value)}
                                 className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
                                     timeRange === range.value
-                                        ? 'bg-[#10B981] text-white'
+                                        ? 'bg-[#14B8A6] text-white'
                                         : 'bg-[#1A1A1E] text-[#9CA3AF] hover:text-[#F5F5F5]'
                                 }`}
                             >
@@ -293,8 +293,8 @@ const AdminHealthPage = () => {
                 
                 {errors.length === 0 ? (
                     <div className="px-6 py-12 text-center">
-                        <HeartIcon className="w-12 h-12 mx-auto mb-3 text-[#10B981]" />
-                        <p className="text-[#10B981] font-medium">No errors in this time period</p>
+                        <HeartIcon className="w-12 h-12 mx-auto mb-3 text-[#14B8A6]" />
+                        <p className="text-[#14B8A6] font-medium">No errors in this time period</p>
                         <p className="text-sm text-[#6B7280] mt-1">Your system is running smoothly</p>
                     </div>
                 ) : (

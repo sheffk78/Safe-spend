@@ -51,8 +51,8 @@ const timeAgo = (dateStr) => {
 
 // Event type badge colors
 const eventColors = {
-    'org.created': 'bg-[rgba(16,185,129,0.1)] text-[#10B981]',
-    'spend.approved': 'bg-[rgba(16,185,129,0.1)] text-[#10B981]',
+    'org.created': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
+    'spend.approved': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'spend.denied': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
     'escrow.funded': 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
     'approval.requested': 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]',
@@ -110,7 +110,7 @@ const AdminOverviewPage = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -148,10 +148,10 @@ const AdminOverviewPage = () => {
                         : 'bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.2)]'
                 }`}>
                     <div className={`w-2 h-2 rounded-full ${
-                        status?.services?.database?.status === 'connected' ? 'bg-[#10B981]' : 'bg-[#EF4444]'
+                        status?.services?.database?.status === 'connected' ? 'bg-[#14B8A6]' : 'bg-[#EF4444]'
                     }`} />
                     <span className={`text-sm font-medium ${
-                        status?.services?.database?.status === 'connected' ? 'text-[#10B981]' : 'text-[#EF4444]'
+                        status?.services?.database?.status === 'connected' ? 'text-[#14B8A6]' : 'text-[#EF4444]'
                     }`}>
                         Database: {status?.services?.database?.status === 'connected' ? 'Connected' : 'Error'}
                         {status?.services?.database?.latency_ms && (
@@ -167,10 +167,10 @@ const AdminOverviewPage = () => {
                         : 'bg-[rgba(107,114,128,0.1)] border-[rgba(107,114,128,0.2)]'
                 }`}>
                     <div className={`w-2 h-2 rounded-full ${
-                        status?.services?.stripe?.status === 'configured' ? 'bg-[#10B981]' : 'bg-[#6B7280]'
+                        status?.services?.stripe?.status === 'configured' ? 'bg-[#14B8A6]' : 'bg-[#6B7280]'
                     }`} />
                     <span className={`text-sm font-medium ${
-                        status?.services?.stripe?.status === 'configured' ? 'text-[#10B981]' : 'text-[#6B7280]'
+                        status?.services?.stripe?.status === 'configured' ? 'text-[#14B8A6]' : 'text-[#6B7280]'
                     }`}>
                         Stripe: {status?.services?.stripe?.status === 'configured' ? 'Connected' : 'Not Configured'}
                     </span>
@@ -178,8 +178,8 @@ const AdminOverviewPage = () => {
 
                 {/* Uptime */}
                 <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.2)]">
-                    <ClockIcon className="w-4 h-4 text-[#10B981]" />
-                    <span className="text-sm font-medium text-[#10B981]">
+                    <ClockIcon className="w-4 h-4 text-[#14B8A6]" />
+                    <span className="text-sm font-medium text-[#14B8A6]">
                         Uptime: {status?.uptime_seconds ? formatUptime(status.uptime_seconds) : 'N/A'}
                     </span>
                 </div>
@@ -199,7 +199,7 @@ const AdminOverviewPage = () => {
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Organizations</p>
                     {metrics?.organizations?.created_this_week > 0 && (
-                        <p className="text-xs text-[#10B981] mt-1">+{metrics.organizations.created_this_week} this week</p>
+                        <p className="text-xs text-[#14B8A6] mt-1">+{metrics.organizations.created_this_week} this week</p>
                     )}
                 </div>
 
@@ -207,7 +207,7 @@ const AdminOverviewPage = () => {
                 <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-[rgba(16,185,129,0.1)] flex items-center justify-center">
-                            <CurrencyDollarIcon className="w-5 h-5 text-[#10B981]" />
+                            <CurrencyDollarIcon className="w-5 h-5 text-[#14B8A6]" />
                         </div>
                     </div>
                     <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
@@ -230,7 +230,7 @@ const AdminOverviewPage = () => {
                         {metrics?.spend_requests?.today || 0}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Spend Requests Today</p>
-                    <p className="text-xs text-[#10B981] mt-1">
+                    <p className="text-xs text-[#14B8A6] mt-1">
                         {(parseFloat(metrics?.spend_requests?.approved_rate || 0) * 100).toFixed(0)}% approved
                     </p>
                 </div>
@@ -319,7 +319,7 @@ const AdminOverviewPage = () => {
                     <h2 className="font-heading font-semibold text-[#F5F5F5]">Recent Activity</h2>
                     <Link
                         to="/admin/audit"
-                        className="text-sm text-[#10B981] hover:text-[#34D399] transition-colors"
+                        className="text-sm text-[#14B8A6] hover:text-[#2DD4BF] transition-colors"
                     >
                         View all →
                     </Link>

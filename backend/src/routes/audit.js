@@ -1,9 +1,8 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { requireOrgAuth } = require('../middleware/auth');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 /**
  * GET /v1/audit

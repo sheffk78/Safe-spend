@@ -171,7 +171,7 @@ const AdminKeysPage = () => {
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#10B981] hover:bg-[#34D399] rounded-lg text-white font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all"
                     data-testid="create-key-btn"
                 >
                     <PlusIcon className="w-5 h-5" />
@@ -192,16 +192,16 @@ const AdminKeysPage = () => {
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-[rgba(16,185,129,0.2)] flex items-center justify-center">
-                                <KeyIcon className="w-5 h-5 text-[#10B981]" />
+                                <KeyIcon className="w-5 h-5 text-[#14B8A6]" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-[#10B981]">Key Created Successfully</h3>
-                                <p className="text-xs text-[#10B981]/70">Copy and save this key now - it won't be shown again</p>
+                                <h3 className="font-semibold text-[#14B8A6]">Key Created Successfully</h3>
+                                <p className="text-xs text-[#14B8A6]/70">Copy and save this key now - it won't be shown again</p>
                             </div>
                         </div>
                         <button
                             onClick={() => setNewKey(null)}
-                            className="text-[#10B981] hover:text-[#34D399]"
+                            className="text-[#14B8A6] hover:text-[#2DD4BF]"
                         >
                             <XMarkIcon className="w-5 h-5" />
                         </button>
@@ -209,12 +209,12 @@ const AdminKeysPage = () => {
                     
                     <div className="bg-[#0A0A0B] rounded-lg p-4">
                         <div className="flex items-center justify-between">
-                            <code className="text-sm text-[#10B981] font-mono break-all">
+                            <code className="text-sm text-[#14B8A6] font-mono break-all">
                                 {newKey.key}
                             </code>
                             <button
                                 onClick={() => copyToClipboard(newKey.key)}
-                                className="ml-3 p-2 bg-[#141416] rounded-lg text-[#10B981] hover:bg-[#1A1A1E] transition-all flex-shrink-0"
+                                className="ml-3 p-2 bg-[#141416] rounded-lg text-[#14B8A6] hover:bg-[#1A1A1E] transition-all flex-shrink-0"
                             >
                                 {copied ? (
                                     <CheckIcon className="w-4 h-4" />
@@ -225,7 +225,7 @@ const AdminKeysPage = () => {
                         </div>
                     </div>
                     
-                    <div className="mt-3 flex items-center gap-2 text-xs text-[#10B981]/70">
+                    <div className="mt-3 flex items-center gap-2 text-xs text-[#14B8A6]/70">
                         <ExclamationTriangleIcon className="w-4 h-4" />
                         This key has {newKey.scopes?.join(', ')} scope(s)
                     </div>
@@ -255,7 +255,7 @@ const AdminKeysPage = () => {
                                     value={label}
                                     onChange={(e) => setLabel(e.target.value)}
                                     placeholder="e.g., Kit Operations, Blog Publisher"
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                                     data-testid="key-label-input"
                                 />
                             </div>
@@ -277,11 +277,11 @@ const AdminKeysPage = () => {
                                                 type="checkbox"
                                                 checked={selectedScopes.includes(scope.value)}
                                                 onChange={() => toggleScope(scope.value)}
-                                                className="mt-0.5 accent-[#10B981]"
+                                                className="mt-0.5 accent-[#14B8A6]"
                                             />
                                             <div>
                                                 <p className={`text-sm font-medium ${
-                                                    selectedScopes.includes(scope.value) ? 'text-[#10B981]' : 'text-[#F5F5F5]'
+                                                    selectedScopes.includes(scope.value) ? 'text-[#14B8A6]' : 'text-[#F5F5F5]'
                                                 }`}>
                                                     {scope.label}
                                                 </p>
@@ -303,7 +303,7 @@ const AdminKeysPage = () => {
                             <button
                                 onClick={handleCreate}
                                 disabled={creating || !label || selectedScopes.length === 0}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#10B981] hover:bg-[#34D399] rounded-lg text-white font-medium transition-all disabled:opacity-50"
+                                className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all disabled:opacity-50"
                                 data-testid="create-key-submit-btn"
                             >
                                 {creating ? (
@@ -322,7 +322,7 @@ const AdminKeysPage = () => {
             <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : keys.length === 0 ? (
                     <div className="text-center py-12">
@@ -330,7 +330,7 @@ const AdminKeysPage = () => {
                         <p className="text-[#6B7280]">No admin keys found</p>
                         <button
                             onClick={() => setShowCreate(true)}
-                            className="inline-flex items-center gap-2 mt-4 text-sm text-[#10B981] hover:text-[#34D399]"
+                            className="inline-flex items-center gap-2 mt-4 text-sm text-[#14B8A6] hover:text-[#2DD4BF]"
                         >
                             <PlusIcon className="w-4 h-4" />
                             Create your first key
@@ -368,7 +368,7 @@ const AdminKeysPage = () => {
                                         className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)]"
                                     >
                                         <td className="py-4 px-4">
-                                            <code className="text-sm text-[#10B981] font-mono">
+                                            <code className="text-sm text-[#14B8A6] font-mono">
                                                 {key.key_prefix}...
                                             </code>
                                         </td>
@@ -425,7 +425,7 @@ const AdminKeysPage = () => {
             <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
                 <h3 className="font-medium text-[#F5F5F5] mb-2">About Admin Keys</h3>
                 <ul className="text-sm text-[#9CA3AF] space-y-1">
-                    <li>• Admin keys use the format <code className="text-[#10B981]">ss_admin_...</code></li>
+                    <li>• Admin keys use the format <code className="text-[#14B8A6]">ss_admin_...</code></li>
                     <li>• Keys are hashed and cannot be recovered after creation</li>
                     <li>• Assign minimal scopes needed for each use case</li>
                     <li>• Use separate keys for different services (Kit, CI/CD, etc.)</li>

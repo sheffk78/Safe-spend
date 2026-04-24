@@ -210,8 +210,8 @@ const FiduciaryPoliciesPage = () => {
                     icon={Lock} 
                     label="Active (Locked)" 
                     value={stats.active} 
-                    color="text-emerald-400" 
-                    bg="bg-emerald-500/10" 
+                    color="text-teal-400" 
+                    bg="bg-teal-500/10" 
                 />
                 <StatsCard 
                     icon={FileText} 
@@ -360,7 +360,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
     return (
         <div className={`bg-ss-surface rounded-xl border overflow-hidden transition-all ${
             isDraft ? 'border-amber-500/50' : 
-            isLocked ? 'border-emerald-500/30' : 
+            isLocked ? 'border-teal-500/30' : 
             'border-[rgba(255,255,255,0.06)]'
         }`} data-testid={`policy-card-${policy.id}`}>
             {/* Draft Banner */}
@@ -376,11 +376,11 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                         isDraft ? 'bg-amber-500/10' : 
-                        isLocked ? 'bg-emerald-500/10' : 
+                        isLocked ? 'bg-teal-500/10' : 
                         'bg-ss-accent/10'
                     }`}>
                         {isLocked ? (
-                            <Lock className="w-6 h-6 text-emerald-400" />
+                            <Lock className="w-6 h-6 text-teal-400" />
                         ) : isDraft ? (
                             <FileText className="w-6 h-6 text-amber-400" />
                         ) : (
@@ -418,7 +418,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                         </span>
                     )}
                     {isLocked && (
-                        <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+                        <span className="px-2.5 py-1 bg-teal-500/10 border border-teal-500/30 rounded-full text-xs font-medium text-teal-400 flex items-center gap-1.5">
                             <Lock size={12} />
                             Active
                         </span>
@@ -456,7 +456,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                     </span>
                 )}
                 {policy.auto_approve_under_cents && (
-                    <span className="px-2 py-1 bg-emerald-500/10 rounded text-xs text-emerald-400">
+                    <span className="px-2 py-1 bg-teal-500/10 rounded text-xs text-teal-400">
                         Auto &lt; {formatCents(policy.auto_approve_under_cents)}
                     </span>
                 )}
@@ -625,7 +625,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                             {isDraft && (
                                 <button
                                     onClick={onLock}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm font-medium transition-all"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-lg text-teal-400 text-sm font-medium transition-all"
                                     data-testid={`lock-btn-${policy.id}`}
                                 >
                                     <Lock size={14} />
@@ -694,7 +694,7 @@ const ThresholdVisualization = ({ autoApprove, humanReview, perTxLimit }) => {
             <div className="relative h-8 bg-ss-elevated rounded-full overflow-hidden">
                 {/* Auto-approve zone */}
                 <div 
-                    className="absolute inset-y-0 left-0 bg-emerald-500/30 border-r-2 border-emerald-500"
+                    className="absolute inset-y-0 left-0 bg-teal-500/30 border-r-2 border-teal-500"
                     style={{ width: `${autoPercent}%` }}
                 />
                 {/* Human review zone (if different from auto-approve) */}
@@ -712,8 +712,8 @@ const ThresholdVisualization = ({ autoApprove, humanReview, perTxLimit }) => {
             </div>
             <div className="flex justify-between mt-2 text-xs">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-emerald-500/50" />
-                    <span className="text-emerald-400">Auto-approve: {autoApprove ? formatCents(autoApprove) : 'None'}</span>
+                    <div className="w-3 h-3 rounded bg-teal-500/50" />
+                    <span className="text-teal-400">Auto-approve: {autoApprove ? formatCents(autoApprove) : 'None'}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 rounded bg-amber-500/50" />
@@ -973,7 +973,7 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                                 <button
                                     onClick={() => handleSubmit(false)}
                                     disabled={loading || !canProceed()}
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
                                     data-testid="wizard-activate-btn"
                                 >
                                     {loading ? (
@@ -1112,10 +1112,10 @@ const Step2Thresholds = ({ formData, onChange }) => {
                 <div className="relative h-12 bg-ss-elevated rounded-lg overflow-hidden mb-4">
                     {autoApprove > 0 && (
                         <div 
-                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500/40 to-emerald-500/20 flex items-center justify-center"
+                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-500/40 to-teal-500/20 flex items-center justify-center"
                             style={{ width: `${Math.min((autoApprove / maxLimit) * 100, 100)}%` }}
                         >
-                            <span className="text-xs font-medium text-emerald-400">Auto</span>
+                            <span className="text-xs font-medium text-teal-400">Auto</span>
                         </div>
                     )}
                     {humanReview > autoApprove && (
@@ -1133,7 +1133,7 @@ const Step2Thresholds = ({ formData, onChange }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-medium text-emerald-400 mb-2">
+                        <label className="block text-xs font-medium text-teal-400 mb-2">
                             Auto-Approve Under
                         </label>
                         <div className="relative">
@@ -1145,7 +1145,7 @@ const Step2Thresholds = ({ formData, onChange }) => {
                                 placeholder="50"
                                 min="0"
                                 step="1"
-                                className="w-full pl-7 pr-4 py-2.5 bg-ss-elevated border border-emerald-500/30 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-emerald-500"
+                                className="w-full pl-7 pr-4 py-2.5 bg-ss-elevated border border-teal-500/30 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-teal-500"
                                 data-testid="wizard-auto-approve"
                             />
                         </div>
@@ -1502,7 +1502,7 @@ const Step4Review = ({ formData, escrowAccounts }) => {
                         </h4>
                         <div className="flex flex-wrap gap-2">
                             {formData.auto_approve_under && (
-                                <span className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">
+                                <span className="px-3 py-1.5 bg-teal-500/10 border border-teal-500/30 text-teal-400 rounded-lg text-xs font-medium">
                                     Auto-approve under ${formData.auto_approve_under}
                                 </span>
                             )}

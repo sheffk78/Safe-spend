@@ -12,11 +12,9 @@
  * - Max 10 retry attempts before marking as failed
  */
 
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const crypto = require('crypto');
 const { generateId } = require('../utils/ids');
-
-const prisma = new PrismaClient();
 
 // Supported webhook event types
 const SUPPORTED_EVENTS = [

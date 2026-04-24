@@ -28,7 +28,7 @@ const BlogHeader = () => {
         <header className="border-b border-white/[0.06] bg-[#111113]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl shrink-0">
-                    <span className="text-emerald-500">&#9670;</span>
+                    <span className="text-teal-500">&#9670;</span>
                     Safe-Spend
                 </Link>
                 {/* Desktop nav */}
@@ -36,7 +36,7 @@ const BlogHeader = () => {
                     <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium">Home</Link>
                     <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium">Dashboard</Link>
                     <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium">Docs</Link>
-                    <Link to="/blog" className="text-emerald-500 text-sm font-medium">Blog</Link>
+                    <Link to="/blog" className="text-teal-500 text-sm font-medium">Blog</Link>
                     <a href="/api/blog/rss" className="text-zinc-400 hover:text-white" title="RSS Feed">
                         <Rss size={18} />
                     </a>
@@ -56,7 +56,7 @@ const BlogHeader = () => {
                     <Link to="/" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Home</Link>
                     <Link to="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Dashboard</Link>
                     <Link to="/docs" className="text-zinc-400 hover:text-white text-sm font-medium py-2">Docs</Link>
-                    <Link to="/blog" className="text-emerald-500 text-sm font-medium py-2">Blog</Link>
+                    <Link to="/blog" className="text-teal-500 text-sm font-medium py-2">Blog</Link>
                     <a href="/api/blog/rss" className="text-zinc-400 hover:text-white text-sm font-medium py-2 flex items-center gap-2">
                         <Rss size={16} /> RSS Feed
                     </a>
@@ -116,7 +116,7 @@ export const BlogIndexPage = () => {
         <div className="min-h-screen bg-[#0A0A0B]">
             <Helmet>
                 <title>Blog | Safe-Spend</title>
-                <meta name="description" content="Insights on AI agent spending controls, escrow, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible." />
+                <meta name="description" content="Insights on AI agent spending controls, spending pools, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible." />
                 <link rel="canonical" href="https://safe-spend.dev/blog" />
                 <link rel="alternate" type="application/rss+xml" title="Safe-Spend Blog" href="/api/blog/rss" />
             </Helmet>
@@ -130,7 +130,7 @@ export const BlogIndexPage = () => {
                         Safe-Spend Blog
                     </h1>
                     <p className="text-zinc-400 text-lg">
-                        Insights on AI agent spending controls, escrow, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible.
+                        Insights on AI agent spending controls, spending pools, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible.
                     </p>
                 </div>
             </section>
@@ -144,7 +144,7 @@ export const BlogIndexPage = () => {
                                 onClick={() => handleTagClick(null)}
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                                     !currentTag 
-                                        ? 'bg-emerald-500 text-white' 
+                                        ? 'bg-teal-500 text-white' 
                                         : 'bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.06]'
                                 }`}
                             >
@@ -156,7 +156,7 @@ export const BlogIndexPage = () => {
                                     onClick={() => handleTagClick(t.tag)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                                         currentTag === t.tag 
-                                            ? 'bg-emerald-500 text-white' 
+                                            ? 'bg-teal-500 text-white' 
                                             : 'bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.06]'
                                     }`}
                                 >
@@ -172,7 +172,7 @@ export const BlogIndexPage = () => {
             <main className="max-w-6xl mx-auto px-6 py-12">
                 {loading ? (
                     <div className="text-center py-20">
-                        <div className="animate-spin h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto"></div>
+                        <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full mx-auto"></div>
                     </div>
                 ) : posts.length === 0 ? (
                     <div className="text-center py-20 text-zinc-400">
@@ -183,7 +183,7 @@ export const BlogIndexPage = () => {
                         {posts.map(post => (
                             <article 
                                 key={post.id} 
-                                className="bg-[#111113] border border-white/[0.06] rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all hover:-translate-y-1"
+                                className="bg-[#111113] border border-white/[0.06] rounded-xl overflow-hidden hover:border-teal-500/50 transition-all hover:-translate-y-1"
                             >
                                 <Link to={`/blog/${post.slug}`}>
                                     {post.cover_image ? (
@@ -193,7 +193,7 @@ export const BlogIndexPage = () => {
                                             className="w-full h-48 object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-48 bg-zinc-800 flex items-center justify-center text-5xl text-emerald-500">
+                                        <div className="w-full h-48 bg-zinc-800 flex items-center justify-center text-5xl text-teal-500">
                                             ◆
                                         </div>
                                     )}
@@ -214,7 +214,7 @@ export const BlogIndexPage = () => {
                                         </span>
                                     </div>
                                     <Link to={`/blog/${post.slug}`}>
-                                        <h2 className="text-lg font-semibold text-white mb-2 hover:text-emerald-500 transition-colors font-['Space_Grotesk']">
+                                        <h2 className="text-lg font-semibold text-white mb-2 hover:text-teal-500 transition-colors font-['Space_Grotesk']">
                                             {post.title}
                                         </h2>
                                     </Link>
@@ -253,7 +253,7 @@ export const BlogIndexPage = () => {
                                 onClick={() => handlePageChange(page)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium ${
                                     page === currentPage 
-                                        ? 'bg-emerald-500 text-white' 
+                                        ? 'bg-teal-500 text-white' 
                                         : 'bg-zinc-800 border border-white/[0.06] text-zinc-400 hover:text-white'
                                 }`}
                             >
@@ -304,7 +304,7 @@ export const BlogPostPage = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-                <div className="animate-spin h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
             </div>
         );
     }
@@ -316,7 +316,7 @@ export const BlogPostPage = () => {
                 <p className="text-zinc-400 mb-8">Post not found</p>
                 <Link 
                     to="/blog" 
-                    className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
+                    className="px-6 py-3 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
                 >
                     Back to Blog
                 </Link>
@@ -371,7 +371,7 @@ export const BlogPostPage = () => {
                 {/* Post Header */}
                 <header className="text-center mb-12">
                     {post.category && (
-                        <span className="inline-block px-4 py-1.5 bg-emerald-500 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-6">
+                        <span className="inline-block px-4 py-1.5 bg-teal-500 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-6">
                             {post.category}
                         </span>
                     )}
@@ -401,16 +401,16 @@ export const BlogPostPage = () => {
                 
                 {/* Content */}
                 <div 
-                    className="prose prose-invert prose-emerald max-w-none
+                    className="prose prose-invert prose-teal max-w-none
                         prose-headings:font-['Space_Grotesk'] prose-headings:text-white
                         prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
                         prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
                         prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:mb-6
-                        prose-a:text-emerald-500 prose-a:no-underline hover:prose-a:underline
+                        prose-a:text-teal-500 prose-a:no-underline hover:prose-a:underline
                         prose-strong:text-white
                         prose-code:bg-zinc-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
                         prose-pre:bg-zinc-800 prose-pre:border prose-pre:border-white/[0.06] prose-pre:rounded-lg
-                        prose-blockquote:border-l-emerald-500 prose-blockquote:text-zinc-400 prose-blockquote:italic
+                        prose-blockquote:border-l-teal-500 prose-blockquote:text-zinc-400 prose-blockquote:italic
                         prose-ul:text-zinc-400 prose-ol:text-zinc-400
                         prose-li:mb-2"
                     dangerouslySetInnerHTML={{ __html: post.content_html }}
@@ -422,7 +422,7 @@ export const BlogPostPage = () => {
                         <Link 
                             key={tag}
                             to={`/blog?tag=${encodeURIComponent(tag)}`}
-                            className="px-4 py-2 bg-zinc-800 border border-white/[0.06] rounded-full text-sm text-zinc-400 hover:text-white hover:border-emerald-500/50 transition-all"
+                            className="px-4 py-2 bg-zinc-800 border border-white/[0.06] rounded-full text-sm text-zinc-400 hover:text-white hover:border-teal-500/50 transition-all"
                         >
                             <Tag size={12} className="inline mr-1.5" />
                             {tag}

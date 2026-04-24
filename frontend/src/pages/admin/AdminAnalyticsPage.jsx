@@ -271,7 +271,7 @@ const AdminAnalyticsPage = () => {
                         <DonutChart data={approvalChartData} size={100} />
                         <div className="space-y-2 text-sm">
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                <div className="w-3 h-3 rounded-full bg-teal-500"></div>
                                 <span className="text-ss-text-secondary">Approved:</span>
                                 <span className="text-ss-text font-medium">{approvalRates?.approval_rate || 0}%</span>
                             </div>
@@ -374,7 +374,7 @@ const AdminAnalyticsPage = () => {
                                         <td className="py-2 text-right text-ss-text-secondary">{formatCents(e.total_spent_cents)}</td>
                                         <td className="py-2">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                                e.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                                                e.status === 'active' ? 'bg-teal-500/10 text-teal-400' :
                                                 e.status === 'paused' ? 'bg-amber-500/10 text-amber-400' :
                                                 e.status === 'depleted' ? 'bg-red-500/10 text-red-400' :
                                                 'bg-gray-500/10 text-gray-400'

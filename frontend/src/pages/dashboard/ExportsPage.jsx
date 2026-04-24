@@ -29,8 +29,8 @@ const REPORT_TYPES = {
         label: 'Spend Activity',
         description: 'Export all spend requests with amounts, vendors, statuses, and approvals',
         icon: ArrowRightLeft,
-        color: 'text-emerald-400',
-        bgColor: 'bg-emerald-400/10',
+        color: 'text-teal-400',
+        bgColor: 'bg-teal-400/10',
     },
     'audit-events': {
         label: 'Audit Events',
@@ -430,7 +430,7 @@ const ExportsPage = () => {
             )}
             
             {success && (
-                <div className="flex items-center gap-2 text-emerald-400 text-sm bg-emerald-400/10 px-4 py-3 rounded-lg">
+                <div className="flex items-center gap-2 text-teal-400 text-sm bg-teal-400/10 px-4 py-3 rounded-lg">
                     <CheckCircle size={18} />
                     {success}
                 </div>

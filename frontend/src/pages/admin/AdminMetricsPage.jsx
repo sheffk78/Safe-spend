@@ -36,7 +36,7 @@ const MiniBarChart = ({ data, max }) => {
             {data.map((item, i) => (
                 <div 
                     key={i}
-                    className="flex-1 bg-[#10B981] rounded-t hover:bg-[#34D399] transition-all"
+                    className="flex-1 bg-[#14B8A6] rounded-t hover:bg-[#2DD4BF] transition-all"
                     style={{ height: `${(item.value / maxValue) * 100}%`, minHeight: '2px' }}
                     title={`${item.label}: ${item.value}`}
                 />
@@ -82,7 +82,7 @@ const AdminMetricsPage = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -135,7 +135,7 @@ const AdminMetricsPage = () => {
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">This week</span>
-                            <span className="text-[#10B981]">+{metrics?.organizations?.created_this_week || 0}</span>
+                            <span className="text-[#14B8A6]">+{metrics?.organizations?.created_this_week || 0}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">This month</span>
@@ -148,7 +148,7 @@ const AdminMetricsPage = () => {
                 <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-[rgba(16,185,129,0.1)] flex items-center justify-center">
-                            <CurrencyDollarIcon className="w-6 h-6 text-[#10B981]" />
+                            <CurrencyDollarIcon className="w-6 h-6 text-[#14B8A6]" />
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
@@ -160,7 +160,7 @@ const AdminMetricsPage = () => {
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Active</span>
-                            <span className="text-[#10B981]">{metrics?.escrow_accounts?.active || 0}</span>
+                            <span className="text-[#14B8A6]">{metrics?.escrow_accounts?.active || 0}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Paused</span>
@@ -214,7 +214,7 @@ const AdminMetricsPage = () => {
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Live</span>
-                            <span className="text-[#10B981]">{metrics?.api_keys?.by_type?.live || 0}</span>
+                            <span className="text-[#14B8A6]">{metrics?.api_keys?.by_type?.live || 0}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Test</span>
@@ -239,14 +239,14 @@ const AdminMetricsPage = () => {
                         <div>
                             <div className="flex justify-between mb-1">
                                 <div className="flex items-center gap-2">
-                                    <CheckCircleIcon className="w-4 h-4 text-[#10B981]" />
+                                    <CheckCircleIcon className="w-4 h-4 text-[#14B8A6]" />
                                     <span className="text-sm text-[#9CA3AF]">Approved</span>
                                 </div>
-                                <span className="text-sm font-mono text-[#10B981]">{approvedRate.toFixed(0)}%</span>
+                                <span className="text-sm font-mono text-[#14B8A6]">{approvedRate.toFixed(0)}%</span>
                             </div>
                             <div className="h-2 bg-[#1A1A1E] rounded-full overflow-hidden">
                                 <div 
-                                    className="h-full bg-[#10B981] rounded-full transition-all"
+                                    className="h-full bg-[#14B8A6] rounded-full transition-all"
                                     style={{ width: `${approvedRate}%` }}
                                 />
                             </div>
@@ -296,10 +296,10 @@ const AdminMetricsPage = () => {
                     
                     <div className="flex items-center gap-2 mb-4">
                         <div className={`w-2 h-2 rounded-full ${
-                            stripeMetrics?.status === 'configured' ? 'bg-[#10B981]' : 'bg-[#6B7280]'
+                            stripeMetrics?.status === 'configured' ? 'bg-[#14B8A6]' : 'bg-[#6B7280]'
                         }`} />
                         <span className={`text-sm ${
-                            stripeMetrics?.status === 'configured' ? 'text-[#10B981]' : 'text-[#6B7280]'
+                            stripeMetrics?.status === 'configured' ? 'text-[#14B8A6]' : 'text-[#6B7280]'
                         }`}>
                             {stripeMetrics?.status === 'configured' ? 'Connected' : 'Not Configured'}
                         </span>
@@ -315,7 +315,7 @@ const AdminMetricsPage = () => {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm text-[#6B7280]">Total funded</span>
-                                <span className="text-sm font-mono text-[#10B981]">
+                                <span className="text-sm font-mono text-[#14B8A6]">
                                     {formatCents(stripeMetrics.fundings_this_month.total_cents || 0)}
                                 </span>
                             </div>

@@ -29,7 +29,7 @@ const formatDate = (dateStr) => {
 
 // Status badge colors
 const statusColors = {
-    published: 'bg-[rgba(16,185,129,0.1)] text-[#10B981] border-[rgba(16,185,129,0.2)]',
+    published: 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6] border-[rgba(16,185,129,0.2)]',
     draft: 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B] border-[rgba(245,158,11,0.2)]',
     archived: 'bg-[rgba(107,114,128,0.1)] text-[#6B7280] border-[rgba(107,114,128,0.2)]'
 };
@@ -160,7 +160,7 @@ const AdminBlogPage = () => {
                 </div>
                 <Link
                     to="/admin/blog/new"
-                    className="flex items-center gap-2 px-4 py-2 bg-[#10B981] hover:bg-[#34D399] rounded-lg text-white font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all"
                     data-testid="new-post-btn"
                 >
                     <PlusIcon className="w-5 h-5" />
@@ -185,7 +185,7 @@ const AdminBlogPage = () => {
                             onClick={() => setFilter(status)}
                             className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                                 filter === status
-                                    ? 'bg-[#10B981] text-white'
+                                    ? 'bg-[#14B8A6] text-white'
                                     : 'bg-[#141416] text-[#9CA3AF] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.06)]'
                             }`}
                         >
@@ -203,7 +203,7 @@ const AdminBlogPage = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search posts..."
-                        className="pl-9 pr-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] text-sm w-64"
+                        className="pl-9 pr-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] text-sm w-64"
                     />
                 </div>
             </div>
@@ -212,7 +212,7 @@ const AdminBlogPage = () => {
             <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : filteredPosts.length === 0 ? (
                     <div className="text-center py-12">
@@ -223,7 +223,7 @@ const AdminBlogPage = () => {
                         {posts.length === 0 && (
                             <Link
                                 to="/admin/blog/new"
-                                className="inline-flex items-center gap-2 mt-4 text-sm text-[#10B981] hover:text-[#34D399]"
+                                className="inline-flex items-center gap-2 mt-4 text-sm text-[#14B8A6] hover:text-[#2DD4BF]"
                             >
                                 <PlusIcon className="w-4 h-4" />
                                 Create your first post
@@ -261,7 +261,7 @@ const AdminBlogPage = () => {
                                         <td className="py-4 px-4">
                                             <Link 
                                                 to={`/admin/blog/edit/${post.id}`}
-                                                className="hover:text-[#10B981] transition-colors"
+                                                className="hover:text-[#14B8A6] transition-colors"
                                             >
                                                 <p className="font-medium text-[#F5F5F5]">{post.title}</p>
                                                 {post.subtitle && (
@@ -316,7 +316,7 @@ const AdminBlogPage = () => {
                                                     <button
                                                         onClick={() => handlePublish(post.id)}
                                                         disabled={publishing === post.id}
-                                                        className="p-2 text-[#10B981] hover:bg-[rgba(16,185,129,0.1)] rounded-lg transition-all disabled:opacity-50"
+                                                        className="p-2 text-[#14B8A6] hover:bg-[rgba(16,185,129,0.1)] rounded-lg transition-all disabled:opacity-50"
                                                         title="Publish"
                                                     >
                                                         {publishing === post.id ? (

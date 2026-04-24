@@ -48,6 +48,7 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
+    healthCheckPath: /health
     headers:
       - path: /*
         name: X-Frame-Options

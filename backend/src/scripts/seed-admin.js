@@ -4,9 +4,7 @@
  */
 
 const bcrypt = require('bcrypt');
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 async function seedAdmin() {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@agentictrust.app';

@@ -1,12 +1,10 @@
+const prisma = require('../lib/prisma.js');
 /**
  * Blog Service
  * Handles blog post operations with auto-computed fields
  */
 
-const { PrismaClient } = require('@prisma/client');
 const { marked } = require('marked');
-const prisma = new PrismaClient();
-
 // Configure marked for syntax highlighting
 marked.setOptions({
     gfm: true,

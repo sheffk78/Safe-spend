@@ -4,13 +4,12 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { generateId } = require('../utils/ids');
 const { requireOrgAuth, requireOrgOwner, requirePermission } = require('../middleware/auth');
 const rbacService = require('../services/rbac-service');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 /**
  * GET /v1/team

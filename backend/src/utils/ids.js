@@ -13,7 +13,7 @@ const ID_PREFIXES = {
     auditEvent: 'evt_',
     webhook: 'whk_',
     webhookDelivery: 'dlv_',
-    event: 'evt_',
+    event: 'evn_',
     orgMember: 'mbr_',
     agentCertificate: 'acrt_',
     crossToolEvent: 'evt_at_',

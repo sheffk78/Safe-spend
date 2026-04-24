@@ -13,9 +13,7 @@ const blogService = require('../services/blog-service');
 const adminKeyService = require('../services/admin-key-service');
 const { requireAdmin } = require('../middleware/admin-auth');
 const jwt = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
 
 // Configure multer for image uploads

@@ -5,12 +5,11 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 const { logger } = require('../lib/logger');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const AAV_API_URL = process.env.AAV_API_URL || 'https://agentauthority.dev';
 

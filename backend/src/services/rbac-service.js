@@ -1,13 +1,11 @@
+const prisma = require('../lib/prisma.js');
 /**
  * RBAC (Role-Based Access Control) Service
  * Manages organization members, roles, and permissions
  */
 
-const { PrismaClient } = require('@prisma/client');
 const crypto = require('crypto');
 const { generateId } = require('../utils/ids');
-
-const prisma = new PrismaClient();
 
 // Role definitions and permissions
 const ROLES = {

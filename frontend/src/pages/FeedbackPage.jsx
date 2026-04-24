@@ -10,7 +10,7 @@ const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 const CATEGORIES = [
   { id: 'api', label: 'API', color: 'bg-blue-500/20 text-blue-400' },
   { id: 'sdk', label: 'SDK', color: 'bg-purple-500/20 text-purple-400' },
-  { id: 'dashboard', label: 'Dashboard', color: 'bg-emerald-500/20 text-emerald-400' },
+  { id: 'dashboard', label: 'Dashboard', color: 'bg-teal-500/20 text-teal-400' },
   { id: 'integrations', label: 'Integrations', color: 'bg-orange-500/20 text-orange-400' },
   { id: 'docs', label: 'Docs', color: 'bg-cyan-500/20 text-cyan-400' },
   { id: 'billing', label: 'Billing', color: 'bg-pink-500/20 text-pink-400' },
@@ -20,9 +20,9 @@ const CATEGORIES = [
 const STATUS_CONFIG = {
   new: { label: 'New', color: 'bg-gray-500/20 text-gray-400', icon: Clock },
   under_review: { label: 'Under Review', color: 'bg-amber-500/20 text-amber-400', icon: Eye },
-  planned: { label: 'Planned', color: 'bg-emerald-500/20 text-emerald-400', icon: Check },
+  planned: { label: 'Planned', color: 'bg-teal-500/20 text-teal-400', icon: Check },
   in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400', icon: Rocket },
-  shipped: { label: 'Shipped', color: 'bg-emerald-500/20 text-emerald-400', icon: CheckCircle },
+  shipped: { label: 'Shipped', color: 'bg-teal-500/20 text-teal-400', icon: CheckCircle },
   declined: { label: 'Declined', color: 'bg-gray-500/20 text-gray-400', icon: XCircle }
 };
 
@@ -109,7 +109,7 @@ const FeedbackPage = () => {
             </div>
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
               data-testid="submit-idea-btn"
             >
               <Plus className="w-4 h-4" />
@@ -126,7 +126,7 @@ const FeedbackPage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search ideas..."
-                className="w-full pl-10 pr-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-10 pr-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
               />
             </div>
             <div className="flex gap-1 bg-[#0A0A0B] rounded-lg p-1 border border-white/6">
@@ -157,7 +157,7 @@ const FeedbackPage = () => {
             <p className="text-gray-400 mb-4">No feature requests yet. Be the first!</p>
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg"
             >
               Submit an Idea
             </button>
@@ -181,15 +181,15 @@ const FeedbackPage = () => {
                       onClick={() => handleVote(request.id)}
                       className={`p-1 rounded transition-colors ${
                         request.has_voted
-                          ? 'text-emerald-400'
-                          : 'text-gray-500 hover:text-emerald-400'
+                          ? 'text-teal-400'
+                          : 'text-gray-500 hover:text-teal-400'
                       }`}
                       data-testid={`vote-${request.id}`}
                     >
                       <ChevronUp className="w-5 h-5" />
                     </button>
                     <span className={`text-sm font-mono ${
-                      request.has_voted ? 'text-emerald-400' : 'text-white'
+                      request.has_voted ? 'text-teal-400' : 'text-white'
                     }`}>
                       {request.vote_count}
                     </span>
@@ -202,7 +202,7 @@ const FeedbackPage = () => {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="text-white font-medium mb-1 hover:text-emerald-400 transition-colors">
+                        <h3 className="text-white font-medium mb-1 hover:text-teal-400 transition-colors">
                           {request.is_pinned && <span className="mr-2">📌</span>}
                           {request.title}
                         </h3>
@@ -242,7 +242,7 @@ const FeedbackPage = () => {
                 onClick={() => setPage(p)}
                 className={`w-8 h-8 rounded ${
                   page === p
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-teal-600 text-white'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
               >
@@ -346,7 +346,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
               placeholder='e.g., "Slack notifications for approval requests"'
-              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
               required
               data-testid="idea-title"
             />
@@ -361,7 +361,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               maxLength={1000}
               rows={4}
               placeholder="What problem does this solve? How would you use it?"
-              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 resize-none"
+              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500 resize-none"
               required
               data-testid="idea-description"
             />
@@ -380,7 +380,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
                   onClick={() => setCategory(cat.id)}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                     category === cat.id
-                      ? 'bg-emerald-600 text-white'
+                      ? 'bg-teal-600 text-white'
                       : 'bg-white/5 text-gray-400 hover:bg-white/10'
                   }`}
                   data-testid={`category-${cat.id}`}
@@ -395,7 +395,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
             <div
               className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
                 isAnonymous
-                  ? 'bg-emerald-600 border-emerald-500'
+                  ? 'bg-teal-600 border-teal-500'
                   : 'border-white/20'
               }`}
             >
@@ -423,7 +423,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
             <button
               type="submit"
               disabled={!title || !description || !category || submitting}
-              className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="flex-1 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               data-testid="submit-idea"
             >
               {submitting ? 'Submitting...' : 'Submit Idea →'}
@@ -515,14 +515,14 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
                 onClick={onVote}
                 className={`p-2 rounded-lg border transition-colors ${
                   request.has_voted
-                    ? 'bg-emerald-900/50 border-emerald-500 text-emerald-400'
-                    : 'border-white/6 text-gray-400 hover:border-emerald-500'
+                    ? 'bg-teal-900/50 border-teal-500 text-teal-400'
+                    : 'border-white/6 text-gray-400 hover:border-teal-500'
                 }`}
               >
                 <ChevronUp className="w-6 h-6" />
               </button>
               <span className={`text-lg font-mono ${
-                request.has_voted ? 'text-emerald-400' : 'text-white'
+                request.has_voted ? 'text-teal-400' : 'text-white'
               }`}>
                 {request.vote_count}
               </span>
@@ -566,12 +566,12 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
                 <div key={comment.id} className="bg-[#141416] rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-sm font-medium ${
-                      comment.is_team ? 'text-emerald-400' : 'text-white'
+                      comment.is_team ? 'text-teal-400' : 'text-white'
                     }`}>
                       {comment.org_name}
                     </span>
                     {comment.is_team && (
-                      <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">
+                      <span className="px-1.5 py-0.5 bg-teal-500/20 text-teal-400 text-xs rounded">
                         Safe-Spend Team
                       </span>
                     )}
@@ -591,12 +591,12 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+                className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
               />
               <button
                 onClick={handleComment}
                 disabled={!newComment.trim() || submitting}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
                 Comment
               </button>

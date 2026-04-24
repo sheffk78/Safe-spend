@@ -1,16 +1,16 @@
 # Safe-Spend
 
-**Fiduciary-grade spending control for AI agents.**
+**Spending governance for AI agents.**
 
-Safe-Spend is a fiat-first escrow and spending-control API that applies trust-law principles to agent spending. Fund an escrow account, define fiduciary policies, and let your agents spend within them. Every dollar, every decision, every receipt — logged.
+Safe-Spend is a policy-based spend control API for AI agents. Fund a spending pool, define guardrails, and let your agents spend within them. Every dollar, every decision, every receipt — logged.
 
 ## Features
 
-- **Escrow Accounts**: Segregated fund pools for AI agents
-- **Fiduciary Policies**: Trust-law inspired spending rules with per-transaction limits, daily caps, vendor/category restrictions
-- **Agent Authority Vault (AAV)**: Tie agent identity to spending policies
+- **Spending Pools**: Segregated fund pools for AI agents
+- **Policy Engine**: Programmatic spending rules with per-transaction limits, daily/weekly/monthly caps, vendor/category restrictions
+- **Agent Authorization**: Configurable agent identity verification (certificate-based crypto verification coming soon)
 - **Real-time Approvals**: Webhook notifications for spend requests
-- **Audit Trail**: Complete transaction history with compliance exports
+- **Audit Trail**: Complete transaction history with compliance exports (PDF statements coming soon)
 - **Python SDK & LangChain Integration**: Ready-to-use tools for AI agents
 
 ## Tech Stack

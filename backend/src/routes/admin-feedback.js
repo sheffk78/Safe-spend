@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const adminKeyService = require('../services/admin-key-service');
 const { v4: uuidv4 } = require('uuid');
-
-const prisma = new PrismaClient();
 
 // Helper to generate prefixed IDs
 const generateId = (prefix) => `${prefix}_${uuidv4().replace(/-/g, '').substring(0, 12)}`;

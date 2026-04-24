@@ -1,3 +1,4 @@
+const prisma = require('../lib/prisma.js');
 /**
  * Stripe Service
  * Handles Stripe-related business logic for Safe-Spend
@@ -9,11 +10,8 @@
  * - Webhook event processing
  */
 
-const { PrismaClient } = require('@prisma/client');
 const stripeLib = require('../lib/stripe');
 const { generateId } = require('../utils/ids');
-
-const prisma = new PrismaClient();
 
 /**
  * Helper function to generate event IDs

@@ -50,7 +50,7 @@ const AdminLoginPage = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -131,7 +131,7 @@ const AdminLoginPage = () => {
 
                 {/* Footer */}
                 <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.06)] text-center">
-                    <a href="/" className="text-sm text-[#6B7280] hover:text-[#10B981] transition-colors">
+                    <a href="/" className="text-sm text-[#6B7280] hover:text-[#14B8A6] transition-colors">
                         ← Back to Safe-Spend
                     </a>
                 </div>

@@ -607,7 +607,7 @@ const simulateSpendRequest = (body) => {
 const MethodBadge = ({ method }) => {
     const colors = {
         GET: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-        POST: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+        POST: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
         PATCH: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
         PUT: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
         DELETE: 'bg-red-500/20 text-red-400 border-red-500/30'
@@ -621,7 +621,7 @@ const MethodBadge = ({ method }) => {
 
 const StatusBadge = ({ status }) => {
     if (status >= 200 && status < 300) {
-        return <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-sm font-mono">{status} OK</span>;
+        return <span className="px-2 py-1 bg-teal-500/20 text-teal-400 rounded text-sm font-mono">{status} OK</span>;
     }
     if (status >= 400 && status < 500) {
         return <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-sm font-mono">{status} Error</span>;
@@ -648,7 +648,7 @@ const CodeBlock = ({ code, language, onCopy }) => {
                 onClick={handleCopy}
                 className="absolute top-3 right-3 p-2 bg-[#1A1A1E] hover:bg-[#242428] rounded-lg text-[#6B7280] hover:text-[#F5F5F5] transition-all z-10"
             >
-                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copied ? <Check size={14} className="text-teal-400" /> : <Copy size={14} />}
             </button>
             <pre className="bg-[#0A0A0B] rounded-lg p-4 overflow-x-auto text-sm border border-[rgba(255,255,255,0.06)]">
                 <code className="text-[#9CA3AF] font-mono whitespace-pre">{code}</code>
@@ -919,7 +919,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     onClick={() => { setMode('demo'); handleDisconnect(); }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                         mode === 'demo'
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                            ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                                             : 'bg-[#141416] text-[#9CA3AF] border border-[rgba(255,255,255,0.06)] hover:text-[#F5F5F5]'
                                     }`}
                                 >
@@ -948,13 +948,13 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                         value={apiKeyInput}
                                         onChange={(e) => setApiKeyInput(e.target.value)}
                                         placeholder="sk_live_... or sk_test_..."
-                                        className="flex-1 px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-emerald-500"
+                                        className="flex-1 px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500"
                                         data-testid="api-key-input"
                                     />
                                     <button
                                         onClick={handleConnect}
                                         disabled={connecting || !apiKeyInput}
-                                        className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
+                                        className="px-6 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
                                         data-testid="connect-btn"
                                     >
                                         {connecting ? 'Connecting...' : 'Connect'}
@@ -969,8 +969,8 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             ) : mode === 'live' && apiKey ? (
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                                        <span className="text-emerald-400 font-medium">Connected</span>
+                                        <div className="w-2 h-2 rounded-full bg-teal-400" />
+                                        <span className="text-teal-400 font-medium">Connected</span>
                                         {connectedOrg && (
                                             <span className="text-[#9CA3AF]">— {connectedOrg.name}</span>
                                         )}
@@ -988,8 +988,8 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             ) : (
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                        <span className="text-emerald-400 font-medium">Demo Mode</span>
+                                        <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                                        <span className="text-teal-400 font-medium">Demo Mode</span>
                                         <span className="text-[#9CA3AF]">— Using simulated data</span>
                                     </div>
                                     <button
@@ -1015,7 +1015,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
                                 <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
                                     <div className="flex items-center gap-2">
-                                        <Play size={16} className="text-emerald-400" />
+                                        <Play size={16} className="text-teal-400" />
                                         <h2 className="font-semibold text-[#F5F5F5]">Quick Scenarios</h2>
                                     </div>
                                 </div>
@@ -1026,13 +1026,13 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                             onClick={() => selectScenario(scenario)}
                                             className={`w-full px-4 py-3 text-left transition-all ${
                                                 selectedScenario?.id === scenario.id
-                                                    ? 'bg-emerald-500/5 border-l-2 border-emerald-500'
+                                                    ? 'bg-teal-500/5 border-l-2 border-teal-500'
                                                     : 'hover:bg-[rgba(255,255,255,0.02)] border-l-2 border-transparent'
                                             }`}
                                             data-testid={`scenario-${scenario.id}`}
                                         >
                                             <p className={`font-medium text-sm ${
-                                                selectedScenario?.id === scenario.id ? 'text-emerald-400' : 'text-[#F5F5F5]'
+                                                selectedScenario?.id === scenario.id ? 'text-teal-400' : 'text-[#F5F5F5]'
                                             }`}>
                                                 {scenario.name}
                                             </p>
@@ -1071,7 +1071,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                                 onClick={() => selectEndpoint(endpoint)}
                                                                 className={`w-full px-4 py-2 flex items-center gap-2 text-left transition-all ${
                                                                     isSelected
-                                                                        ? 'bg-emerald-500/5 border-l-2 border-emerald-500'
+                                                                        ? 'bg-teal-500/5 border-l-2 border-teal-500'
                                                                         : 'hover:bg-[rgba(255,255,255,0.02)] border-l-2 border-transparent'
                                                                 }`}
                                                             >
@@ -1094,7 +1094,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         <div className="flex-1 space-y-6">
                             {/* Scenario Description */}
                             {selectedScenario && (
-                                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+                                <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-4">
                                     <p className="text-[#9CA3AF] text-sm leading-relaxed">
                                         {selectedScenario.plainEnglish}
                                     </p>
@@ -1136,7 +1136,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     <button
                                         onClick={handleSendRequest}
                                         disabled={sending}
-                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
+                                        className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
                                         data-testid="send-request-btn"
                                     >
                                         {sending ? (
@@ -1161,7 +1161,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                 <label className="block text-sm text-[#9CA3AF] mb-1">
                                                     {key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                                                     {['escrow_id', 'amount_cents', 'vendor'].includes(key) && (
-                                                        <span className="text-emerald-400 ml-1">*</span>
+                                                        <span className="text-teal-400 ml-1">*</span>
                                                     )}
                                                 </label>
                                                 {typeof value === 'object' ? (
@@ -1173,14 +1173,14 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                             } catch {}
                                                         }}
                                                         rows={3}
-                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-emerald-500 resize-none"
+                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500 resize-none"
                                                     />
                                                 ) : (
                                                     <input
                                                         type={key.includes('cents') ? 'number' : 'text'}
                                                         value={value}
                                                         onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-emerald-500"
+                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500"
                                                     />
                                                 )}
                                                 {key === 'amount_cents' && value && (
@@ -1208,7 +1208,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                     onClick={() => setCodeLanguage(lang)}
                                                     className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                                                         codeLanguage === lang
-                                                            ? 'bg-emerald-500/20 text-emerald-400'
+                                                            ? 'bg-teal-500/20 text-teal-400'
                                                             : 'bg-[#1A1A1E] text-[#6B7280] hover:text-[#9CA3AF]'
                                                     }`}
                                                 >
@@ -1261,8 +1261,8 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     
                                     {/* Demo Mode Badge */}
                                     {mode === 'demo' && (
-                                        <div className="px-4 py-2 bg-emerald-500/5 border-b border-emerald-500/20">
-                                            <p className="text-xs text-emerald-400">
+                                        <div className="px-4 py-2 bg-teal-500/5 border-b border-teal-500/20">
+                                            <p className="text-xs text-teal-400">
                                                 🎯 Demo Response — switch to Live Mode to use real data
                                             </p>
                                         </div>
@@ -1328,19 +1328,19 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         </h2>
                         <ol className="space-y-3 text-sm text-[#9CA3AF] mb-6">
                             <li className="flex items-start gap-3">
-                                <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
                                 <span>Start with a <strong className="text-[#F5F5F5]">Quick Scenario</strong> on the left — click one and we'll pre-fill everything.</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                                <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
                                 <span>Hit <strong className="text-[#F5F5F5]">"Send Request"</strong> to see how the API responds.</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                                <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
                                 <span>Switch between <strong className="text-[#F5F5F5]">"Pretty"</strong> and <strong className="text-[#F5F5F5]">"Plain English"</strong> tabs to understand the response.</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                                <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
                                 <span>When you're ready, connect your own API key to test with real data.</span>
                             </li>
                         </ol>
@@ -1353,7 +1353,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             </button>
                             <button
                                 onClick={() => dismissOnboarding(false)}
-                                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white font-medium text-sm transition-all"
+                                className="px-6 py-2 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-medium text-sm transition-all"
                             >
                                 Got it
                             </button>

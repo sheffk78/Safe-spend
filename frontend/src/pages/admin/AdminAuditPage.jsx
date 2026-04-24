@@ -26,11 +26,11 @@ const formatTime = (dateStr) => {
 
 // Event type colors
 const eventColors = {
-    'spend.approved': 'bg-[rgba(16,185,129,0.1)] text-[#10B981]',
+    'spend.approved': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'spend.denied': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
     'spend.expired': 'bg-[rgba(107,114,128,0.1)] text-[#6B7280]',
     'approval.requested': 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]',
-    'approval.approved': 'bg-[rgba(16,185,129,0.1)] text-[#10B981]',
+    'approval.approved': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'approval.denied': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
     'escrow.created': 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
     'escrow.funded': 'bg-[rgba(34,197,94,0.1)] text-[#22C55E]',
@@ -143,7 +143,7 @@ const AdminAuditPage = () => {
                         onClick={() => setShowFilters(!showFilters)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
                             showFilters || hasActiveFilters
-                                ? 'bg-[#10B981] text-white'
+                                ? 'bg-[#14B8A6] text-white'
                                 : 'bg-[#141416] border border-[rgba(255,255,255,0.06)] text-[#9CA3AF] hover:text-[#F5F5F5]'
                         }`}
                     >
@@ -172,7 +172,7 @@ const AdminAuditPage = () => {
                             <select
                                 value={eventType}
                                 onChange={(e) => { setEventType(e.target.value); setOffset(0); }}
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#10B981]"
+                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#14B8A6]"
                             >
                                 {EVENT_TYPES.map((type) => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -186,7 +186,7 @@ const AdminAuditPage = () => {
                             <select
                                 value={actorType}
                                 onChange={(e) => { setActorType(e.target.value); setOffset(0); }}
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#10B981]"
+                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#14B8A6]"
                             >
                                 {ACTOR_TYPES.map((type) => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -202,7 +202,7 @@ const AdminAuditPage = () => {
                                 value={orgId}
                                 onChange={(e) => { setOrgId(e.target.value); setOffset(0); }}
                                 placeholder="org_..."
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                             />
                         </div>
                     </div>
@@ -229,7 +229,7 @@ const AdminAuditPage = () => {
             <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
                 {loading && events.length === 0 ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : events.length === 0 ? (
                     <div className="text-center py-12">

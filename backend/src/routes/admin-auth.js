@@ -7,12 +7,11 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { logger } = require('../lib/logger');
 const { generateId } = require('../utils/ids');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Use separate secret for admin JWT (falls back to main secret)
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;

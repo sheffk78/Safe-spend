@@ -4,10 +4,8 @@
  */
 
 const jwt = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { logger } = require('../lib/logger');
-
-const prisma = new PrismaClient();
 
 // Use separate secret for admin JWT (falls back to main secret)
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;

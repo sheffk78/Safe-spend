@@ -8,8 +8,7 @@
  * Future: Will include actual PDF generation using a library like PDFKit or Puppeteer.
  */
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 // ============================================
 // Configuration

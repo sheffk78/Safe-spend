@@ -211,8 +211,8 @@ if (spend.status === 'approved') {
 
                 <div className="bg-ss-surface border border-[rgba(255,255,255,0.06)] rounded-lg p-5">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                            <Bot size={20} className="text-emerald-400" />
+                        <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                            <Bot size={20} className="text-teal-400" />
                         </div>
                         <div>
                             <h3 className="font-semibold text-ss-text">LangChain Integration</h3>

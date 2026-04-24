@@ -169,7 +169,7 @@ const ApiKeysPage = () => {
                         title="Live Keys"
                         description="Use in production environments"
                         keys={liveKeys}
-                        badgeColor="emerald"
+                        badgeColor="teal"
                         onRevoke={handleRevoke}
                         onToggleActive={handleToggleActive}
                     />
@@ -257,7 +257,7 @@ const KeySection = ({ title, description, keys, badgeColor, onRevoke, onToggleAc
     if (keys.length === 0) return null;
 
     const badgeStyles = {
-        emerald: 'bg-ss-accent/10 text-ss-accent',
+        teal: 'bg-ss-accent/10 text-ss-accent',
         amber: 'bg-ss-warning/10 text-ss-warning',
         blue: 'bg-blue-500/10 text-blue-400'
     };

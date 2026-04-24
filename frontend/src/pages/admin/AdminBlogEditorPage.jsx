@@ -35,11 +35,11 @@ const renderMarkdownPreview = (content) => {
         // Italic
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         // Code blocks
-        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-[#0A0A0B] p-3 rounded-lg overflow-x-auto my-4"><code class="text-sm text-[#10B981]">$2</code></pre>')
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-[#0A0A0B] p-3 rounded-lg overflow-x-auto my-4"><code class="text-sm text-[#14B8A6]">$2</code></pre>')
         // Inline code
-        .replace(/`([^`]+)`/g, '<code class="bg-[#1A1A1E] px-1.5 py-0.5 rounded text-[#10B981] text-sm">$1</code>')
+        .replace(/`([^`]+)`/g, '<code class="bg-[#1A1A1E] px-1.5 py-0.5 rounded text-[#14B8A6] text-sm">$1</code>')
         // Links
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#10B981] underline">$1</a>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#14B8A6] underline">$1</a>')
         // Line breaks
         .replace(/\n\n/g, '</p><p class="text-[#9CA3AF] mb-4">')
         .replace(/\n/g, '<br>');
@@ -258,7 +258,7 @@ const AdminBlogEditorPage = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -289,7 +289,7 @@ const AdminBlogEditorPage = () => {
                         onClick={() => setShowPreview(!showPreview)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
                             showPreview 
-                                ? 'bg-[#10B981] text-white' 
+                                ? 'bg-[#14B8A6] text-white' 
                                 : 'bg-[#141416] border border-[rgba(255,255,255,0.06)] text-[#9CA3AF] hover:text-[#F5F5F5]'
                         }`}
                     >
@@ -313,7 +313,7 @@ const AdminBlogEditorPage = () => {
                     <button
                         onClick={handlePublish}
                         disabled={saving}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#10B981] hover:bg-[#34D399] rounded-lg text-white font-medium text-sm transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium text-sm transition-all disabled:opacity-50"
                     >
                         {saving ? (
                             <ArrowPathIcon className="w-4 h-4 animate-spin" />
@@ -332,7 +332,7 @@ const AdminBlogEditorPage = () => {
                 </div>
             )}
             {success && (
-                <div className="p-4 bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)] rounded-lg text-[#10B981]">
+                <div className="p-4 bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)] rounded-lg text-[#14B8A6]">
                     {success}
                 </div>
             )}
@@ -347,7 +347,7 @@ const AdminBlogEditorPage = () => {
                         value={title}
                         onChange={(e) => handleTitleChange(e.target.value)}
                         placeholder="Post title..."
-                        className="w-full px-4 py-3 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-2xl font-heading placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                        className="w-full px-4 py-3 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-2xl font-heading placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                         data-testid="post-title-input"
                     />
 
@@ -357,7 +357,7 @@ const AdminBlogEditorPage = () => {
                         value={subtitle}
                         onChange={(e) => setSubtitle(e.target.value)}
                         placeholder="Subtitle (optional)..."
-                        className="w-full px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#9CA3AF] placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                        className="w-full px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#9CA3AF] placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                     />
 
                     {/* Content Editor */}
@@ -367,7 +367,7 @@ const AdminBlogEditorPage = () => {
                             onChange={(e) => setContent(e.target.value)}
                             placeholder="Write your post in Markdown..."
                             rows={20}
-                            className="w-full px-4 py-3 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] resize-y"
+                            className="w-full px-4 py-3 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] resize-y"
                             data-testid="post-content-input"
                         />
                         <div className="absolute bottom-3 right-3 text-xs text-[#6B7280]">
@@ -412,7 +412,7 @@ const AdminBlogEditorPage = () => {
                                     value={slug}
                                     onChange={(e) => setSlug(e.target.value)}
                                     placeholder="post-url-slug"
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                                 />
                                 <p className="text-xs text-[#6B7280] mt-1">/blog/{slug || 'your-post-slug'}</p>
                             </div>
@@ -425,7 +425,7 @@ const AdminBlogEditorPage = () => {
                                     value={author}
                                     onChange={(e) => setAuthor(e.target.value)}
                                     placeholder="Author name"
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                                 />
                             </div>
 
@@ -445,13 +445,13 @@ const AdminBlogEditorPage = () => {
                                     />
                                     <label
                                         htmlFor="cover-image-upload"
-                                        className={`flex items-center justify-center gap-2 w-full px-3 py-3 border-2 border-dashed border-[rgba(255,255,255,0.1)] hover:border-[#10B981] rounded-lg cursor-pointer transition-all ${
+                                        className={`flex items-center justify-center gap-2 w-full px-3 py-3 border-2 border-dashed border-[rgba(255,255,255,0.1)] hover:border-[#14B8A6] rounded-lg cursor-pointer transition-all ${
                                             uploading ? 'opacity-50 cursor-not-allowed' : ''
                                         }`}
                                     >
                                         {uploading ? (
                                             <>
-                                                <ArrowPathIcon className="w-5 h-5 text-[#10B981] animate-spin" />
+                                                <ArrowPathIcon className="w-5 h-5 text-[#14B8A6] animate-spin" />
                                                 <span className="text-sm text-[#9CA3AF]">Uploading...</span>
                                             </>
                                         ) : (
@@ -471,7 +471,7 @@ const AdminBlogEditorPage = () => {
                                         value={coverImageUrl}
                                         onChange={(e) => setCoverImageUrl(e.target.value)}
                                         placeholder="Or enter image URL..."
-                                        className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] pr-8"
+                                        className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] pr-8"
                                     />
                                     {coverImageUrl && (
                                         <button
@@ -510,7 +510,7 @@ const AdminBlogEditorPage = () => {
                                     value={tags}
                                     onChange={(e) => setTags(e.target.value)}
                                     placeholder="tag1, tag2, tag3"
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                                 />
                                 <p className="text-xs text-[#6B7280] mt-1">Separate with commas</p>
                             </div>
@@ -521,7 +521,7 @@ const AdminBlogEditorPage = () => {
                                     <label className="block text-sm text-[#9CA3AF]">Excerpt</label>
                                     <button
                                         onClick={generateExcerpt}
-                                        className="text-xs text-[#10B981] hover:text-[#34D399]"
+                                        className="text-xs text-[#14B8A6] hover:text-[#2DD4BF]"
                                     >
                                         Auto-generate
                                     </button>
@@ -531,7 +531,7 @@ const AdminBlogEditorPage = () => {
                                     onChange={(e) => setExcerpt(e.target.value)}
                                     placeholder="Brief description for previews..."
                                     rows={3}
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] resize-none"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] resize-none"
                                 />
                                 <p className="text-xs text-[#6B7280] mt-1">{excerpt.length}/160 characters</p>
                             </div>
@@ -548,7 +548,7 @@ const AdminBlogEditorPage = () => {
                                     value={metaTitle}
                                     onChange={(e) => setMetaTitle(e.target.value)}
                                     placeholder={title || 'Post title'}
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981]"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
                                 />
                             </div>
 
@@ -559,7 +559,7 @@ const AdminBlogEditorPage = () => {
                                     onChange={(e) => setMetaDescription(e.target.value)}
                                     placeholder={excerpt || 'Description for search engines...'}
                                     rows={2}
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#10B981] resize-none"
+                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] resize-none"
                                 />
                             </div>
                         </div>

@@ -127,9 +127,9 @@ const ApprovalActionPage = () => {
         return (
             <div className="min-h-screen bg-ss-bg flex items-center justify-center p-4">
                 <div className="max-w-md w-full bg-ss-card border border-[rgba(255,255,255,0.06)] rounded-xl p-8 text-center">
-                    <div className={`w-16 h-16 ${isApproved ? 'bg-emerald-400/10' : 'bg-red-400/10'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                    <div className={`w-16 h-16 ${isApproved ? 'bg-teal-400/10' : 'bg-red-400/10'} rounded-full flex items-center justify-center mx-auto mb-4`}>
                         {isApproved ? (
-                            <CheckCircle className="w-8 h-8 text-emerald-400" />
+                            <CheckCircle className="w-8 h-8 text-teal-400" />
                         ) : (
                             <XCircle className="w-8 h-8 text-red-400" />
                         )}
@@ -182,9 +182,9 @@ const ApprovalActionPage = () => {
                 {/* Action Card */}
                 <div className="bg-ss-card border border-[rgba(255,255,255,0.06)] rounded-xl p-8">
                     <div className="text-center mb-6">
-                        <div className={`w-16 h-16 ${isApproveAction ? 'bg-emerald-400/10' : 'bg-red-400/10'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                        <div className={`w-16 h-16 ${isApproveAction ? 'bg-teal-400/10' : 'bg-red-400/10'} rounded-full flex items-center justify-center mx-auto mb-4`}>
                             {isApproveAction ? (
-                                <CheckCircle className="w-8 h-8 text-emerald-400" />
+                                <CheckCircle className="w-8 h-8 text-teal-400" />
                             ) : (
                                 <XCircle className="w-8 h-8 text-red-400" />
                             )}
@@ -244,7 +244,7 @@ const ApprovalActionPage = () => {
                             disabled={verifying}
                             className={`w-full px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
                                 isApproveAction 
-                                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                    ? 'bg-teal-500 hover:bg-teal-600 text-white'
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                             data-testid="confirm-action-btn"

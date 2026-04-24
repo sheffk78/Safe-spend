@@ -1,5 +1,5 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { generateId, generateWebhookSecret } = require('../utils/ids');
 const { requireOrgAuth } = require('../middleware/auth');
 const { 
@@ -9,7 +9,6 @@ const {
 } = require('../services/webhook-service');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 /**
  * POST /v1/webhooks

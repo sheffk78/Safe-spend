@@ -7,12 +7,11 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { requireAuth } = require('../middleware/auth');
 const { validateAgentId } = require('../utils/ids');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 /**
  * GET /v1/agents/:agent_id/escrow-accounts

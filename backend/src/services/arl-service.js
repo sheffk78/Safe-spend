@@ -1,3 +1,4 @@
+const prisma = require('../lib/prisma.js');
 /**
  * ARL (Agent Reputation Ledger) Service
  * 
@@ -5,10 +6,7 @@
  * All ARL calls are async and fire-and-forget — they never block spend responses.
  */
 
-const { PrismaClient } = require('@prisma/client');
 const { logger } = require('../lib/logger');
-
-const prisma = new PrismaClient();
 
 const ARL_API_URL = process.env.ARL_API_URL || 'https://repledger.agentictrust.app';
 const ARL_API_KEY = process.env.ARL_API_KEY || '';
@@ -62,7 +60,9 @@ async function reportOutcome(agentId, result, taskType) {
  * Report spend approved to ARL
  */
 function reportSpendApproved(agentId) {
-    reportOutcome(agentId, 'success', 'safe_spend:approved').catch(() => {});
+    reportOutcome(agentId, 'success', 'safe_spend:approved').catch((err) => {
+        logger.warn({ error: err?.message, agentId }, 'ARL reportSpendApproved failed');
+    });
 }
 
 /**
@@ -70,14 +70,18 @@ function reportSpendApproved(agentId) {
  */
 function reportSpendDenied(agentId, denyingRule) {
     const taskType = `safe_spend:denied:${denyingRule || 'unknown'}`;
-    reportOutcome(agentId, 'failure', taskType).catch(() => {});
+    reportOutcome(agentId, 'failure', taskType).catch((err) => {
+        logger.warn({ error: err?.message, agentId, denyingRule }, 'ARL reportSpendDenied failed');
+    });
 }
 
 /**
  * Report spend expired to ARL
  */
 function reportSpendExpired(agentId) {
-    reportOutcome(agentId, 'timeout', 'safe_spend:expired').catch(() => {});
+    reportOutcome(agentId, 'timeout', 'safe_spend:expired').catch((err) => {
+        logger.warn({ error: err?.message, agentId }, 'ARL reportSpendExpired failed');
+    });
 }
 
 /**

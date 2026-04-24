@@ -37,9 +37,9 @@ const ROLE_CONFIG = {
     finance_admin: {
         label: 'Finance Admin',
         icon: ShieldCheck,
-        color: 'text-emerald-400',
-        bgColor: 'bg-emerald-400/10',
-        borderColor: 'border-emerald-400/20'
+        color: 'text-teal-400',
+        bgColor: 'bg-teal-400/10',
+        borderColor: 'border-teal-400/20'
     },
     developer: {
         label: 'Developer',
@@ -79,7 +79,7 @@ const RoleBadge = ({ role, size = 'md' }) => {
 // Status Badge Component
 const StatusBadge = ({ status }) => {
     const statusConfig = {
-        active: { label: 'Active', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+        active: { label: 'Active', color: 'text-teal-400', bg: 'bg-teal-400/10' },
         pending: { label: 'Pending', color: 'text-amber-400', bg: 'bg-amber-400/10' },
         removed: { label: 'Removed', color: 'text-red-400', bg: 'bg-red-400/10' }
     };
@@ -216,8 +216,8 @@ const InviteSuccessModal = ({ inviteUrl, email, onClose }) => {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-ss-card border border-[rgba(255,255,255,0.06)] rounded-xl max-w-md w-full p-6">
                 <div className="text-center mb-4">
-                    <div className="w-12 h-12 bg-emerald-400/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Check size={24} className="text-emerald-400" />
+                    <div className="w-12 h-12 bg-teal-400/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Check size={24} className="text-teal-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-ss-text">Invitation Sent!</h3>
                     <p className="text-sm text-ss-text-secondary mt-1">
@@ -236,7 +236,7 @@ const InviteSuccessModal = ({ inviteUrl, email, onClose }) => {
                             className="p-2 text-ss-text-secondary hover:text-ss-text bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] rounded transition-colors"
                             data-testid="copy-invite-url-btn"
                         >
-                            {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                            {copied ? <Check size={16} className="text-teal-400" /> : <Copy size={16} />}
                         </button>
                     </div>
                 </div>

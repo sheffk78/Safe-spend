@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Admin Users (for internal Agentic Trust operators)
@@ -315,6 +315,7 @@ model SpendRequest {
   
   metadata  String   @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   organization  Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)

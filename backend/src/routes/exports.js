@@ -4,14 +4,13 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { requireOrgAuth, requirePermission } = require('../middleware/auth');
 const { exportRateLimiter } = require('../middleware/rate-limit');
 const rbacService = require('../services/rbac-service');
 const { generateId } = require('../utils/ids');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // ============================================
 // Export Configuration

@@ -1,11 +1,10 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const { generateId, generateApiKey } = require('../utils/ids');
 const { requireOrgAuth } = require('../middleware/auth');
 const { trackKeyRevocation } = require('../services/security-alerts');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 /**
  * POST /v1/api-keys

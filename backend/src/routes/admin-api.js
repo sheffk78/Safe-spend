@@ -13,7 +13,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../lib/prisma');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -21,8 +21,6 @@ const crypto = require('crypto');
 const adminKeyService = require('../services/admin-key-service');
 const errorLogService = require('../services/error-log-service');
 const blogService = require('../services/blog-service');
-
-const prisma = new PrismaClient();
 
 // Track server start time for uptime
 const SERVER_START_TIME = Date.now();

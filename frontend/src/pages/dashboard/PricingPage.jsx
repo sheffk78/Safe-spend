@@ -156,7 +156,7 @@ const PricingPage = () => {
       period: '/month',
       description: 'For indie developers and small teams',
       icon: Crown,
-      color: 'from-emerald-500 to-emerald-600',
+      color: 'from-teal-500 to-teal-600',
       popular: true,
       features: [
         { name: '1 live escrow account', included: true },
@@ -218,7 +218,7 @@ const PricingPage = () => {
 
         {/* Success/Error Messages */}
         {successMessage && (
-          <div className="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-center">
+          <div className="mb-8 p-4 bg-teal-500/10 border border-teal-500/30 rounded-lg text-teal-400 text-center">
             {successMessage}
           </div>
         )}
@@ -265,12 +265,12 @@ const PricingPage = () => {
               <div
                 key={plan.id}
                 className={`relative bg-slate-900 rounded-2xl border ${
-                  plan.popular ? 'border-emerald-500/50' : 'border-slate-700'
+                  plan.popular ? 'border-teal-500/50' : 'border-slate-700'
                 } overflow-hidden`}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
+                  <div className="absolute top-0 right-0 bg-teal-500 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
                     MOST POPULAR
                   </div>
                 )}
@@ -298,7 +298,7 @@ const PricingPage = () => {
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-3">
                         {feature.included ? (
-                          <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                          <Check className="w-5 h-5 text-teal-400 flex-shrink-0" />
                         ) : (
                           <X className="w-5 h-5 text-slate-600 flex-shrink-0" />
                         )}
