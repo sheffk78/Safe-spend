@@ -3,9 +3,9 @@ set -e
 
 echo "=== Starting Safe-Spend Backend ==="
 
-echo "Running prisma migrate deploy..."
-npx prisma migrate deploy || {
-  echo "ERROR: prisma migrate deploy failed with exit code $?"
+echo "Running prisma db push..."
+npx prisma db push --accept-data-loss || {
+  echo "ERROR: prisma db push failed with exit code $?"
   exit 1
 }
 

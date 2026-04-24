@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { hashApiKey } = require('../utils/ids');
 const { logger, events } = require('../lib/logger');
 const { trackFailedAuth } = require('../services/security-alerts');
+
+const prisma = new PrismaClient();
 
 /**
  * Timing-safe string comparison to prevent timing attacks

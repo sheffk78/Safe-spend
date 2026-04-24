@@ -17,10 +17,18 @@ COPY prisma ./prisma
 # Install dependencies (postinstall: npx prisma generate will find the schema)
 RUN npm install --production=false
 
-# Copy application source
+# Generate Prisma client with the default schema first
+RUN npx prisma generate
+
+# Copy application source (overwrites prisma/schema.prisma with original)
 COPY . .
 
-# Generate Prisma client
+# Switch to PostgreSQL schema for production AFTER full copy
+RUN if [ -f prisma/schema.postgresql.prisma ]; then \
+      cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
+    fi
+
+# Re-generate Prisma client with PostgreSQL schema
 RUN npx prisma generate
 
 # Production stage

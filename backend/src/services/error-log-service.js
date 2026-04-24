@@ -3,7 +3,8 @@
  * Captures application errors for admin monitoring
  */
 
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // In-memory ring buffer as backup (last 500 errors)
 const ERROR_BUFFER_SIZE = 500;

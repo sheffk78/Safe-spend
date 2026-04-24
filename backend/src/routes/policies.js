@@ -1,9 +1,10 @@
 const express = require('express');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * POST /v1/policies

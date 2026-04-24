@@ -1,4 +1,3 @@
-const prisma = require('prisma.js');
 /**
  * Org-Scoped Database Helpers
  * Safe-Spend Production Hardening
@@ -7,7 +6,10 @@ const prisma = require('prisma.js');
  * Prevents cross-org data access.
  */
 
+const { PrismaClient } = require('@prisma/client');
 const { NotFoundError, ForbiddenError } = require('../middleware/error-handler');
+
+const prisma = new PrismaClient();
 
 /**
  * Get escrow account for an organization

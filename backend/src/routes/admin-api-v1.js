@@ -13,12 +13,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { z } = require('zod');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { requireAdmin, requireAdminRole } = require('../middleware/admin-auth');
 const { logger } = require('../lib/logger');
 const { generateId } = require('../utils/ids');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 // All routes require admin auth
 router.use(requireAdmin);

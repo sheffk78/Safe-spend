@@ -1,11 +1,13 @@
-const prisma = require('../lib/prisma.js');
 /**
  * Admin API Key Service
  * Handles generation and validation of admin API keys for automation (Kit)
  * Supports scope-based access control
  */
 
+const { PrismaClient } = require('@prisma/client');
 const crypto = require('crypto');
+
+const prisma = new PrismaClient();
 
 const KEY_PREFIX = 'ss_admin_';
 

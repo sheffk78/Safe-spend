@@ -12,9 +12,10 @@ const {
     formatAAVConfiguration 
 } = require('../services/aav-service');
 const { generateId } = require('../utils/ids');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * GET /v1/settings/aav

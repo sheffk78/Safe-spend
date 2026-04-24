@@ -3,10 +3,12 @@
  * Handles Stripe subscription lifecycle for Safe-Spend plans
  */
 
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const stripeLib = require('../lib/stripe');
 const { generateId } = require('../utils/ids');
 const { logger } = require('../lib/logger');
+
+const prisma = new PrismaClient();
 
 // Stripe Price IDs (from reference-stripe-products.md)
 const PRICE_IDS = {

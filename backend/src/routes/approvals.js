@@ -1,5 +1,5 @@
 const express = require('express');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireOrgAuth, requireApprover } = require('../middleware/auth');
 const { 
@@ -15,6 +15,7 @@ const { reportSpendExpired } = require('../services/arl-service');
 const { emitSpendExpired } = require('../services/cross-tool-events');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * GET /v1/approvals
@@ -138,6 +139,29 @@ router.post('/:id/approve', requireOrgAuth, requireApprover, async (req, res) =>
             return res.status(400).json({ error: 'Approval has expired' });
         }
         
+        // Get escrow account with lock
+        const escrow = await prisma.escrowAccount.findUnique({
+            where: { id: approval.spendRequest.escrowId }
+        });
+        
+        if (!escrow) {
+            return res.status(400).json({ error: 'Escrow account not found' });
+        }
+        
+        if (escrow.status !== 'active') {
+            return res.status(400).json({ error: `Escrow account is ${escrow.status}` });
+        }
+        
+        if (escrow.balanceCents < approval.spendRequest.amountCents) {
+            return res.status(400).json({ 
+                error: 'Insufficient funds',
+                balance_cents: escrow.balanceCents,
+                required_cents: approval.spendRequest.amountCents
+            });
+        }
+        
+        const balanceAfter = escrow.balanceCents - approval.spendRequest.amountCents;
+        
         // Append human approval to rules_evaluated
         const rulesEvaluated = JSON.parse(approval.spendRequest.rulesEvaluated || '[]');
         rulesEvaluated.push({
@@ -151,63 +175,8 @@ router.post('/:id/approve', requireOrgAuth, requireApprover, async (req, res) =>
             }
         });
         
-        // Execute the spend in a transaction with serializable isolation
-        // to prevent race conditions on balance checks
-        const [updatedApproval, updatedSpendRequest, updatedEscrow] = await prisma.$transaction(async (tx) => {
-            // Re-read escrow inside transaction with lock
-            const escrow = await tx.escrowAccount.findUnique({
-                where: { id: approval.spendRequest.escrowId }
-            });
-            
-            if (!escrow) {
-                throw new Error('Escrow account not found');
-            }
-            
-            if (escrow.status !== 'active') {
-                throw new Error(`Escrow account is ${escrow.status}`);
-            }
-            
-            if (escrow.balanceCents < approval.spendRequest.amountCents) {
-                throw new Error('Insufficient funds');
-            }
-            
-            const balanceAfter = escrow.balanceCents - approval.spendRequest.amountCents;
-            
-            const [updApproval, updSpend, updEscrow] = await Promise.all([
-                tx.approval.update({
-                    where: { id: approval.id },
-                    data: {
-                        status: 'approved',
-                        decidedBy: `human:${req.org.email || req.org.id}`,
-                        decidedAt: new Date(),
-                        decisionNote: note || null
-                    }
-                }),
-                tx.spendRequest.update({
-                    where: { id: approval.spendRequestId },
-                    data: {
-                        status: 'approved',
-                        resolvedAt: new Date(),
-                        resolvedBy: `human:${req.org.email || req.org.id}`,
-                        balanceBeforeCents: escrow.balanceCents,
-                        balanceAfterCents: balanceAfter,
-                        rulesEvaluated: JSON.stringify(rulesEvaluated)
-                    }
-                }),
-                tx.escrowAccount.update({
-                    where: { id: escrow.id },
-                    data: {
-                        balanceCents: balanceAfter,
-                        totalSpentCents: escrow.totalSpentCents + approval.spendRequest.amountCents,
-                        status: balanceAfter <= 0 ? 'depleted' : 'active'
-                    }
-                })
-            ]);
-            
-            return [updApproval, updSpend, updEscrow];
-        }, {
-            isolationLevel: 'Serializable'
-        });
+        // Execute the spend in a transaction
+        const [updatedApproval, updatedSpendRequest, updatedEscrow] = await prisma.$transaction([
             prisma.approval.update({
                 where: { id: approval.id },
                 data: {

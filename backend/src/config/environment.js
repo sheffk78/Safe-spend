@@ -78,7 +78,7 @@ function getConfig() {
         databaseUrl: process.env.DATABASE_URL,
 
         // Auth
-        jwtSecret: process.env.JWT_SECRET || (nodeEnv === 'development' ? 'dev-secret-change-in-production' : undefined),
+        jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
         jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 
         // Stripe
@@ -109,16 +109,7 @@ function getConfig() {
         },
 
         // CORS
-        corsOrigins: process.env.CORS_ORIGINS === '*' ? '*' : (process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(o => {
-            if (!o) return false;
-            try {
-                new URL(o);
-                return true;
-            } catch {
-                console.warn(`Invalid CORS origin ignored: ${o}`);
-                return false;
-            }
-        }),
+        corsOrigins: process.env.CORS_ORIGINS === '*' ? '*' : (process.env.CORS_ORIGINS || '').split(',').filter(Boolean),
     };
 }
 

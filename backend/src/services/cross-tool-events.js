@@ -1,4 +1,3 @@
-const prisma = require('../lib/prisma.js');
 /**
  * Cross-Tool Event Service
  * 
@@ -18,8 +17,11 @@ const prisma = require('../lib/prisma.js');
  */
 
 const crypto = require('crypto');
+const { PrismaClient } = require('@prisma/client');
 const { logger } = require('../lib/logger');
 const { generateHex } = require('../utils/ids');
+
+const prisma = new PrismaClient();
 
 /**
  * Build a cross-tool event envelope

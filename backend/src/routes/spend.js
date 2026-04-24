@@ -1,5 +1,5 @@
 const express = require('express');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { generateId, validateAgentId } = require('../utils/ids');
 const { requireAuth } = require('../middleware/auth');
 const { spendRateLimiter } = require('../middleware/rate-limit');
@@ -14,6 +14,7 @@ const { reportSpendApproved, reportSpendDenied } = require('../services/arl-serv
 const { emitSpendApproved, emitSpendDenied } = require('../services/cross-tool-events');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 // Track consecutive denials per escrow for runaway detection
 const denialTracker = new Map();
@@ -148,16 +149,6 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 error: 'amount_cents exceeds maximum allowed value',
                 max_allowed: MAX_AMOUNT_CENTS,
                 max_dollars: '$10,000,000,000'
-            });
-        }
-        
-        // Per-transaction limit for safety (configurable via plan limits in future)
-        const PER_TRANSACTION_MAX_CENTS = 10000000; // $100,000
-        if (amountCentsNum > PER_TRANSACTION_MAX_CENTS) {
-            return res.status(400).json({
-                error: 'amount_cents exceeds per-transaction maximum',
-                max_cents: PER_TRANSACTION_MAX_CENTS,
-                max_dollars: '$100,000'
             });
         }
         

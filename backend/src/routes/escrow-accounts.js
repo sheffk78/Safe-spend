@@ -1,5 +1,5 @@
 const express = require('express');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { generateId, validateAgentId } = require('../utils/ids');
 const { requireAuth, requireOwnerKey } = require('../middleware/auth');
 const { queueWebhooks } = require('../services/webhook-service');
@@ -8,6 +8,7 @@ const stripeService = require('../services/stripe-service');
 const { isStripeConfigured } = require('../lib/stripe');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * POST /v1/escrow-accounts

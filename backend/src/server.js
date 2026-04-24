@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const prisma = require('./lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 
 // Config & Logging
 const { validateEnvironment, getConfig } = require('./config/environment');
@@ -66,7 +66,7 @@ const controlPlaneRoutes = require('./routes/control-plane');
 // Validate environment at startup
 validateEnvironment();
 const config = getConfig();
-
+const prisma = new PrismaClient();
 
 const app = express();
 

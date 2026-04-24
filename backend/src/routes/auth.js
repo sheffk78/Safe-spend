@@ -1,11 +1,12 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const prisma = require('../lib/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { generateId } = require('../utils/ids');
 const { requireOrgAuth } = require('../middleware/auth');
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
 /**
  * POST /v1/auth/signup
