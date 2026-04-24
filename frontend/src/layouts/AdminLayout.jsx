@@ -40,7 +40,7 @@ const AdminLayout = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -71,8 +71,8 @@ const AdminLayout = () => {
                 {/* Logo/Brand */}
                 <div className="p-5 border-b border-[rgba(255,255,255,0.06)]">
                     <Link to="/admin" className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#10B981]/20 flex items-center justify-center">
-                            <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#10B981]" fill="currentColor">
+                        <div className="w-8 h-8 rounded-lg bg-[#14B8A6]/20 flex items-center justify-center">
+                            <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#14B8A6]" fill="currentColor">
                                 <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2zM4 9.8l7 3.5v6.4L4 16.2V9.8zm9 9.9v-6.4l7-3.5v6.4l-7 3.5z"/>
                             </svg>
                         </div>
@@ -103,7 +103,7 @@ const AdminLayout = () => {
                                 onClick={() => setSidebarOpen(false)}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                                     isActive
-                                        ? 'bg-[rgba(16,185,129,0.08)] text-[#10B981]'
+                                        ? 'bg-[rgba(16,185,129,0.08)] text-[#14B8A6]'
                                         : 'text-[#9CA3AF] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.04)]'
                                 }`}
                                 data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
@@ -123,7 +123,7 @@ const AdminLayout = () => {
                         href="/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#10B981] mb-3 transition-colors"
+                        className="flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#14B8A6] mb-3 transition-colors"
                     >
                         Back to Site
                         <ArrowTopRightOnSquareIcon className="w-4 h-4" />

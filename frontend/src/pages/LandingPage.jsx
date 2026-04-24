@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
 import TransactionTable from '@/components/TransactionTable';
+import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
 import { ArrowRight, DollarSign, Bot, Clock, Shield, Code, Landmark, Layers } from 'lucide-react';
 
 const LandingPage = () => {
@@ -140,6 +142,47 @@ def spend(amount: int, vendor: str, description: str) -> dict:
         }
     ];
 
+    // Problem card data with severity-based visual weight
+    const problemCards = [
+        {
+            icon: DollarSign,
+            title: '"$82,000 in 48 hours"',
+            description: 'A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn\'t hold your credentials.',
+            source: 'Source: The Register, March 2026',
+            severity: 'high'
+        },
+        {
+            icon: Bot,
+            title: '"$3,000 without asking"',
+            description: 'An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow. No one told it not to.',
+            source: 'Source: X/Twitter, Feb 2026',
+            severity: 'medium'
+        },
+        {
+            icon: Clock,
+            title: '"$187 in 10 minutes"',
+            description: 'A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don\'t prevent overspend.',
+            source: 'Source: AgentBudget creator, Feb 2026',
+            severity: 'low'
+        }
+    ];
+
+    const getSeverityStyles = (severity) => {
+        switch (severity) {
+            case 'high': return 'border-[rgba(239,68,68,0.15)] hover:border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.03)]';
+            case 'medium': return 'border-[rgba(245,158,11,0.15)] hover:border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.02)]';
+            default: return 'border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] bg-ss-surface';
+        }
+    };
+
+    const getSeverityIconColor = (severity) => {
+        switch (severity) {
+            case 'high': return 'text-ss-error';
+            case 'medium': return 'text-ss-warning';
+            default: return 'text-ss-accent';
+        }
+    };
+
     return (
         <div className="min-h-screen bg-ss-bg">
             <Navbar />
@@ -149,10 +192,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-12">
                         <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-ss-text leading-tight mb-6">
-                            Your agent needs a trust account,<br className="hidden md:block" /> not a wallet.
+                            Your agent needs spending governance,<br className="hidden md:block" /> not a wallet.
                         </h1>
                         <p className="text-lg md:text-xl text-ss-text-secondary max-w-3xl mx-auto mb-8 leading-relaxed">
-                            Safe-Spend applies fiduciary-grade governance to agent spending. Fund an escrow account. Define policies. Your agent spends within them. Every dollar, every decision, every receipt — logged.
+                            Policy-based spend control for AI agents. Fund a spending pool. Define guardrails. Your agent spends within them. Every dollar, every decision, every receipt — logged.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
@@ -181,58 +224,39 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             {/* The Problem Section */}
             <section className="py-24 px-6 bg-ss-code" data-testid="problem-section">
                 <div className="max-w-[1200px] mx-auto">
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-16">
-                        Agents are spending money. Badly.
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Problem Card 1 */}
-                        <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] transition-all duration-200 hover:-translate-y-0.5" data-testid="problem-card-1">
-                            <div className="text-4xl mb-4">
-                                <DollarSign className="w-10 h-10 text-ss-error" />
-                            </div>
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">
-                                "$82,000 in 48 hours"
-                            </h3>
-                            <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn't hold your credentials.
-                            </p>
-                            <p className="text-ss-text-tertiary text-xs mt-4">
-                                Source: The Register, March 2026
-                            </p>
-                        </div>
-
-                        {/* Problem Card 2 */}
-                        <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] transition-all duration-200 hover:-translate-y-0.5" data-testid="problem-card-2">
-                            <div className="text-4xl mb-4">
-                                <Bot className="w-10 h-10 text-ss-warning" />
-                            </div>
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">
-                                "$3,000 without asking"
-                            </h3>
-                            <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow. No one told it not to.
-                            </p>
-                            <p className="text-ss-text-tertiary text-xs mt-4">
-                                Source: X/Twitter, Feb 2026
-                            </p>
-                        </div>
-
-                        {/* Problem Card 3 */}
-                        <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] transition-all duration-200 hover:-translate-y-0.5" data-testid="problem-card-3">
-                            <div className="text-4xl mb-4">
-                                <Clock className="w-10 h-10 text-ss-accent" />
-                            </div>
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">
-                                "$187 in 10 minutes"
-                            </h3>
-                            <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don't prevent overspend.
-                            </p>
-                            <p className="text-ss-text-tertiary text-xs mt-4">
-                                Source: AgentBudget creator, Feb 2026
-                            </p>
-                        </div>
-                    </div>
+                    <RevealOnScroll>
+                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-16">
+                            Agents are spending money. Badly.
+                        </h2>
+                    </RevealOnScroll>
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        whileInView="show"
+                        viewport={{ once: true, margin: "-100px" }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {problemCards.map((card, index) => (
+                            <motion.div
+                                key={index}
+                                variants={staggerItem}
+                                className={`${getSeverityStyles(card.severity)} p-8 rounded-xl transition-all duration-200 hover:-translate-y-0.5`}
+                                data-testid={`problem-card-${index + 1}`}
+                            >
+                                <div className="w-10 h-10 rounded-lg bg-ss-surface flex items-center justify-center mb-4">
+                                    <card.icon className={`w-5 h-5 ${getSeverityIconColor(card.severity)}`} />
+                                </div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">
+                                    {card.title}
+                                </h3>
+                                <p className="text-ss-text-secondary text-sm leading-relaxed">
+                                    {card.description}
+                                </p>
+                                <p className="text-ss-text-tertiary text-xs mt-4">
+                                    {card.source}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
             </section>
 
@@ -240,10 +264,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             <section id="how-it-works" className="py-24 px-6" data-testid="how-it-works-section">
                 <div className="max-w-[1200px] mx-auto">
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-4">
-                        Three steps. Fiduciary-grade control.
+                        Three steps. Real guardrails.
                     </h2>
                     <p className="text-ss-text-secondary text-center mb-16 max-w-2xl mx-auto">
-                        From funding to disbursement, every step is governed by trust-grade policies.
+                        From funding to disbursement, every step is governed by policy-based controls.
                     </p>
                     
                     <div className="relative">
@@ -257,10 +281,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                     1
                                 </div>
                                 <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Fund an Escrow Account
+                                    Fund a Spending Pool
                                 </h3>
                                 <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    A human deposits USD via ACH or card. Funds are held in a segregated escrow account — never commingled, purpose-restricted, fully auditable.
+                                    A human deposits USD via ACH or card. Funds are held in a segregated spending pool — not commingled, fully auditable.
                                 </p>
                             </div>
 
@@ -270,10 +294,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                     2
                                 </div>
                                 <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Define Fiduciary Policies
+                                    Define Spending Policies
                                 </h3>
                                 <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, time-windowed authority, and approval cascades.
+                                    Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, and approval cascades. Your agent drafts policies — you review and approve.
                                 </p>
                                 <div className="mt-4 p-3 bg-ss-accent/10 rounded-lg border border-ss-accent/20">
                                     <p className="text-xs text-ss-accent">
@@ -291,7 +315,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                     Agent Requests Disbursement
                                 </h3>
                                 <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Your agent calls the API. Safe-Spend evaluates every policy in a 13-step validation cascade, executes if approved, and logs the complete decision trail.
+                                    Your agent calls the API. Safe-Spend evaluates every policy in a 14-step validation cascade, executes if approved, and logs the complete decision trail.
                                 </p>
                             </div>
                         </div>
@@ -304,10 +328,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                            Trust-grade spending governance
+                            Governance-grade controls
                         </h2>
                         <p className="text-ss-text-secondary max-w-3xl mx-auto">
-                            Built by a trust law practitioner. Every policy maps to a real fiduciary constraint. This isn't a wallet with limits — it's a trust account with programmatic instruments.
+                            Every policy maps to a real spending constraint. This isn't a wallet with limits — it's a funded account with programmatic guardrails.
                         </p>
                     </div>
                     
@@ -371,9 +395,9 @@ def spend(amount: int, vendor: str, description: str) -> dict:
 
                         <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="feature-card-governance">
                             <Shield className="w-8 h-8 text-ss-accent mb-4" />
-                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Trust-Grade Governance</h3>
+                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Governance-Grade Controls</h3>
                             <p className="text-ss-text-secondary text-sm">
-                                Segregated escrow accounts, fiduciary policy engine, 13-step validation cascade, immutable audit trail.
+                                Segregated spending pools, policy engine, 14-step validation cascade, immutable audit trail.
                             </p>
                         </div>
 
@@ -381,7 +405,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                             <Layers className="w-8 h-8 text-ss-accent mb-4" />
                             <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Part of Agentic Trust</h3>
                             <p className="text-ss-text-secondary text-sm">
-                                Pair with Agent Authority Vault for identity + spending authority in one stack.
+                                Configurable agent authorization with certificate-based verification coming soon.
                             </p>
                         </div>
                     </div>
@@ -443,7 +467,8 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                         </div>
 
                         {/* Builder */}
-                        <div className="bg-ss-surface p-8 rounded-xl border-2 border-ss-accent relative" data-testid="pricing-card-builder">
+                        {/* Builder — visually distinct */}
+                        <div className="bg-ss-surface p-8 rounded-xl border-2 border-ss-accent relative bg-[rgba(20,184,166,0.02)]" data-testid="pricing-card-builder">
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-ss-accent text-ss-bg text-xs font-semibold rounded-full">
                                 Most Popular
                             </div>
@@ -457,13 +482,13 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Live escrow accounts
+                                    Live spending pools
                                 </li>
                                 <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Up to $5,000/mo in escrow volume
+                                    Up to $5,000/mo in spend volume
                                 </li>
                                 <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -499,13 +524,13 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Unlimited escrow volume
+                                    Unlimited spend volume
                                 </li>
                                 <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Multiple escrow accounts per org
+                                    Multiple spending pools per org
                                 </li>
                                 <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
                                     <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -542,10 +567,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             <section className="py-24 px-6 bg-ss-code" data-testid="cta-section">
                 <div className="max-w-[1200px] mx-auto text-center">
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                        Wallets hold money. Trust accounts govern it.
+                        Wallets hold money. Governance controls it.
                     </h2>
                     <p className="text-ss-text-secondary text-lg mb-8 max-w-2xl mx-auto">
-                        Give your agent fiduciary-grade spending authority in five minutes.
+                        Give your agent policy-based spending authority in five minutes.
                     </p>
                     <Link
                         to="/signup"

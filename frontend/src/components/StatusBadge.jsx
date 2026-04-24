@@ -3,13 +3,13 @@ import React from 'react';
 const statusStyles = {
     active: {
         bg: 'rgba(16, 185, 129, 0.1)',
-        text: '#10B981',
-        dot: '#10B981'
+        text: '#14B8A6',
+        dot: '#14B8A6'
     },
     approved: {
         bg: 'rgba(16, 185, 129, 0.1)',
-        text: '#10B981',
-        dot: '#10B981'
+        text: '#14B8A6',
+        dot: '#14B8A6'
     },
     pending: {
         bg: 'rgba(245, 158, 11, 0.1)',
@@ -48,8 +48,8 @@ const statusStyles = {
     },
     live: {
         bg: 'rgba(16, 185, 129, 0.1)',
-        text: '#10B981',
-        dot: '#10B981'
+        text: '#14B8A6',
+        dot: '#14B8A6'
     },
     test: {
         bg: 'rgba(245, 158, 11, 0.1)',

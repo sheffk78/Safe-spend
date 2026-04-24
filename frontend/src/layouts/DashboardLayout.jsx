@@ -31,7 +31,7 @@ import { getMyRole } from '@/lib/api';
 // Role configuration
 const ROLE_CONFIG = {
     owner: { label: 'Owner', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-    finance_admin: { label: 'Finance Admin', icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+    finance_admin: { label: 'Finance Admin', icon: ShieldCheck, color: 'text-teal-400', bg: 'bg-teal-400/10' },
     developer: { label: 'Developer', icon: Code2, color: 'text-blue-400', bg: 'bg-blue-400/10' },
     read_only: { label: 'Read Only', icon: Eye, color: 'text-gray-400', bg: 'bg-gray-400/10' }
 };

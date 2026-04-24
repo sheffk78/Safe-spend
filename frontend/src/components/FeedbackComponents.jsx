@@ -67,7 +67,7 @@ export const PageFeedbackFooter = ({ page }) => {
   if (submitted) {
     return (
       <div className="mt-8 py-4 px-6 bg-[#141416] border border-white/6 rounded-lg text-center">
-        <span className="text-emerald-400 text-sm">Thanks — noted.</span>
+        <span className="text-teal-400 text-sm">Thanks — noted.</span>
       </div>
     );
   }
@@ -94,19 +94,19 @@ export const PageFeedbackFooter = ({ page }) => {
             onClick={() => handleSentimentClick('good')}
             className={`p-2 rounded-lg border transition-all ${
               selectedSentiment === 'good' 
-                ? 'bg-emerald-900/50 border-emerald-500' 
+                ? 'bg-teal-900/50 border-teal-500' 
                 : 'border-white/6 hover:border-white/12 hover:bg-white/5'
             }`}
             title="Good"
             data-testid="feedback-good"
           >
-            <CheckCircle className="w-5 h-5 text-emerald-400" />
+            <CheckCircle className="w-5 h-5 text-teal-400" />
           </button>
           <button
             onClick={() => handleSentimentClick('great')}
             className={`p-2 rounded-lg border transition-all ${
               selectedSentiment === 'great' 
-                ? 'bg-emerald-900/50 border-emerald-500' 
+                ? 'bg-teal-900/50 border-teal-500' 
                 : 'border-white/6 hover:border-white/12 hover:bg-white/5'
             }`}
             title="Great"
@@ -117,7 +117,7 @@ export const PageFeedbackFooter = ({ page }) => {
           
           <button
             onClick={() => setShowNote(!showNote)}
-            className="ml-2 text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+            className="ml-2 text-sm text-teal-400 hover:text-teal-300 flex items-center gap-1"
             data-testid="add-note-btn"
           >
             <MessageSquare className="w-4 h-4" />
@@ -133,13 +133,13 @@ export const PageFeedbackFooter = ({ page }) => {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What would make this better?"
-            className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-emerald-500"
+            className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
             data-testid="feedback-note-input"
           />
           <button
             onClick={handleNoteSubmit}
             disabled={!selectedSentiment}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
             data-testid="submit-note-btn"
           >
             Send
@@ -195,7 +195,7 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
   if (submitted) {
     return (
       <div className="fixed bottom-6 right-6 w-80 bg-[#1A1A1E] border border-white/6 rounded-xl shadow-2xl p-4 animate-slideIn z-50">
-        <p className="text-emerald-400 text-center">Thanks for the feedback!</p>
+        <p className="text-teal-400 text-center">Thanks for the feedback!</p>
       </div>
     );
   }
@@ -225,7 +225,7 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
               (sentiment === 'confusing' && selectedSentiment === 'negative') ||
               (sentiment === 'fine' && selectedSentiment === 'neutral') ||
               (sentiment === 'easy' && selectedSentiment === 'great')
-                ? 'bg-emerald-900/50 border-emerald-500 text-white'
+                ? 'bg-teal-900/50 border-teal-500 text-white'
                 : 'border-white/6 text-gray-400 hover:border-white/12'
             }`}
           >
@@ -239,13 +239,13 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional: tell us more..."
-        className="w-full px-3 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm mb-3 focus:outline-none focus:border-emerald-500"
+        className="w-full px-3 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm mb-3 focus:outline-none focus:border-teal-500"
       />
       
       <button
         onClick={submitFeedback}
         disabled={!selectedSentiment}
-        className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+        className="w-full py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
       >
         Send
       </button>
@@ -306,7 +306,7 @@ export const ErrorClarityFeedback = ({ errorCode, endpoint, errorMessage }) => {
           <span className="text-xs text-gray-500">Was this error message clear?</span>
           <button
             onClick={() => handleResponse(true)}
-            className="text-xs text-emerald-400 hover:text-emerald-300"
+            className="text-xs text-teal-400 hover:text-teal-300"
           >
             Yes
           </button>
@@ -324,11 +324,11 @@ export const ErrorClarityFeedback = ({ errorCode, endpoint, errorMessage }) => {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What was confusing?"
-            className="flex-1 px-3 py-1 bg-[#0A0A0B] border border-white/6 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-emerald-500"
+            className="flex-1 px-3 py-1 bg-[#0A0A0B] border border-white/6 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-teal-500"
           />
           <button
             onClick={() => submitFeedback(false, note)}
-            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs"
+            className="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded text-xs"
           >
             Send
           </button>
@@ -381,7 +381,7 @@ export const DocFeedback = ({ page }) => {
 
   if (submitted) {
     return (
-      <div className="mt-8 py-4 text-center text-emerald-400 text-sm">
+      <div className="mt-8 py-4 text-center text-teal-400 text-sm">
         Thanks for the feedback!
       </div>
     );
@@ -394,7 +394,7 @@ export const DocFeedback = ({ page }) => {
           <span className="text-sm text-gray-400">Did this page help you integrate?</span>
           <button
             onClick={() => handleResponse(true)}
-            className="flex items-center gap-1 px-3 py-1 text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 rounded hover:bg-emerald-500/10"
+            className="flex items-center gap-1 px-3 py-1 text-sm text-teal-400 hover:text-teal-300 border border-teal-500/30 rounded hover:bg-teal-500/10"
           >
             👍 Yes
           </button>
@@ -414,11 +414,11 @@ export const DocFeedback = ({ page }) => {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Tell us what's missing..."
-              className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-emerald-500"
+              className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
             />
             <button
               onClick={() => submitFeedback(false, note)}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm"
             >
               Send
             </button>

@@ -93,7 +93,7 @@ const PulseCheck = ({ onClose }) => {
   if (submitted) {
     return (
       <div className="bg-[#141416] border border-white/6 rounded-xl p-6 mb-6 animate-fadeIn">
-        <p className="text-emerald-400 text-center">Thanks for your feedback! It helps us improve Safe-Spend.</p>
+        <p className="text-teal-400 text-center">Thanks for your feedback! It helps us improve Safe-Spend.</p>
       </div>
     );
   }
@@ -119,8 +119,8 @@ const PulseCheck = ({ onClose }) => {
               onClick={() => setNpsScore(score)}
               className={`w-10 h-10 rounded-lg border text-sm transition-all ${
                 npsScore === score
-                  ? 'bg-emerald-600 border-emerald-500 text-white'
-                  : 'border-white/6 text-gray-400 hover:border-emerald-500/50 hover:text-white'
+                  ? 'bg-teal-600 border-teal-500 text-white'
+                  : 'border-white/6 text-gray-400 hover:border-teal-500/50 hover:text-white'
               }`}
               data-testid={`nps-${score}`}
             >
@@ -144,7 +144,7 @@ const PulseCheck = ({ onClose }) => {
           value={improvement}
           onChange={(e) => setImprovement(e.target.value)}
           placeholder={`e.g., "${IMPROVEMENT_PLACEHOLDERS[placeholderIndex]}"`}
-          className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-emerald-500"
+          className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
           data-testid="improvement-input"
         />
       </div>
@@ -165,7 +165,7 @@ const PulseCheck = ({ onClose }) => {
               <div
                 className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
                   useCases.includes(option.id)
-                    ? 'bg-emerald-600 border-emerald-500'
+                    ? 'bg-teal-600 border-teal-500'
                     : 'border-white/20 group-hover:border-white/40'
                 }`}
               >
@@ -192,7 +192,7 @@ const PulseCheck = ({ onClose }) => {
             <div
               className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
                 useCases.includes('other')
-                  ? 'bg-emerald-600 border-emerald-500'
+                  ? 'bg-teal-600 border-teal-500'
                   : 'border-white/20'
               }`}
               onClick={() => toggleUseCase('other')}
@@ -218,7 +218,7 @@ const PulseCheck = ({ onClose }) => {
                 }
               }}
               placeholder="..."
-              className="flex-1 px-3 py-1 bg-[#0A0A0B] border border-white/6 rounded text-white placeholder-gray-500 text-sm focus:outline-none focus:border-emerald-500"
+              className="flex-1 px-3 py-1 bg-[#0A0A0B] border border-white/6 rounded text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ const PulseCheck = ({ onClose }) => {
         <button
           onClick={handleSubmit}
           disabled={!npsScore}
-          className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex-1 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
           data-testid="submit-pulse"
         >
           Submit Check-In

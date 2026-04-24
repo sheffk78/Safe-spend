@@ -40,7 +40,7 @@ const PolicyCard = ({ policy }) => {
             <div className="p-6 border-b border-[rgba(255,255,255,0.04)]">
                 <div className="flex items-start justify-between mb-3">
                     <div>
-                        <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-1">Escrow Policy</p>
+                        <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-1">Spending Policy</p>
                         <h3 className="text-lg font-semibold text-ss-text font-heading">{name}</h3>
                     </div>
                     <StatusBadge status={status} />

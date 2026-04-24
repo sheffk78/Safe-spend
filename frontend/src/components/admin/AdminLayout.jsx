@@ -33,7 +33,7 @@ const AdminLayout = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-                <div className="animate-spin h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
             </div>
         );
     }
@@ -54,7 +54,7 @@ const AdminLayout = () => {
                 {/* Logo & Admin Badge */}
                 <div className="p-6 border-b border-white/[0.06]">
                     <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl mb-3">
-                        <span className="text-emerald-500">◆</span>
+                        <span className="text-teal-500">◆</span>
                         Safe-Spend
                     </Link>
                     <span className="inline-block px-2 py-1 bg-amber-500/15 text-amber-500 text-[11px] font-semibold tracking-wider rounded">
@@ -74,7 +74,7 @@ const AdminLayout = () => {
                                 to={item.path}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                                     active
-                                        ? 'bg-emerald-500/10 text-emerald-500'
+                                        ? 'bg-teal-500/10 text-teal-500'
                                         : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                                 }`}
                             >

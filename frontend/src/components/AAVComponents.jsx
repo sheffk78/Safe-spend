@@ -94,7 +94,7 @@ export const EscrowAAVConfig = ({ escrow, onUpdate, loading }) => {
         <button
           onClick={() => handleToggle('aav_enabled')}
           className={`w-12 h-6 rounded-full transition-colors ${
-            config.aav_enabled ? 'bg-emerald-500' : 'bg-gray-600'
+            config.aav_enabled ? 'bg-teal-500' : 'bg-gray-600'
           }`}
         >
           <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -135,7 +135,7 @@ export const EscrowAAVConfig = ({ escrow, onUpdate, loading }) => {
             <div className="flex items-center justify-between mb-2">
               <span className="text-white text-sm">AAV API Key</span>
               {escrow.aav_api_key_configured && (
-                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">
+                <span className="px-2 py-0.5 bg-teal-500/20 text-teal-400 text-xs rounded">
                   Configured
                 </span>
               )}
@@ -245,7 +245,7 @@ export const EscrowAAVConfig = ({ escrow, onUpdate, loading }) => {
             <button
               onClick={() => handleToggle('aav_require_certificate')}
               className={`w-12 h-6 rounded-full transition-colors ${
-                config.aav_require_certificate ? 'bg-emerald-500' : 'bg-gray-600'
+                config.aav_require_certificate ? 'bg-teal-500' : 'bg-gray-600'
               }`}
             >
               <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -402,7 +402,7 @@ export const AAVVerificationBadge = ({ spendRequest }) => {
   }
 
   const statusConfig = {
-    verified: { color: 'bg-emerald-500/20 text-emerald-400', icon: Check, label: 'AAV Verified' },
+    verified: { color: 'bg-teal-500/20 text-teal-400', icon: Check, label: 'AAV Verified' },
     unverified: { color: 'bg-amber-500/20 text-amber-400', icon: AlertTriangle, label: 'AAV Unverified' },
     denied: { color: 'bg-red-500/20 text-red-400', icon: AlertTriangle, label: 'AAV Denied' },
     bypassed: { color: 'bg-gray-500/20 text-gray-400', icon: Shield, label: 'AAV Bypassed' },
@@ -474,7 +474,7 @@ export const AAVDetailsPanel = ({ spendRequest }) => {
           <div>
             <span className="text-gray-500">AAV Result</span>
             <p className={`font-medium ${
-              spendRequest.aav_result === 'authorized' ? 'text-emerald-400' :
+              spendRequest.aav_result === 'authorized' ? 'text-teal-400' :
               spendRequest.aav_result === 'denied' ? 'text-red-400' :
               'text-amber-400'
             }`}>

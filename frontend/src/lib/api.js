@@ -14,9 +14,20 @@ const getAuthHeaders = () => {
 };
 
 const handleResponse = async (response) => {
-    const data = await response.json();
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType && contentType.includes('application/json');
+    
+    let data;
+    try {
+        data = isJson ? await response.json() : { raw: await response.text() };
+    } catch (parseError) {
+        data = { raw: await response.text() };
+    }
+    
     if (!response.ok) {
-        throw new Error(data.error || `Request failed with status ${response.status}`);
+        const errorMessage = data?.error || data?.message || `Request failed with status ${response.status}`;
+        throw new Error(errorMessage);
     }
     return data;
 };
