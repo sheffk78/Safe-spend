@@ -1,10 +1,11 @@
 import React from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
+import { SEOHead } from "@/lib/seo";
 
 // Pages
 import LandingPage from "@/pages/LandingPage";
@@ -68,6 +69,12 @@ import AdminFeedbackPage from "@/pages/admin/AdminFeedbackPage";
 // Feedback Page
 import FeedbackPage from "@/pages/FeedbackPage";
 
+// SEO component that reads current pathname and injects meta tags
+const SEORouter = () => {
+    const location = useLocation();
+    return <SEOHead pathname={location.pathname} />;
+};
+
 // Admin wrapper component that provides AdminContext (API key auth)
 const AdminRoutes = () => (
     <AdminProvider>
@@ -91,6 +98,7 @@ const AdminRoutes = () => (
 function App() {
     return (
         <BrowserRouter>
+            <SEORouter />
             <ScrollToTop />
             <AuthProvider>
                 <Routes>
