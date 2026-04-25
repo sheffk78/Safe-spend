@@ -1,0 +1,39 @@
+# Safe-Spend
+# https://safe-spend.dev
+
+User-agent: *
+Allow: /
+
+# AI citation crawlers - explicitly allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# Private routes
+User-agent: *
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://safe-spend.dev/sitemap.xml
