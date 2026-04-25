@@ -1,0 +1,73 @@
+# llms-full.txt — Extended AI visibility content for Safe-Spend
+# https://safe-spend.dev
+
+## What is Safe-Spend?
+Safe-Spend is a fiat-first escrow and spending control platform built specifically for AI agents. It solves the fundamental problem of autonomous agents spending money without governance — by providing policy-based controls, segregated escrow accounts, and complete audit trails.
+
+Every agent transaction goes through a 14-step validation cascade: balance check, policy evaluation, approval routing, vendor verification, category matching, and more. If any check fails, the transaction is blocked and logged.
+
+## Why This Matters
+- $82,000 charged in 48 hours from a stolen API key (The Register, March 2026)
+- An autonomous agent bought a $3,000 premium domain without asking (X/Twitter, Feb 2026)
+- A GPT-4o retry loop burned $187 in 10 minutes (AgentBudget creator, Feb 2026)
+
+API keys are financial attack surfaces. Credit cards on file are open liabilities. Safe-Spend replaces both with governed spending pools where the agent can only spend within human-defined boundaries.
+
+## How It Works
+1. **Fund a Spending Pool** — A human deposits USD via ACH or card. Funds are held in a segregated escrow account, not commingled.
+2. **Define Spending Policies** — Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, and approval cascades. Your agent can draft policies — you review and approve.
+3. **Agent Requests Disbursement** — Your agent calls the API. Safe-Spend evaluates every policy in the validation cascade, executes if approved, and logs the complete decision trail.
+
+## Policy Engine
+Policies are JSON-defined rules that govern agent spending:
+- Transaction limits (per-transaction, daily, weekly, monthly caps)
+- Vendor allowlists and blocklists
+- Category restrictions (e.g., "ai_compute", "infrastructure", "data_access")
+- Approval thresholds (auto-approve under $X, require human approval above)
+- Time-based restrictions (business hours, weekend rules)
+- Idempotency keys to prevent duplicate transactions
+
+## Audit Trail
+Every transaction produces a complete decision log:
+- Which policies were evaluated
+- Which checks passed/failed
+- Who approved (human or auto-policy)
+- Full transaction details (amount, vendor, category, timestamp)
+- Remaining balance after transaction
+
+## SDK Integration
+```python
+from safespend import SafeSpend
+client = SafeSpend(api_key="sk_live_...")
+
+result = client.spend.create(
+    escrow_id="esc_9f3k2m",
+    amount=4999,
+    currency="usd",
+    vendor="Anthropic",
+    category="ai_compute",
+    description="Claude API credits top-up",
+    idempotency_key="agent-run-001"
+)
+```
+
+Framework integrations available for LangChain, CrewAI, and OpenAI SDK. MCP server available for direct agent tool use.
+
+## Trust & Security
+- Funds held in segregated accounts, not commingled
+- SOC 2 Type II in progress
+- All API traffic encrypted with TLS 1.3
+- Idempotency keys prevent duplicate charges
+- Complete audit trail for compliance
+
+## Pages
+- Homepage: https://safe-spend.dev/
+- API Playground: https://safe-spend.dev/playground
+- Documentation: https://safe-spend.dev/docs
+- Pricing: https://safe-spend.dev/pricing (accessible via dashboard)
+- Blog: https://safe-spend.dev/blog
+- Terms: https://safe-spend.dev/terms
+- Privacy: https://safe-spend.dev/privacy
+
+## Organization
+Safe-Spend is a product of Agentic Trust, which also builds Agent Authority Vault (AAV) — trust governance infrastructure for AI agents.

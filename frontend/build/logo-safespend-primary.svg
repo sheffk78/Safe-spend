@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon: Shield with embedded dollar/flow mark -->
+  <g transform="translate(16, 10)">
+    <!-- Shield shape -->
+    <path d="M44 4 L82 18 L82 52 C82 74 66 92 44 100 C22 92 6 74 6 52 L6 18 Z" 
+          fill="url(#shieldGrad)" opacity="0.12" stroke="url(#shieldGrad)" stroke-width="2.5"/>
+    
+    <!-- Inner shield highlight -->
+    <path d="M44 14 L72 25 L72 50 C72 67 60 81 44 87 C28 81 16 67 16 50 L16 25 Z" 
+          fill="none" stroke="#10B981" stroke-width="1" opacity="0.3"/>
+    
+    <!-- Dollar sign / flow lines inside shield -->
+    <!-- Vertical bar of dollar -->
+    <line x1="44" y1="30" x2="44" y2="74" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Top curve of S -->
+    <path d="M56 38 C56 32 50 28 44 28 C38 28 32 32 32 38 C32 44 38 46 44 48" 
+          fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Bottom curve of S -->
+    <path d="M32 60 C32 66 38 70 44 70 C50 70 56 66 56 60 C56 54 50 52 44 50" 
+          fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Small flow arrows exiting shield right side (agent spending) -->
+    <g opacity="0.5">
+      <line x1="68" y1="42" x2="80" y2="42" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+      <polyline points="77,39 80,42 77,45" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g opacity="0.35">
+      <line x1="72" y1="54" x2="84" y2="54" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+      <polyline points="81,51 84,54 81,57" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g opacity="0.2">
+      <line x1="68" y1="66" x2="80" y2="66" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+      <polyline points="77,63 80,66 77,69" fill="none" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Wordmark: Safe-Spend -->
+  <g transform="translate(120, 0)">
+    <!-- Wordmark as single text with tspan for colored hyphen -->
+    <text y="72" font-family="'Space Grotesk', system-ui, sans-serif" font-size="52" font-weight="700" letter-spacing="-1">
+      <tspan fill="#F5F5F5">Safe</tspan><tspan fill="#10B981">-</tspan><tspan fill="#F5F5F5">Spend</tspan>
+    </text>
+  </g>
+  
+  <!-- Tagline -->
+  <text x="120" y="98" font-family="'Inter', system-ui, sans-serif" font-size="14" font-weight="400" fill="#6B7280" letter-spacing="2.5">TRUST-GRADE AGENT SPENDING</text>
+</svg>
