@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
 import TransactionTable from '@/components/TransactionTable';
+import SeoHelmet from '@/components/SeoHelmet';
+import { homepageStructuredData, faqStructuredData } from '@/lib/structuredData';
 import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
 import { ArrowRight, DollarSign, Bot, Clock, Shield, Code, Landmark, Layers } from 'lucide-react';
 
@@ -185,6 +187,27 @@ def spend(amount: int, vendor: str, description: str) -> dict:
 
     return (
         <div className="min-h-screen bg-ss-bg">
+            <SeoHelmet
+                title="Policy-Based Spend Control for AI Agents"
+                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
+                canonicalPath="/"
+                ogImage="https://safe-spend.dev/og-image.png"
+                structuredData={homepageStructuredData}
+            />
+            <SeoHelmet
+                title="Policy-Based Spend Control for AI Agents"
+                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
+                canonicalPath="/"
+                ogImage="https://safe-spend.dev/og-image.png"
+                structuredData={homepageStructuredData}
+            />
+            <SeoHelmet
+                title="Policy-Based Spend Control for AI Agents"
+                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
+                canonicalPath="/"
+                ogImage="https://safe-spend.dev/og-image.png"
+                structuredData={homepageStructuredData}
+            />
             <Navbar />
             
             {/* Hero Section */}
