@@ -39,9 +39,9 @@ RUN chmod +x /start.sh
 # Copy built assets
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Health check - uses PORT env var set by start.sh
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-80}/health || exit 1
+# Health check on port 80
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1
 
-# Start nginx with PORT substitution
+# Start nginx
 CMD ["/start.sh"]
