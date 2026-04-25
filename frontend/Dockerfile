@@ -1,5 +1,6 @@
 # Safe-Spend Frontend Dockerfile
 # React SPA with Vite build + nginx serving
+# Build: 2026-04-25-v2 (nginx llms.txt fix)
 
 # Build stage - use Node 18 LTS
 FROM node:18-alpine AS build
