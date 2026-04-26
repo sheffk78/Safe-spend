@@ -211,18 +211,18 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
                                 to="/signup"
-                                className="px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200 flex items-center gap-2"
+                                className="group px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-ss-accent/25"
                                 data-testid="hero-cta-primary"
                             >
                                 Get API Keys
-                                <ArrowRight size={18} />
+                                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                             </Link>
                             <Link
                                 to="/playground"
-                                className="px-8 py-3.5 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.04)] text-ss-text font-semibold rounded-lg transition-all duration-200"
+                                className="px-8 py-3.5 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-ss-accent/50 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-lg transition-all duration-200"
                                 data-testid="hero-cta-playground"
                             >
-                                Try the API Playground →
+                                Try the API Playground
                             </Link>
                         </div>
                     </div>
@@ -242,34 +242,78 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                             Agents are spending money. Badly.
                         </h2>
                     </RevealOnScroll>
-                    <motion.div
-                        variants={staggerContainer}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, margin: "-100px" }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {problemCards.map((card, index) => (
-                            <motion.div
-                                key={index}
-                                variants={staggerItem}
-                                className={`${getSeverityStyles(card.severity)} p-8 rounded-xl transition-all duration-200 hover:-translate-y-0.5`}
-                                data-testid={`problem-card-${index + 1}`}
-                            >
-                                <div className="w-10 h-10 rounded-lg bg-ss-surface flex items-center justify-center mb-4">
-                                    <card.icon className={`w-5 h-5 ${getSeverityIconColor(card.severity)}`} />
+                    {/* Asymmetric layout: featured card + two supporting cards */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Featured card — high severity */}
+                        <RevealOnScroll>
+                            <div className="p-8 rounded-xl border border-[rgba(239,68,68,0.2)] hover:border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.04)] transition-all duration-300 hover:scale-[1.01] lg:row-span-2">
+                                <div className="flex items-start gap-4 mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-ss-error/10 flex items-center justify-center shrink-0">
+                                        <DollarSign className="w-6 h-6 text-ss-error" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-heading text-xl font-semibold text-ss-text">
+                                            "$82,000 in 48 hours"
+                                        </h3>
+                                        <p className="text-ss-text-tertiary text-xs mt-1">
+                                            Source: The Register, March 2026
+                                        </p>
+                                    </div>
                                 </div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">
-                                    {card.title}
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    {card.description}
+                                <p className="text-ss-text-secondary text-sm leading-relaxed mb-6">
+                                    A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn't hold your credentials.
                                 </p>
-                                <p className="text-ss-text-tertiary text-xs mt-4">
-                                    {card.source}
-                                </p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                                <div className="flex items-center gap-2 text-ss-error/80 text-xs font-medium">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-ss-error" />
+                                    Critical — requires immediate guardrails
+                                </div>
+                            </div>
+                        </RevealOnScroll>
+                        
+                        {/* Two supporting cards */}
+                        <div className="flex flex-col gap-6">
+                            <RevealOnScroll>
+                                <div className="p-6 rounded-xl border border-[rgba(245,158,11,0.15)] hover:border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.03)] transition-all duration-300 hover:scale-[1.01]">
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-lg bg-ss-warning/10 flex items-center justify-center shrink-0">
+                                            <Bot className="w-5 h-5 text-ss-warning" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-heading text-lg font-semibold text-ss-text">
+                                                "$3,000 without asking"
+                                            </h3>
+                                            <p className="text-ss-text-tertiary text-xs mt-0.5">
+                                                Source: X/Twitter, Feb 2026
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p className="text-ss-text-secondary text-sm leading-relaxed">
+                                        An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow.
+                                    </p>
+                                </div>
+                            </RevealOnScroll>
+                            <RevealOnScroll>
+                                <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] bg-ss-surface transition-all duration-300 hover:scale-[1.01]">
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center shrink-0">
+                                            <Clock className="w-5 h-5 text-ss-accent" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-heading text-lg font-semibold text-ss-text">
+                                                "$187 in 10 minutes"
+                                            </h3>
+                                            <p className="text-ss-text-tertiary text-xs mt-0.5">
+                                                Source: AgentBudget creator, Feb 2026
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p className="text-ss-text-secondary text-sm leading-relaxed">
+                                        A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don't prevent overspend.
+                                    </p>
+                                </div>
+                            </RevealOnScroll>
+                        </div>
+                    </div>
                 </div>
             </section>
 
