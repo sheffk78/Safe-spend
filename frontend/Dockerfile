@@ -38,9 +38,8 @@ RUN chmod +x /start.sh
 # Copy built assets
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1
+# No Dockerfile HEALTHCHECK - Railway handles health checks
+# Health check is at /health endpoint, Railway checks it automatically
 
 # Start nginx with PORT substitution
 CMD ["/start.sh"]
