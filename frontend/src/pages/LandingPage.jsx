@@ -186,7 +186,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
     };
 
     return (
-        <div className="min-h-screen bg-ss-bg">
+        <div className="min-h-screen bg-ss-bg ss-noise-overlay">
             <SeoHelmet
                 title="Policy-Based Spend Control for AI Agents"
                 description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
@@ -198,8 +198,8 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-6 overflow-hidden" data-testid="hero-section">
-                {/* Background gradient orb */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-ss-accent/10 via-ss-accent/5 to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+                {/* Ambient code glow */}
+                <div className="absolute top-1/3 right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-ss-accent/[0.03] via-ss-accent/[0.01] to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
                 <div className="relative max-w-[1200px] mx-auto">
                     <div className="text-center mb-12">
                         <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-ss-text leading-tight mb-6">
@@ -233,7 +233,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* The Problem Section */}
-            <section className="relative py-32 px-6 bg-ss-code overflow-hidden" data-testid="problem-section">
+            <section className="relative py-20 lg:py-28 px-6 bg-ss-code overflow-hidden" data-testid="problem-section">
                 {/* Subtle mesh gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ss-error/3 to-transparent pointer-events-none" aria-hidden="true" />
                 <div className="relative max-w-[1200px] mx-auto">
@@ -318,7 +318,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="relative py-32 px-6 overflow-hidden" data-testid="how-it-works-section">
+            <section id="how-it-works" className="relative py-20 lg:py-32 px-6 overflow-hidden" data-testid="how-it-works-section">
                 {/* Background gradient orb */}
                 <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-tl from-ss-accent/8 to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
                 <div className="relative max-w-[1200px] mx-auto">
@@ -383,7 +383,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* Features Section - Policy Engine */}
-            <section id="features" className="py-24 px-6 bg-ss-code" data-testid="features-section">
+            <section id="features" className="py-16 lg:py-24 px-6 bg-ss-code" data-testid="features-section">
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
@@ -401,7 +401,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* Audit Trail Section */}
-            <section className="py-24 px-6" data-testid="audit-section">
+            <section className="py-20 lg:py-28 px-6" data-testid="audit-section">
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
@@ -419,7 +419,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* Framework Integration Section */}
-            <section className="py-24 px-6 bg-ss-code" data-testid="integration-section">
+            <section className="py-16 lg:py-24 px-6 bg-ss-code" data-testid="integration-section">
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
@@ -472,7 +472,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* Pricing Section */}
-            <section id="pricing" className="py-24 px-6" data-testid="pricing-section">
+            <section id="pricing" className="py-20 lg:py-28 px-6" data-testid="pricing-section">
                 <div className="max-w-[1200px] mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
@@ -528,9 +528,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                         {/* Builder */}
                         {/* Builder — visually distinct */}
                         <div className="bg-ss-surface p-8 rounded-xl border-2 border-ss-accent relative bg-[rgba(20,184,166,0.02)]" data-testid="pricing-card-builder">
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-ss-accent text-ss-bg text-xs font-semibold rounded-full">
-                                Most Popular
-                            </div>
+                            <p className="text-xs text-ss-text-tertiary mb-4">For solo developers and small teams</p>
                             <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Builder</h3>
                             <div className="mb-6">
                                 <span className="text-3xl font-bold text-ss-text">$29</span>
@@ -623,7 +621,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 px-6 bg-ss-code" data-testid="cta-section">
+            <section className="py-20 lg:py-28 px-6 bg-ss-code" data-testid="cta-section">
                 <div className="max-w-[1200px] mx-auto text-center">
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
                         Wallets hold money. Governance controls it.
@@ -633,7 +631,7 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                     </p>
                     <Link
                         to="/signup"
-                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200"
+                        className="ss-cta-pulse inline-flex items-center gap-2 px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200"
                         data-testid="final-cta"
                     >
                         Get Your API Keys
