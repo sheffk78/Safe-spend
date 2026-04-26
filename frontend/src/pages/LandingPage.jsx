@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
 import TransactionTable from '@/components/TransactionTable';
 import SeoHelmet from '@/components/SeoHelmet';
-import { homepageStructuredData, faqStructuredData } from '@/lib/structuredData';
-import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
+import { homepageStructuredData } from '@/lib/structuredData';
+import { RevealOnScroll, staggerContainer, staggerItem } from '@/components/ScrollReveal';
 import { ArrowRight, DollarSign, Bot, Clock, Shield, Code, Landmark, Layers } from 'lucide-react';
 
 const LandingPage = () => {
@@ -194,25 +194,13 @@ def spend(amount: int, vendor: str, description: str) -> dict:
                 ogImage="https://safe-spend.dev/og-image.png"
                 structuredData={homepageStructuredData}
             />
-            <SeoHelmet
-                title="Policy-Based Spend Control for AI Agents"
-                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
-                canonicalPath="/"
-                ogImage="https://safe-spend.dev/og-image.png"
-                structuredData={homepageStructuredData}
-            />
-            <SeoHelmet
-                title="Policy-Based Spend Control for AI Agents"
-                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
-                canonicalPath="/"
-                ogImage="https://safe-spend.dev/og-image.png"
-                structuredData={homepageStructuredData}
-            />
             <Navbar />
             
             {/* Hero Section */}
-            <section className="pt-32 pb-20 px-6" data-testid="hero-section">
-                <div className="max-w-[1200px] mx-auto">
+            <section className="relative pt-32 pb-20 px-6 overflow-hidden" data-testid="hero-section">
+                {/* Background gradient orb */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-ss-accent/10 via-ss-accent/5 to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+                <div className="relative max-w-[1200px] mx-auto">
                     <div className="text-center mb-12">
                         <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-ss-text leading-tight mb-6">
                             Your agent needs spending governance,<br className="hidden md:block" /> not a wallet.
@@ -245,8 +233,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* The Problem Section */}
-            <section className="py-24 px-6 bg-ss-code" data-testid="problem-section">
-                <div className="max-w-[1200px] mx-auto">
+            <section className="relative py-32 px-6 bg-ss-code overflow-hidden" data-testid="problem-section">
+                {/* Subtle mesh gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ss-error/3 to-transparent pointer-events-none" aria-hidden="true" />
+                <div className="relative max-w-[1200px] mx-auto">
                     <RevealOnScroll>
                         <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-16">
                             Agents are spending money. Badly.
@@ -284,8 +274,10 @@ def spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="py-24 px-6" data-testid="how-it-works-section">
-                <div className="max-w-[1200px] mx-auto">
+            <section id="how-it-works" className="relative py-32 px-6 overflow-hidden" data-testid="how-it-works-section">
+                {/* Background gradient orb */}
+                <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-tl from-ss-accent/8 to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+                <div className="relative max-w-[1200px] mx-auto">
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-4">
                         Three steps. Real guardrails.
                     </h2>
