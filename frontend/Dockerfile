@@ -40,4 +40,8 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 # Default PORT, Railway will override it
 ENV PORT=80
+
+# Expose the default port
+EXPOSE 80
+
 CMD /start.sh
