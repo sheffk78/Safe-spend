@@ -1,7 +1,7 @@
 # Safe-Spend Frontend Dockerfile
 # React SPA with Vite build + nginx serving
 
-# Build stage - use Node 18 LTS
+# Build stage
 FROM node:18-alpine AS build
 
 WORKDIR /app
@@ -26,7 +26,7 @@ RUN npm run build
 RUN ls -la /app/build/assets/ && echo "Build verified" || (echo "Build failed - no assets directory" && exit 1)
 
 # Production stage with nginx
-FROM nginx:alpine AS production
+FROM nginx:alpine
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -38,8 +38,6 @@ RUN chmod +x /start.sh
 # Copy built assets
 COPY --from=build /app/build /usr/share/nginx/html
 
-# No Dockerfile HEALTHCHECK - Railway handles health checks
-# Health check is at /health endpoint, Railway checks it automatically
-
-# Start nginx with PORT substitution
-CMD ["/start.sh"]
+# Default PORT, Railway will override it
+ENV PORT=80
+CMD /start.sh
