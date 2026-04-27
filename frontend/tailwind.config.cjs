@@ -13,18 +13,18 @@ module.exports = {
                 sm: 'calc(var(--radius) - 4px)'
             },
             colors: {
-                // Safe-Spend Design System
-                'ss-bg': '#0A0A0B',
-                'ss-surface': '#141416',
-                'ss-elevated': '#1A1A1E',
-                'ss-code': '#0F0F11',
-                'ss-accent': '#14B8A6',
-                'ss-accent-hover': '#2DD4BF',
-                'ss-text': '#F5F5F5',
-                'ss-text-secondary': '#9CA3AF',
-                'ss-text-tertiary': '#6B7280',
-                'ss-warning': '#F59E0B',
-                'ss-error': '#EF4444',
+                // Safe-Spend Design System — Warm, authoritative, human
+                'ss-bg': '#FAFAF8',
+                'ss-surface': '#FFFFFF',
+                'ss-elevated': '#F5F3F0',
+                'ss-code': '#1C1917',
+                'ss-accent': '#2563EB',
+                'ss-accent-hover': '#1D4ED8',
+                'ss-text': '#1C1917',
+                'ss-text-secondary': '#57534E',
+                'ss-text-tertiary': '#A8A29E',
+                'ss-warning': '#D97706',
+                'ss-error': '#DC2626',
                 // Existing colors
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',

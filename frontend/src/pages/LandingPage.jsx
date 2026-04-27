@@ -1,22 +1,167 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CodeBlock from '@/components/CodeBlock';
-import PolicyCard from '@/components/PolicyCard';
-import TransactionTable from '@/components/TransactionTable';
 import SeoHelmet from '@/components/SeoHelmet';
 import { homepageStructuredData } from '@/lib/structuredData';
-import { RevealOnScroll, staggerContainer, staggerItem } from '@/components/ScrollReveal';
-import { ArrowRight, DollarSign, Bot, Clock, Shield, Code, Landmark, Layers } from 'lucide-react';
 
 const LandingPage = () => {
-    const heroCodeTabs = [
-        {
-            label: 'Python',
-            language: 'python',
-            code: `from safespend import SafeSpend
+    return (
+        <div className="min-h-screen bg-ss-bg">
+            <SeoHelmet
+                title="Safe-Spend — Fiduciary Rails for AI Agents"
+                description="Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
+                structuredData={homepageStructuredData}
+            />
+            <Navbar />
+
+            {/* Hero — Clean, direct, no decorations */}
+            <section className="pt-32 pb-20 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        Fiduciary spending controls for AI
+                    </p>
+                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-ss-text leading-[1.1] mb-6">
+                        Agents spend money.<br />
+                        Someone should be watching.
+                    </h1>
+                    <p className="text-lg md:text-xl text-ss-text-secondary leading-relaxed mb-10 max-w-2xl">
+                        Safe-Spend connects AI agents to card rails with fiduciary guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Link
+                            to="/signup"
+                            className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center"
+                        >
+                            Start free
+                        </Link>
+                        <a
+                            href="#how-it-works"
+                            className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
+                        >
+                            See how it works
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            {/* The Problem — Direct, no cards */}
+            <section className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        The problem
+                    </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-8">
+                        AI agents can now spend your money. What could go wrong?
+                    </h2>
+
+                    <div className="space-y-8">
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-error/10 flex items-center justify-center mt-1">
+                                <span className="text-ss-error font-bold text-sm">1</span>
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Uncontrolled spending</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    Agents with API access to payment systems can spend without limits. A misconfigured agent, a prompt injection, or a logic error can drain an account in minutes.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-warning/10 flex items-center justify-center mt-1">
+                                <span className="text-ss-warning font-bold text-sm">2</span>
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">No audit trail</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    When an agent spends, who approved it? What policy governed it? Without fiduciary documentation, you can't answer your accountant, your board, or your regulator.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-accent/10 flex items-center justify-center mt-1">
+                                <span className="text-ss-accent font-bold text-sm">3</span>
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Card rails ≠ fiduciary rails</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    Virtual cards and spend limits are a start. But they don't enforce <em>policy</em>, they don't document <em>intent</em>, and they don't create the paper trail a trustee actually needs. That's the gap Safe-Spend fills.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* How It Works — Steps, no decorative lines */}
+            <section id="how-it-works" className="py-20 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        How it works
+                    </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-12">
+                        Three steps. Full control.
+                    </h2>
+
+                    <div className="space-y-12">
+                        <div className="flex gap-6">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
+                                1
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Set policy</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    Define spending limits, vendor allowlists, category rules, and approval thresholds. Your fiduciary policy — not a credit limit — governs every transaction.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-6">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
+                                2
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Agent requests spend</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    Your AI agent calls the Safe-Spend API before every purchase. The request is checked against your policy in real time — approved, flagged for human review, or denied.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-6">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
+                                3
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Full audit trail</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">
+                                    Every transaction — approved, denied, or escalated — is logged with the policy that governed it, the agent that initiated it, and the timestamp. The paper trail a trustee needs.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Code Example — Clean, no tab decoration */}
+            <section className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        For developers
+                    </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-6">
+                        One API call. Full control.
+                    </h2>
+                    <p className="text-ss-text-secondary leading-relaxed mb-8">
+                        Add fiduciary spending controls to any agent with a single function call. Works with LangChain, CrewAI, AutoGPT, and any framework that supports tool use.
+                    </p>
+
+                    <div className="bg-ss-code rounded-lg p-6 overflow-x-auto">
+                        <pre className="text-sm leading-relaxed">
+                            <code className="text-green-400">
+{`from safespend import SafeSpend
 
 client = SafeSpend(api_key="sk_live_...")
 
@@ -32,621 +177,126 @@ result = client.spend.create(
 )
 
 # result.status → "approved"
-# result.remaining_balance → 45001`
-        },
-        {
-            label: 'TypeScript',
-            language: 'typescript',
-            code: `// Coming soon
-import { SafeSpend } from '@safespend/sdk';
-
-const client = new SafeSpend({ apiKey: 'sk_live_...' });`
-        },
-        {
-            label: 'cURL',
-            language: 'bash',
-            code: `# Coming soon
-curl -X POST https://api.safe-spend.io/v1/spend \\
-  -H "Authorization: Bearer sk_live_..." \\
-  -H "Content-Type: application/json"`
-        }
-    ];
-
-    const frameworkTabs = [
-        {
-            label: 'LangChain',
-            language: 'python',
-            code: `from langchain.tools import tool
-from safespend import SafeSpend
-
-client = SafeSpend(api_key="sk_agent_...")
-
-@tool
-def safe_spend(amount: int, vendor: str, description: str) -> dict:
-    """Spend money from the escrow account with policy enforcement."""
-    return client.spend.create(
-        escrow_id="esc_9f3k2m",
-        amount=amount,
-        vendor=vendor,
-        description=description
-    )`
-        },
-        {
-            label: 'CrewAI',
-            language: 'python',
-            code: `from crewai import Agent, Task
-from crewai_tools import tool
-from safespend import SafeSpend
-
-client = SafeSpend(api_key="sk_agent_...")
-
-@tool("Safe-Spend")
-def spend_money(amount: int, vendor: str, category: str) -> str:
-    """Execute a spend request through Safe-Spend escrow."""
-    result = client.spend.create(
-        escrow_id="esc_9f3k2m",
-        amount=amount,
-        vendor=vendor,
-        category=category
-    )
-    return f"Spend {result['status']}: \${amount/100:.2f} to {vendor}"`
-        },
-        {
-            label: 'OpenAI SDK',
-            language: 'python',
-            code: `from openai import OpenAI
-from openai.types.beta import FunctionTool
-from safespend import SafeSpend
-
-ss_client = SafeSpend(api_key="sk_agent_...")
-
-@function_tool
-def spend(amount: int, vendor: str, description: str) -> dict:
-    """Request a disbursement from the escrow account."""
-    return ss_client.spend.create(
-        escrow_id="esc_9f3k2m",
-        amount=amount,
-        vendor=vendor,
-        description=description
-    )`
-        },
-        {
-            label: 'cURL',
-            language: 'bash',
-            code: `curl -X POST https://api.safe-spend.io/v1/spend \\
-  -H "Authorization: Bearer sk_agent_..." \\
-  -H "Content-Type: application/json" \\
-  -H "Idempotency-Key: agent-run-001" \\
-  -d '{
-    "escrow_id": "esc_9f3k2m",
-    "amount": 4999,
-    "currency": "usd",
-    "vendor": "Anthropic",
-    "category": "ai_compute",
-    "description": "Claude API credits"
-  }'`
-        },
-        {
-            label: 'MCP',
-            language: 'json',
-            code: `{
-  "mcpServers": {
-    "safe-spend": {
-      "command": "npx",
-      "args": ["-y", "@safespend/mcp-server"],
-      "env": {
-        "SAFESPEND_API_KEY": "sk_agent_...",
-        "SAFESPEND_ESCROW_ID": "esc_9f3k2m"
-      }
-    }
-  }
-}`
-        }
-    ];
-
-    // Problem card data with severity-based visual weight
-    const problemCards = [
-        {
-            icon: DollarSign,
-            title: '"$82,000 in 48 hours"',
-            description: 'A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn\'t hold your credentials.',
-            source: 'Source: The Register, March 2026',
-            severity: 'high'
-        },
-        {
-            icon: Bot,
-            title: '"$3,000 without asking"',
-            description: 'An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow. No one told it not to.',
-            source: 'Source: X/Twitter, Feb 2026',
-            severity: 'medium'
-        },
-        {
-            icon: Clock,
-            title: '"$187 in 10 minutes"',
-            description: 'A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don\'t prevent overspend.',
-            source: 'Source: AgentBudget creator, Feb 2026',
-            severity: 'low'
-        }
-    ];
-
-    const getSeverityStyles = (severity) => {
-        switch (severity) {
-            case 'high': return 'border-[rgba(239,68,68,0.15)] hover:border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.03)]';
-            case 'medium': return 'border-[rgba(245,158,11,0.15)] hover:border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.02)]';
-            default: return 'border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] bg-ss-surface';
-        }
-    };
-
-    const getSeverityIconColor = (severity) => {
-        switch (severity) {
-            case 'high': return 'text-ss-error';
-            case 'medium': return 'text-ss-warning';
-            default: return 'text-ss-accent';
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-ss-bg ss-noise-overlay">
-            <SeoHelmet
-                title="Policy-Based Spend Control for AI Agents"
-                description="Fund a spending pool, define guardrails, and let your AI agent spend within them. Every dollar, every decision, every receipt — logged. Part of the Agentic Trust suite."
-                canonicalPath="/"
-                ogImage="https://safe-spend.dev/og-image.png"
-                structuredData={homepageStructuredData}
-            />
-            <Navbar />
-            
-            {/* Hero Section */}
-            <section className="relative pt-32 pb-20 px-6 overflow-hidden" data-testid="hero-section">
-                {/* Ambient code glow */}
-                <div className="absolute top-1/3 right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-ss-accent/[0.03] via-ss-accent/[0.01] to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-                <div className="relative max-w-[1200px] mx-auto">
-                    <div className="text-center mb-12">
-                        <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-ss-text leading-tight mb-6">
-                            Your agent needs spending governance,<br className="hidden md:block" /> not a wallet.
-                        </h1>
-                        <p className="text-lg md:text-xl text-ss-text-secondary max-w-3xl mx-auto mb-8 leading-relaxed">
-                            Policy-based spend control for AI agents. Fund a spending pool. Define guardrails. Your agent spends within them. Every dollar, every decision, every receipt — logged.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link
-                                to="/signup"
-                                className="group px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 hover:scale-105 hover:shadow-lg hover:shadow-ss-accent/25"
-                                data-testid="hero-cta-primary"
-                            >
-                                Get API Keys
-                                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-                            </Link>
-                            <Link
-                                to="/playground"
-                                className="px-8 py-3.5 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-ss-accent/50 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-lg transition-all duration-200"
-                                data-testid="hero-cta-playground"
-                            >
-                                Try the API Playground
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="max-w-3xl mx-auto">
-                        <CodeBlock tabs={heroCodeTabs} />
-                    </div>
-                </div>
-            </section>
-
-            {/* The Problem Section */}
-            <section className="relative py-20 lg:py-28 px-6 bg-ss-code overflow-hidden" data-testid="problem-section">
-                {/* Subtle mesh gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ss-error/3 to-transparent pointer-events-none" aria-hidden="true" />
-                <div className="relative max-w-[1200px] mx-auto">
-                    <RevealOnScroll>
-                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-16">
-                            Agents are spending money. Badly.
-                        </h2>
-                    </RevealOnScroll>
-                    {/* Asymmetric layout: featured card + two supporting cards */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Featured card — high severity */}
-                        <RevealOnScroll>
-                            <div className="p-8 rounded-xl border border-[rgba(239,68,68,0.2)] hover:border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.04)] transition-all duration-300 hover:scale-[1.01] lg:row-span-2">
-                                <div className="flex items-start gap-4 mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-ss-error/10 flex items-center justify-center shrink-0">
-                                        <DollarSign className="w-6 h-6 text-ss-error" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-heading text-xl font-semibold text-ss-text">
-                                            "$82,000 in 48 hours"
-                                        </h3>
-                                        <p className="text-ss-text-tertiary text-xs mt-1">
-                                            Source: The Register, March 2026
-                                        </p>
-                                    </div>
-                                </div>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed mb-6">
-                                    A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn't hold your credentials.
-                                </p>
-                                <div className="flex items-center gap-2 text-ss-error/80 text-xs font-medium">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-ss-error" />
-                                    Critical — requires immediate guardrails
-                                </div>
-                            </div>
-                        </RevealOnScroll>
-                        
-                        {/* Two supporting cards */}
-                        <div className="flex flex-col gap-6">
-                            <RevealOnScroll>
-                                <div className="p-6 rounded-xl border border-[rgba(245,158,11,0.15)] hover:border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.03)] transition-all duration-300 hover:scale-[1.01]">
-                                    <div className="flex items-start gap-3 mb-3">
-                                        <div className="w-10 h-10 rounded-lg bg-ss-warning/10 flex items-center justify-center shrink-0">
-                                            <Bot className="w-5 h-5 text-ss-warning" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-heading text-lg font-semibold text-ss-text">
-                                                "$3,000 without asking"
-                                            </h3>
-                                            <p className="text-ss-text-tertiary text-xs mt-0.5">
-                                                Source: X/Twitter, Feb 2026
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                        An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow.
-                                    </p>
-                                </div>
-                            </RevealOnScroll>
-                            <RevealOnScroll>
-                                <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] bg-ss-surface transition-all duration-300 hover:scale-[1.01]">
-                                    <div className="flex items-start gap-3 mb-3">
-                                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center shrink-0">
-                                            <Clock className="w-5 h-5 text-ss-accent" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-heading text-lg font-semibold text-ss-text">
-                                                "$187 in 10 minutes"
-                                            </h3>
-                                            <p className="text-ss-text-tertiary text-xs mt-0.5">
-                                                Source: AgentBudget creator, Feb 2026
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                        A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don't prevent overspend.
-                                    </p>
-                                </div>
-                            </RevealOnScroll>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works Section */}
-            <section id="how-it-works" className="relative py-20 lg:py-32 px-6 overflow-hidden" data-testid="how-it-works-section">
-                {/* Background gradient orb */}
-                <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-tl from-ss-accent/8 to-transparent rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-                <div className="relative max-w-[1200px] mx-auto">
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-4">
-                        Three steps. Real guardrails.
-                    </h2>
-                    <p className="text-ss-text-secondary text-center mb-16 max-w-2xl mx-auto">
-                        From funding to disbursement, every step is governed by policy-based controls.
-                    </p>
-                    
-                    <div className="relative">
-                        {/* Connecting line */}
-                        <div className="hidden lg:block absolute top-24 left-[16.67%] right-[16.67%] h-0.5 bg-gradient-to-r from-ss-accent via-ss-accent to-ss-accent opacity-30" />
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Step 1 */}
-                            <div className="relative text-center" data-testid="how-it-works-step-1">
-                                <div className="w-12 h-12 rounded-full bg-ss-accent text-ss-bg font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10">
-                                    1
-                                </div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Fund a Spending Pool
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    A human deposits USD via ACH or card. Funds are held in a segregated spending pool — not commingled, fully auditable.
-                                </p>
-                            </div>
-
-                            {/* Step 2 */}
-                            <div className="relative text-center" data-testid="how-it-works-step-2">
-                                <div className="w-12 h-12 rounded-full bg-ss-accent text-ss-bg font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10">
-                                    2
-                                </div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Define Spending Policies
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, and approval cascades. Your agent drafts policies — you review and approve.
-                                </p>
-                                <div className="mt-4 p-3 bg-ss-accent/10 rounded-lg border border-ss-accent/20">
-                                    <p className="text-xs text-ss-accent">
-                                        <strong>80/20 Setup:</strong> Let your agent draft policies—you just review and approve.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Step 3 */}
-                            <div className="relative text-center" data-testid="how-it-works-step-3">
-                                <div className="w-12 h-12 rounded-full bg-ss-accent text-ss-bg font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10">
-                                    3
-                                </div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Agent Requests Disbursement
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Your agent calls the API. Safe-Spend evaluates every policy in a 14-step validation cascade, executes if approved, and logs the complete decision trail.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section - Policy Engine */}
-            <section id="features" className="py-16 lg:py-24 px-6 bg-ss-code" data-testid="features-section">
-                <div className="max-w-[1200px] mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                            Governance-grade controls
-                        </h2>
-                        <p className="text-ss-text-secondary max-w-3xl mx-auto">
-                            Every policy maps to a real spending constraint. This isn't a wallet with limits — it's a funded account with programmatic guardrails.
-                        </p>
-                    </div>
-                    
-                    <div className="max-w-xl mx-auto">
-                        <PolicyCard />
-                    </div>
-                </div>
-            </section>
-
-            {/* Audit Trail Section */}
-            <section className="py-20 lg:py-28 px-6" data-testid="audit-section">
-                <div className="max-w-[1200px] mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                            Every dollar. Every decision. Every receipt.
-                        </h2>
-                        <p className="text-ss-text-secondary max-w-2xl mx-auto">
-                            Complete audit trail for every spend request — whether approved, denied, or pending human review.
-                        </p>
-                    </div>
-                    
-                    <div className="max-w-5xl mx-auto">
-                        <TransactionTable />
-                    </div>
-                </div>
-            </section>
-
-            {/* Framework Integration Section */}
-            <section className="py-16 lg:py-24 px-6 bg-ss-code" data-testid="integration-section">
-                <div className="max-w-[1200px] mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                            Five minutes to integrate. Any framework.
-                        </h2>
-                        <p className="text-ss-text-secondary max-w-2xl mx-auto">
-                            Drop in a decorator, add a tool, or call the REST API directly. Works with every major agent framework.
-                        </p>
-                    </div>
-                    
-                    <div className="max-w-4xl mx-auto mb-16">
-                        <CodeBlock tabs={frameworkTabs} />
+# result.remaining_balance → 45001`}
+                            </code>
+                        </pre>
                     </div>
 
-                    {/* Feature cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="feature-card-fiat">
-                            <Landmark className="w-8 h-8 text-ss-accent mb-4" />
-                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Fiat-First</h3>
-                            <p className="text-ss-text-secondary text-sm">
-                                Real USD on real payment rails. ACH deposits, Stripe-powered spending. No crypto required.
-                            </p>
-                        </div>
-
-                        <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="feature-card-api">
-                            <Code className="w-8 h-8 text-ss-accent mb-4" />
-                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Headless API</h3>
-                            <p className="text-ss-text-secondary text-sm">
-                                Pure REST API with webhooks. Your agent never touches payment credentials.
-                            </p>
-                        </div>
-
-                        <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="feature-card-governance">
-                            <Shield className="w-8 h-8 text-ss-accent mb-4" />
-                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Governance-Grade Controls</h3>
-                            <p className="text-ss-text-secondary text-sm">
-                                Segregated spending pools, policy engine, 14-step validation cascade, immutable audit trail.
-                            </p>
-                        </div>
-
-                        <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="feature-card-suite">
-                            <Layers className="w-8 h-8 text-ss-accent mb-4" />
-                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Part of Agentic Trust</h3>
-                            <p className="text-ss-text-secondary text-sm">
-                                Configurable agent authorization with certificate-based verification coming soon.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Pricing Section */}
-            <section id="pricing" className="py-20 lg:py-28 px-6" data-testid="pricing-section">
-                <div className="max-w-[1200px] mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                            Simple pricing. No surprises.
-                        </h2>
-                        <p className="text-ss-text-secondary max-w-xl mx-auto">
-                            All plans include agent-ready setup—let your AI draft policies while you review and approve.
-                        </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                        {/* Sandbox */}
-                        <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="pricing-card-sandbox">
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Sandbox</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">Free</span>
-                            </div>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Test mode with fake money
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Full API access + all framework SDKs
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Unlimited test transactions
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Community support
-                                </li>
-                            </ul>
-                            <Link
-                                to="/signup"
-                                className="block w-full text-center px-6 py-3 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.04)] text-ss-text font-medium rounded-lg transition-all duration-200"
-                                data-testid="pricing-cta-sandbox"
-                            >
-                                Start Building
-                            </Link>
-                        </div>
-
-                        {/* Builder */}
-                        {/* Builder — visually distinct */}
-                        <div className="bg-ss-surface p-8 rounded-xl border-2 border-ss-accent relative bg-[rgba(20,184,166,0.02)]" data-testid="pricing-card-builder">
-                            <p className="text-xs text-ss-text-tertiary mb-4">For solo developers and small teams</p>
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Builder</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">$29</span>
-                                <span className="text-ss-text-secondary">/mo + 0.5%</span>
-                            </div>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Live spending pools
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Up to $5,000/mo in spend volume
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Real-time webhooks
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Email support
-                                </li>
-                            </ul>
-                            <Link
-                                to="/signup"
-                                className="block w-full text-center px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-medium rounded-lg transition-all duration-200"
-                                data-testid="pricing-cta-builder"
-                            >
-                                Get Started
-                            </Link>
-                        </div>
-
-                        {/* Scale */}
-                        <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="pricing-card-scale">
-                            <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Scale</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">$149</span>
-                                <span className="text-ss-text-secondary">/mo + 0.3%</span>
-                            </div>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Unlimited spend volume
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Multiple spending pools per org
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Priority support + SLA guarantee
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Custom approval workflows
-                                </li>
-                                <li className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                    <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Multi-tenant / white-label options
-                                </li>
-                            </ul>
-                            <Link
-                                to="/contact"
-                                className="block w-full text-center px-6 py-3 bg-transparent border border-[rgba(255,255,255,0.12)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.04)] text-ss-text font-medium rounded-lg transition-all duration-200"
-                                data-testid="pricing-cta-scale"
-                            >
-                                Contact Us
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="py-20 lg:py-28 px-6 bg-ss-code" data-testid="cta-section">
-                <div className="max-w-[1200px] mx-auto text-center">
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                        Wallets hold money. Governance controls it.
-                    </h2>
-                    <p className="text-ss-text-secondary text-lg mb-8 max-w-2xl mx-auto">
-                        Give your agent policy-based spending authority in five minutes.
-                    </p>
-                    <Link
-                        to="/signup"
-                        className="ss-cta-pulse inline-flex items-center gap-2 px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-semibold rounded-lg transition-all duration-200"
-                        data-testid="final-cta"
-                    >
-                        Get Your API Keys
-                        <ArrowRight size={18} />
-                    </Link>
-                    <p className="text-ss-text-tertiary text-sm mt-8">
-                        Part of the{' '}
-                        <a href="https://agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-ss-accent hover:text-ss-accent-hover transition-colors">
-                            Agentic Trust
-                        </a>{' '}
-                        suite ·{' '}
-                        <a href="https://agentauthority.dev" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-text transition-colors">
-                            Agent Authority Vault
+                    <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                        <Link
+                            to="/docs/quickstart"
+                            className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center text-sm"
+                        >
+                            Read the quickstart
+                        </Link>
+                        <a
+                            href="/docs/api-reference"
+                            className="px-5 py-2.5 border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center text-sm"
+                        >
+                            API reference
                         </a>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features — Simple list, no card grid */}
+            <section className="py-20 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        What you get
                     </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-12">
+                        Fiduciary controls, not just spend limits.
+                    </h2>
+
+                    <div className="space-y-8">
+                        {[
+                            {
+                                title: 'Spending policies',
+                                desc: 'Per-agent limits, vendor allowlists, category restrictions, and approval thresholds. Your rules, enforced in real time.'
+                            },
+                            {
+                                title: 'Escrow accounts',
+                                desc: 'Pre-funded accounts with balance tracking. Agents can only spend what\'s allocated. No overdraft, no surprises.'
+                            },
+                            {
+                                title: 'Approval workflows',
+                                desc: 'Transactions above your threshold get held for human review. No auto-approval on large spends unless you want it.'
+                            },
+                            {
+                                title: 'Full audit trail',
+                                desc: 'Every transaction logged with policy, agent, intent, and timestamp. The documentation a trustee or auditor expects.'
+                            },
+                            {
+                                title: 'Webhooks & integrations',
+                                desc: 'Real-time notifications for approvals, denials, and escalations. Integrate with Slack, PagerDuty, or any system.'
+                            },
+                            {
+                                title: 'SDK support',
+                                desc: 'Python SDK today, TypeScript coming soon. Works with LangChain, CrewAI, AutoGPT, and any agent framework.'
+                            },
+                        ].map((feature, i) => (
+                            <div key={i} className="pb-8 border-b border-ss-text-tertiary/15 last:border-0 last:pb-0">
+                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">{feature.title}</h3>
+                                <p className="text-ss-text-secondary leading-relaxed">{feature.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Social Proof / Trust */}
+            <section className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
+                <div className="max-w-3xl mx-auto text-center">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                        Built for trust
+                    </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-6">
+                        Card rails are for spending.<br />Fiduciary rails are for trust.
+                    </h2>
+                    <p className="text-ss-text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
+                        Virtual cards and spend limits are necessary but not sufficient. When an agent spends money on your behalf, you need more than a transaction log — you need the documentation that proves the spend was authorized, policy-compliant, and properly overseen. That's what fiduciary rails provide.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div>
+                            <p className="font-heading text-3xl font-bold text-ss-text mb-1">&lt;100ms</p>
+                            <p className="text-ss-text-tertiary text-sm">Policy check latency</p>
+                        </div>
+                        <div>
+                            <p className="font-heading text-3xl font-bold text-ss-text mb-1">100%</p>
+                            <p className="text-ss-text-tertiary text-sm">Audit trail coverage</p>
+                        </div>
+                        <div>
+                            <p className="font-heading text-3xl font-bold text-ss-text mb-1">SOC 2</p>
+                            <p className="text-ss-text-tertiary text-sm">Compliant infrastructure</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA — Clean, no decorations */}
+            <section className="py-20 px-6">
+                <div className="max-w-3xl mx-auto text-center">
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-6">
+                        Stop hoping your agents won't overspend.
+                    </h2>
+                    <p className="text-ss-text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
+                        Start for free. Add fiduciary guardrails to your agents in under 10 minutes. No credit card required.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Link
+                            to="/signup"
+                            className="px-8 py-3.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center"
+                        >
+                            Start free
+                        </Link>
+                        <Link
+                            to="/docs/quickstart"
+                            className="px-8 py-3.5 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
+                        >
+                            Read the docs
+                        </Link>
+                    </div>
                 </div>
             </section>
 
@@ -656,4 +306,3 @@ def spend(amount: int, vendor: str, description: str) -> dict:
 };
 
 export default LandingPage;
-
