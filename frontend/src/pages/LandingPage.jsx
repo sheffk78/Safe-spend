@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
 import TransactionSimulator from '@/components/TransactionSimulator';
+import HeroAnimation3D from '@/components/HeroAnimation3D';
 import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
 import MagneticButton from '@/components/MagneticButton';
 import GradientBorderButton from '@/components/GradientBorderButton';
@@ -246,7 +247,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
                             className="lg:flex-1"
                         >
-                            <TransactionSimulator />
+                            <HeroAnimation3D />
                         </motion.div>
                     </div>
 
@@ -269,6 +270,23 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                     >
                         <CodeBlock tabs={heroCodeTabs} />
                     </motion.div>
+                </div>
+            </section>
+
+            {/* ═══ HOW IT WORKS — LIVE DEMO ═══ */}
+            <section className="py-20 px-6" data-testid="live-demo-section">
+                <div className="max-w-[1200px] mx-auto">
+                    <RevealOnScroll>
+                        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text text-center mb-4">
+                            Watch it decide in real time.
+                        </h2>
+                        <p className="text-ss-text-secondary text-center mb-12 max-w-2xl mx-auto">
+                            Every spend request flows through a 14-step policy gate. See exactly what happens — no black box.
+                        </p>
+                    </RevealOnScroll>
+                    <RevealOnScroll delay={0.2}>
+                        <TransactionSimulator />
+                    </RevealOnScroll>
                 </div>
             </section>
 
