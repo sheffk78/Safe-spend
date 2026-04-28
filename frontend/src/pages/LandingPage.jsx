@@ -1,23 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useInView, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
 import HeroAnimation from '@/components/HeroAnimation';
 import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
-import { ArrowRight, DollarSign, Bot, Clock, Shield, Code, Landmark, Layers, Sparkles } from 'lucide-react';
+import { ArrowRight, Shield, Code, Clock, Landmark, Layers, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SeoHelmet from '@/components/SeoHelmet';
 
-// Parallax section wrapper
+const homepageStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Safe-Spend",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "description": "Policy-based spending controls for AI agents. Fund a spending pool, define guardrails, your agent spends within them.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
 const ParallaxSection = ({ children, className = '', speed = 0.1 }) => {
     const ref = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        offset: ["start end", "end start"]
-    });
+    const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
     const y = useTransform(scrollYProgress, [0, 1], [0, speed * -100]);
-
     return (
         <motion.section ref={ref} style={{ y }} className={className}>
             {children}
@@ -25,11 +35,8 @@ const ParallaxSection = ({ children, className = '', speed = 0.1 }) => {
     );
 };
 
-// Animated counter display
 const AnimatedStat = ({ value, prefix = '', suffix = '', label, delay = 0 }) => {
     const [count, ref] = useCountUp(value, 2000);
-    const formattedCount = prefix + count.toLocaleString() + suffix;
-
     return (
         <motion.div
             ref={ref}
@@ -40,7 +47,7 @@ const AnimatedStat = ({ value, prefix = '', suffix = '', label, delay = 0 }) => 
             className="text-center"
         >
             <div className="font-heading text-4xl md:text-5xl font-bold text-ss-accent counter-glow mb-2">
-                {formattedCount}
+                {prefix}{count.toLocaleString()}{suffix}
             </div>
             <div className="text-ss-text-secondary text-sm">{label}</div>
         </motion.div>
@@ -48,162 +55,11 @@ const AnimatedStat = ({ value, prefix = '', suffix = '', label, delay = 0 }) => 
 };
 
 const LandingPage = () => {
-    return (
-        <div className="min-h-screen bg-ss-bg">
-            <SeoHelmet
-                title="Safe-Spend — Fiduciary Rails for AI Agents"
-                description="Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
-                structuredData={homepageStructuredData}
-            />
-            <Navbar />
-
-            {/* Hero — Clean, direct, no decorations */}
-            <section className="pt-32 pb-20 px-6">
-                <div className="max-w-3xl mx-auto">
-                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        Fiduciary spending controls for AI
-                    </p>
-                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-ss-text leading-[1.1] mb-6">
-                        Agents spend money.<br />
-                        Someone should be watching.
-                    </h1>
-                    <p className="text-lg md:text-xl text-ss-text-secondary leading-relaxed mb-10 max-w-2xl">
-                        Safe-Spend connects AI agents to card rails with fiduciary guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <Link
-                            to="/signup"
-                            className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center"
-                        >
-                            Start free
-                        </Link>
-                        <a
-                            href="#how-it-works"
-                            className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
-                        >
-                            See how it works
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            {/* The Problem — Direct, no cards */}
-            <section className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
-                <div className="max-w-3xl mx-auto">
-                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        The problem
-                    </p>
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-8">
-                        AI agents can now spend your money. What could go wrong?
-                    </h2>
-
-                    <div className="space-y-8">
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-error/10 flex items-center justify-center mt-1">
-                                <span className="text-ss-error font-bold text-sm">1</span>
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Uncontrolled spending</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    Agents with API access to payment systems can spend without limits. A misconfigured agent, a prompt injection, or a logic error can drain an account in minutes.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-warning/10 flex items-center justify-center mt-1">
-                                <span className="text-ss-warning font-bold text-sm">2</span>
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">No audit trail</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    When an agent spends, who approved it? What policy governed it? Without fiduciary documentation, you can't answer your accountant, your board, or your regulator.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-ss-accent/10 flex items-center justify-center mt-1">
-                                <span className="text-ss-accent font-bold text-sm">3</span>
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Card rails ≠ fiduciary rails</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    Virtual cards and spend limits are a start. But they don't enforce <em>policy</em>, they don't document <em>intent</em>, and they don't create the paper trail a trustee actually needs. That's the gap Safe-Spend fills.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works — Steps, no decorative lines */}
-            <section id="how-it-works" className="py-20 px-6">
-                <div className="max-w-3xl mx-auto">
-                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        How it works
-                    </p>
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-12">
-                        Three steps. Full control.
-                    </h2>
-
-                    <div className="space-y-12">
-                        <div className="flex gap-6">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
-                                1
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Set policy</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    Define spending limits, vendor allowlists, category rules, and approval thresholds. Your fiduciary policy — not a credit limit — governs every transaction.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-6">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
-                                2
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Agent requests spend</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    Your AI agent calls the Safe-Spend API before every purchase. The request is checked against your policy in real time — approved, flagged for human review, or denied.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-6">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-ss-accent text-white font-heading font-bold text-xl flex items-center justify-center">
-                                3
-                            </div>
-                            <div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Full audit trail</h3>
-                                <p className="text-ss-text-secondary leading-relaxed">
-                                    Every transaction — approved, denied, or escalated — is logged with the policy that governed it, the agent that initiated it, and the timestamp. The paper trail a trustee needs.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Code Example — Clean, no tab decoration */}
-            <section className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
-                <div className="max-w-3xl mx-auto">
-                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        For developers
-                    </p>
-                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-6">
-                        One API call. Full control.
-                    </h2>
-                    <p className="text-ss-text-secondary leading-relaxed mb-8">
-                        Add fiduciary spending controls to any agent with a single function call. Works with LangChain, CrewAI, AutoGPT, and any framework that supports tool use.
-                    </p>
-
-                    <div className="bg-ss-code rounded-lg p-6 overflow-x-auto">
-                        <pre className="text-sm leading-relaxed">
-                            <code className="text-green-400">
-{`from safespend import SafeSpend
+    const heroCodeTabs = [
+        {
+            label: 'Python',
+            language: 'python',
+            code: `from safespend import SafeSpend
 
 client = SafeSpend(api_key="sk_live_...")
 
@@ -218,8 +74,8 @@ result = client.spend.create(
     idempotency_key="agent-run-20260321-001"
 )
 
-# result.status → "approved"
-# result.remaining_balance → 45001`
+# result.status -> "approved"
+# result.remaining_balance -> 45001`
         },
         {
             label: 'TypeScript',
@@ -278,84 +134,54 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
 
     const problems = [
         {
-            amount: 82000,
-            prefix: '$',
-            suffix: '',
-            displayAmount: '$82,000',
+            amount: 82000, prefix: '$', suffix: '', displayAmount: '$82,000',
             title: 'in 48 hours',
             description: 'A stolen API key racked up $82K in Gemini charges in two days. API keys are financial attack surfaces. Your agent shouldn\'t hold your credentials.',
-            source: 'The Register, March 2026',
-            severity: 'high'
+            source: 'The Register, March 2026', severity: 'high'
         },
         {
-            amount: 3000,
-            prefix: '$',
-            suffix: '',
-            displayAmount: '$3,000',
+            amount: 3000, prefix: '$', suffix: '', displayAmount: '$3,000',
             title: 'without asking',
             description: 'An autonomous agent bought a premium domain and enrolled in a $3K program on its own. No spending limits. No approval flow. No one told it not to.',
-            source: 'X/Twitter, Feb 2026',
-            severity: 'medium'
+            source: 'X/Twitter, Feb 2026', severity: 'medium'
         },
         {
-            amount: 187,
-            prefix: '$',
-            suffix: '',
-            displayAmount: '$187',
+            amount: 187, prefix: '$', suffix: '', displayAmount: '$187',
             title: 'in 10 minutes',
             description: 'A GPT-4o loop retried a failed analysis over and over. Monitoring tools track costs after execution. They don\'t prevent overspend.',
-            source: 'AgentBudget creator, Feb 2026',
-            severity: 'low'
+            source: 'AgentBudget creator, Feb 2026', severity: 'low'
         }
     ];
 
     const features = [
-        {
-            icon: Landmark,
-            title: 'Fiat-First',
-            description: 'Real USD on real payment rails. ACH deposits, Stripe-powered spending. No crypto required.'
-        },
-        {
-            icon: Code,
-            title: 'Headless API',
-            description: 'Pure REST API with webhooks. Your agent never touches payment credentials.'
-        },
-        {
-            icon: Shield,
-            title: 'Governance-Grade',
-            description: 'Segregated pools, policy engine, 14-step validation cascade, immutable audit trail.'
-        },
-        {
-            icon: Layers,
-            title: 'Part of Agentic Trust',
-            description: 'Configurable agent authorization with certificate-based verification coming soon.'
-        }
+        { icon: Landmark, title: 'Fiat-First', description: 'Real USD on real payment rails. ACH deposits, Stripe-powered spending. No crypto required.' },
+        { icon: Code, title: 'Headless API', description: 'Pure REST API with webhooks. Your agent never touches payment credentials.' },
+        { icon: Shield, title: 'Governance-Grade', description: 'Segregated pools, policy engine, 14-step validation cascade, immutable audit trail.' },
+        { icon: Layers, title: 'Part of Agentic Trust', description: 'Configurable agent authorization with certificate-based verification coming soon.' }
     ];
 
     return (
         <div className="min-h-screen bg-ss-bg page-enter">
+            <SeoHelmet
+                title="Safe-Spend — Fiduciary Rails for AI Agents"
+                description="Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
+                structuredData={homepageStructuredData}
+            />
             <Navbar />
 
             {/* ═══ HERO ═══ */}
             <section className="pt-32 pb-20 px-6 relative overflow-hidden" data-testid="hero-section">
-                {/* Animated gradient orbs */}
                 <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                    }}
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-ss-accent/8 via-ss-accent/4 to-transparent rounded-full -translate-y-1/3 translate-x-1/4 pointer-events-none"
                 />
                 <motion.div
-                    animate={{
-                        scale: [1, 1.15, 1],
-                        opacity: [0.2, 0.35, 0.2],
-                    }}
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.35, 0.2] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                     className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-ss-accent/6 via-ss-accent/3 to-transparent rounded-full translate-y-1/3 -translate-x-1/4 pointer-events-none"
                 />
-                
+
                 <div className="max-w-[1200px] mx-auto relative">
                     <div className="text-center mb-12">
                         <motion.div
@@ -390,25 +216,15 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
                             className="flex flex-col sm:flex-row items-center justify-center gap-4"
                         >
-                            <Link
-                                to="/signup"
-                                className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl magnetic-btn shadow-ss-accent-lg flex items-center gap-2 text-lg"
-                                data-testid="hero-cta-primary"
-                            >
-                                Get API Keys
-                                <ArrowRight size={20} />
+                            <Link to="/signup" className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl magnetic-btn shadow-ss-accent-lg flex items-center gap-2 text-lg" data-testid="hero-cta-primary">
+                                Get API Keys <ArrowRight size={20} />
                             </Link>
-                            <Link
-                                to="/playground"
-                                className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300 shadow-ss"
-                                data-testid="hero-cta-playground"
-                            >
+                            <Link to="/playground" className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300 shadow-ss" data-testid="hero-cta-playground">
                                 Try the API Playground →
                             </Link>
                         </motion.div>
                     </div>
 
-                    {/* Hero Animation */}
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -418,28 +234,17 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                         <HeroAnimation />
                     </motion.div>
 
-                    {/* Trust bar */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1, delay: 1.2 }}
                         className="flex items-center justify-center gap-8 text-ss-text-tertiary text-sm"
                     >
-                        <span className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-ss-accent/60" />
-                            SOC 2 Compliant
-                        </span>
-                        <span className="flex items-center gap-2">
-                            <Code className="w-4 h-4 text-ss-accent/60" />
-                            Open API
-                        </span>
-                        <span className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-ss-accent/60" />
-                            &lt;5min Setup
-                        </span>
+                        <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-ss-accent/60" /> SOC 2 Compliant</span>
+                        <span className="flex items-center gap-2"><Code className="w-4 h-4 text-ss-accent/60" /> Open API</span>
+                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-ss-accent/60" /> &lt;5min Setup</span>
                     </motion.div>
 
-                    {/* Code block */}
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -494,7 +299,6 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                     </RevealOnScroll>
 
                     <div className="relative mb-20">
-                        {/* Animated connecting line */}
                         <motion.div
                             initial={{ scaleX: 0 }}
                             whileInView={{ scaleX: 1 }}
@@ -511,56 +315,24 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                             className="grid grid-cols-1 lg:grid-cols-3 gap-8"
                         >
                             <motion.div variants={staggerItem} className="relative text-center" data-testid="how-it-works-step-1">
-                                <motion.div
-                                    whileHover={{ scale: 1.1 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg"
-                                >
-                                    1
-                                </motion.div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Fund a Spending Pool
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    A human deposits USD via ACH or card. Funds are held in a segregated spending pool — not commingled, fully auditable.
-                                </p>
+                                <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }} className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg">1</motion.div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">Fund a Spending Pool</h3>
+                                <p className="text-ss-text-secondary text-sm leading-relaxed">A human deposits USD via ACH or card. Funds are held in a segregated spending pool — not commingled, fully auditable.</p>
                             </motion.div>
 
                             <motion.div variants={staggerItem} className="relative text-center" data-testid="how-it-works-step-2">
-                                <motion.div
-                                    whileHover={{ scale: 1.1 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg"
-                                >
-                                    2
-                                </motion.div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Define Spending Policies
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, and approval cascades. Your agent drafts policies — you review and approve.
-                                </p>
+                                <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }} className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg">2</motion.div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">Define Spending Policies</h3>
+                                <p className="text-ss-text-secondary text-sm leading-relaxed">Set per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions, and approval cascades. Your agent drafts policies — you review and approve.</p>
                                 <div className="mt-4 p-3 bg-ss-accent/5 rounded-xl border border-ss-accent/15">
-                                    <p className="text-xs text-ss-accent-hover font-medium">
-                                        <strong>80/20 Setup:</strong> Let your agent draft policies — you just review and approve.
-                                    </p>
+                                    <p className="text-xs text-ss-accent-hover font-medium"><strong>80/20 Setup:</strong> Let your agent draft policies — you just review and approve.</p>
                                 </div>
                             </motion.div>
 
                             <motion.div variants={staggerItem} className="relative text-center" data-testid="how-it-works-step-3">
-                                <motion.div
-                                    whileHover={{ scale: 1.1 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg"
-                                >
-                                    3
-                                </motion.div>
-                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">
-                                    Agent Requests Disbursement
-                                </h3>
-                                <p className="text-ss-text-secondary text-sm leading-relaxed">
-                                    Your agent calls the API. Safe-Spend evaluates every policy in a 14-step validation cascade, executes if approved, and logs the complete decision trail.
-                                </p>
+                                <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }} className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ss-accent to-ss-accent-hover text-white font-heading font-bold text-xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-ss-accent-lg">3</motion.div>
+                                <h3 className="font-heading text-xl font-semibold text-ss-text mb-3">Agent Requests Disbursement</h3>
+                                <p className="text-ss-text-secondary text-sm leading-relaxed">Your agent calls the API. Safe-Spend evaluates every policy in a 14-step validation cascade, executes if approved, and logs the complete decision trail.</p>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -569,9 +341,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                     <RevealOnScroll>
                         <div className="text-center mb-8">
                             <p className="text-ss-text-tertiary text-sm uppercase tracking-widest font-mono mb-2">Live Policy Preview</p>
-                            <h3 className="font-heading text-2xl font-bold text-ss-text">
-                                This is what governance looks like.
-                            </h3>
+                            <h3 className="font-heading text-2xl font-bold text-ss-text">This is what governance looks like.</h3>
                         </div>
                     </RevealOnScroll>
 
@@ -604,11 +374,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                                 transition={{ duration: 0.2 }}
                                 className="bg-white p-6 rounded-xl border border-gray-100 card-hover shadow-ss glass-card"
                             >
-                                <motion.div
-                                    whileHover={{ scale: 1.15, rotate: 5 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="w-10 h-10 bg-ss-accent/10 rounded-lg flex items-center justify-center mb-3"
-                                >
+                                <motion.div whileHover={{ scale: 1.15, rotate: 5 }} transition={{ duration: 0.2 }} className="w-10 h-10 bg-ss-accent/10 rounded-lg flex items-center justify-center mb-3">
                                     <feature.icon className="w-5 h-5 text-ss-accent" />
                                 </motion.div>
                                 <h4 className="font-heading text-base font-semibold text-ss-text mb-2">{feature.title}</h4>
@@ -624,12 +390,8 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                 <div className="max-w-[1200px] mx-auto">
                     <RevealOnScroll>
                         <div className="text-center mb-16">
-                            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                                Five minutes to integrate.
-                            </h2>
-                            <p className="text-ss-text-secondary max-w-2xl mx-auto">
-                                Drop in a decorator or add an MCP server. Works with every major agent framework.
-                            </p>
+                            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">Five minutes to integrate.</h2>
+                            <p className="text-ss-text-secondary max-w-2xl mx-auto">Drop in a decorator or add an MCP server. Works with every major agent framework.</p>
                         </div>
                     </RevealOnScroll>
 
@@ -643,9 +405,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                         <div className="text-center">
                             <p className="text-ss-text-tertiary text-sm">
                                 Also works with <span className="text-ss-text-secondary font-medium">CrewAI</span>, <span className="text-ss-text-secondary font-medium">OpenAI SDK</span>, and <span className="text-ss-text-secondary font-medium">REST API</span> —{' '}
-                                <Link to="/docs/integrations" className="text-ss-accent hover:text-ss-accent-hover transition-colors link-underline">
-                                    see all integrations →
-                                </Link>
+                                <Link to="/docs/integrations" className="text-ss-accent hover:text-ss-accent-hover transition-colors">see all integrations →</Link>
                             </p>
                         </div>
                     </RevealOnScroll>
@@ -657,122 +417,56 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                 <div className="max-w-[1200px] mx-auto">
                     <RevealOnScroll>
                         <div className="text-center mb-16">
-                            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">
-                                Simple pricing. No surprises.
-                            </h2>
-                            <p className="text-ss-text-secondary max-w-xl mx-auto">
-                                All plans include agent-ready setup — let your AI draft policies while you review and approve.
-                            </p>
+                            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-4">Simple pricing. No surprises.</h2>
+                            <p className="text-ss-text-secondary max-w-xl mx-auto">All plans include agent-ready setup — let your AI draft policies while you review and approve.</p>
                         </div>
                     </RevealOnScroll>
 
-                    <motion.div
-                        variants={staggerContainer}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, margin: "-100px" }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto"
-                    >
+                    <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         {/* Sandbox */}
-                        <motion.div
-                            variants={staggerItem}
-                            whileHover={{ y: -6 }}
-                            transition={{ duration: 0.25 }}
-                            className="bg-white p-8 rounded-2xl border border-gray-100 card-hover shadow-ss"
-                            data-testid="pricing-card-sandbox"
-                        >
+                        <motion.div variants={staggerItem} whileHover={{ y: -6 }} transition={{ duration: 0.25 }} className="bg-white p-8 rounded-2xl border border-gray-100 card-hover shadow-ss" data-testid="pricing-card-sandbox">
                             <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Sandbox</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">Free</span>
-                            </div>
+                            <div className="mb-6"><span className="text-3xl font-bold text-ss-text">Free</span></div>
                             <ul className="space-y-3 mb-8">
                                 {['Test mode with fake money', 'Full API access + all framework SDKs', 'Unlimited test transactions', 'Community support'].map((item) => (
                                     <li key={item} className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
+                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-                            <Link
-                                to="/signup"
-                                className="block w-full text-center px-6 py-3 bg-white border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-medium rounded-xl transition-all duration-300"
-                                data-testid="pricing-cta-sandbox"
-                            >
-                                Start Building
-                            </Link>
+                            <Link to="/signup" className="block w-full text-center px-6 py-3 bg-white border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-medium rounded-xl transition-all duration-300" data-testid="pricing-cta-sandbox">Start Building</Link>
                         </motion.div>
 
                         {/* Builder — highlighted */}
-                        <motion.div
-                            variants={staggerItem}
-                            whileHover={{ y: -6 }}
-                            transition={{ duration: 0.25 }}
-                            className="bg-white p-8 rounded-2xl border-2 border-ss-accent relative shadow-ss-accent-lg"
-                            data-testid="pricing-card-builder"
-                        >
-                            <motion.div
-                                animate={{ y: [0, -3, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-ss-accent to-ss-accent-hover text-white text-xs font-semibold rounded-full shadow-ss-accent"
-                            >
-                                Most Popular
-                            </motion.div>
+                        <motion.div variants={staggerItem} whileHover={{ y: -6 }} transition={{ duration: 0.25 }} className="bg-white p-8 rounded-2xl border-2 border-ss-accent relative shadow-ss-accent-lg" data-testid="pricing-card-builder">
+                            <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-ss-accent to-ss-accent-hover text-white text-xs font-semibold rounded-full shadow-ss-accent">Most Popular</motion.div>
                             <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Builder</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">$29</span>
-                                <span className="text-ss-text-secondary">/mo + 0.5%</span>
-                            </div>
+                            <div className="mb-6"><span className="text-3xl font-bold text-ss-text">$29</span><span className="text-ss-text-secondary">/mo + 0.5%</span></div>
                             <ul className="space-y-3 mb-8">
                                 {['Live spending pools', 'Up to $5,000/mo in spend volume', 'Real-time webhooks', 'Email support'].map((item) => (
                                     <li key={item} className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
+                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-                            <Link
-                                to="/signup"
-                                className="block w-full text-center px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-xl magnetic-btn shadow-ss-accent transition-all duration-300"
-                                data-testid="pricing-cta-builder"
-                            >
-                                Get Started
-                            </Link>
+                            <Link to="/signup" className="block w-full text-center px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-xl magnetic-btn shadow-ss-accent transition-all duration-300" data-testid="pricing-cta-builder">Get Started</Link>
                         </motion.div>
 
                         {/* Scale */}
-                        <motion.div
-                            variants={staggerItem}
-                            whileHover={{ y: -6 }}
-                            transition={{ duration: 0.25 }}
-                            className="bg-white p-8 rounded-2xl border border-gray-100 card-hover shadow-ss"
-                            data-testid="pricing-card-scale"
-                        >
+                        <motion.div variants={staggerItem} whileHover={{ y: -6 }} transition={{ duration: 0.25 }} className="bg-white p-8 rounded-2xl border border-gray-100 card-hover shadow-ss" data-testid="pricing-card-scale">
                             <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Scale</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-ss-text">$149</span>
-                                <span className="text-ss-text-secondary">/mo + 0.3%</span>
-                            </div>
+                            <div className="mb-6"><span className="text-3xl font-bold text-ss-text">$149</span><span className="text-ss-text-secondary">/mo + 0.3%</span></div>
                             <ul className="space-y-3 mb-8">
                                 {['Unlimited spend volume', 'Multiple spending pools per org', 'Priority support + SLA guarantee', 'Custom approval workflows', 'SSO + audit export'].map((item) => (
                                     <li key={item} className="flex items-start gap-2 text-sm text-ss-text-secondary">
-                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
+                                        <svg className="w-5 h-5 text-ss-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-                            <Link
-                                to="/signup"
-                                className="block w-full text-center px-6 py-3 bg-white border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-medium rounded-xl transition-all duration-300"
-                                data-testid="pricing-cta-scale"
-                            >
-                                Contact Sales
-                            </Link>
+                            <Link to="/signup" className="block w-full text-center px-6 py-3 bg-white border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-medium rounded-xl transition-all duration-300" data-testid="pricing-cta-scale">Contact Sales</Link>
                         </motion.div>
                     </motion.div>
                 </div>
@@ -780,7 +474,6 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
 
             {/* ═══ FINAL CTA ═══ */}
             <section className="py-24 px-6 relative overflow-hidden" data-testid="final-cta-section">
-                {/* Animated gradient background */}
                 <motion.div
                     animate={{
                         background: [
@@ -792,7 +485,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute inset-0 pointer-events-none"
                 />
-                
+
                 <div className="max-w-[1200px] mx-auto relative">
                     <RevealOnScroll>
                         <div className="text-center max-w-3xl mx-auto bg-white/80 backdrop-blur-xl p-12 rounded-2xl border border-gray-100 shadow-ss-lg glass-card">
@@ -812,19 +505,10 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                                 Free sandbox. Full API. No credit card required. Your first policy is running in under five minutes.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <Link
-                                    to="/signup"
-                                    className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl magnetic-btn shadow-ss-accent-lg flex items-center gap-2 text-lg"
-                                    data-testid="final-cta-primary"
-                                >
-                                    Get API Keys
-                                    <ArrowRight size={20} />
+                                <Link to="/signup" className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl magnetic-btn shadow-ss-accent-lg flex items-center gap-2 text-lg" data-testid="final-cta-primary">
+                                    Get API Keys <ArrowRight size={20} />
                                 </Link>
-                                <Link
-                                    to="/playground"
-                                    className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300"
-                                    data-testid="final-cta-playground"
-                                >
+                                <Link to="/playground" className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300" data-testid="final-cta-playground">
                                     Try the API Playground →
                                 </Link>
                             </div>
@@ -863,12 +547,8 @@ const ProblemRow = ({ problem, index }) => {
                 </span>
             </div>
             <div className="flex-1">
-                <p className="text-ss-text-secondary text-sm md:text-base leading-relaxed">
-                    {problem.description}
-                </p>
-                <p className="text-ss-text-tertiary text-xs mt-3 italic">
-                    Source: {problem.source}
-                </p>
+                <p className="text-ss-text-secondary text-sm md:text-base leading-relaxed">{problem.description}</p>
+                <p className="text-ss-text-tertiary text-xs mt-3 italic">Source: {problem.source}</p>
             </div>
         </motion.div>
     );

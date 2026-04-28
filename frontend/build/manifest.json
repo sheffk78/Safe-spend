@@ -4,9 +4,19 @@
   "description": "Fiat-first escrow and spending control API for AI agents. Fund an escrow account, define policies, let agents spend within them.",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "48x48 32x32 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "favicon-16x16.png",
+      "type": "image/png",
+      "sizes": "16x16"
     },
     {
       "src": "logo192.png",
@@ -22,5 +32,5 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#10B981",
-  "background_color": "#0A0A0B"
+  "background_color": "#FAFBFA"
 }
