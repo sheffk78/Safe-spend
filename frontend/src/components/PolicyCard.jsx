@@ -31,13 +31,11 @@ const PolicyCard = ({ policy }) => {
 
     return (
         <div
-            className={`bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.3)] ${
-                isActive ? 'border-l-[3px] border-l-ss-accent' : ''
-            }`}
+            className="bg-ss-surface rounded-xl border border-ss-border overflow-hidden shadow-ss-lg"
             data-testid="policy-card"
         >
             {/* Header */}
-            <div className="p-6 border-b border-[rgba(255,255,255,0.04)]">
+            <div className="p-6 border-b border-ss-border">
                 <div className="flex items-start justify-between mb-3">
                     <div>
                         <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-1">Spending Policy</p>
@@ -58,7 +56,7 @@ const PolicyCard = ({ policy }) => {
             </div>
 
             {/* Limits */}
-            <div className="p-6 border-b border-[rgba(255,255,255,0.04)]">
+            <div className="p-6 border-b border-ss-border">
                 <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-3">Limits</p>
                 <div className="grid grid-cols-3 gap-4">
                     <div>
@@ -77,7 +75,7 @@ const PolicyCard = ({ policy }) => {
             </div>
 
             {/* Vendor Rules */}
-            <div className="p-6 border-b border-[rgba(255,255,255,0.04)]">
+            <div className="p-6 border-b border-ss-border">
                 <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-3">Vendor Rules</p>
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -112,7 +110,7 @@ const PolicyCard = ({ policy }) => {
             </div>
 
             {/* Categories */}
-            <div className="p-6 border-b border-[rgba(255,255,255,0.04)]">
+            <div className="p-6 border-b border-ss-border">
                 <p className="text-xs text-ss-text-tertiary uppercase tracking-wider mb-3">Categories</p>
                 <div className="flex items-center gap-2 flex-wrap">
                     {categories.allowed.map((cat, i) => (

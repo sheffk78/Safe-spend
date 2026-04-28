@@ -299,13 +299,6 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                     </RevealOnScroll>
 
                     <div className="relative mb-20">
-                        <motion.div
-                            initial={{ scaleX: 0 }}
-                            whileInView={{ scaleX: 1 }}
-                            viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                            className="hidden lg:block absolute top-24 left-[16.67%] right-[16.67%] h-0.5 bg-gradient-to-r from-ss-accent/20 via-ss-accent/40 to-ss-accent/20 origin-left"
-                        />
 
                         <motion.div
                             variants={staggerContainer}
