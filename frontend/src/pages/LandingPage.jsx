@@ -8,7 +8,6 @@ import TransactionSimulator from '@/components/TransactionSimulator';
 import HeroAnimation3D from '@/components/HeroAnimation3D';
 import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
 import MagneticButton from '@/components/MagneticButton';
-import GradientBorderButton from '@/components/GradientBorderButton';
 import TypewriterText from '@/components/TypewriterText';
 import ScrollProgress from '@/components/ScrollProgress';
 import SocialProofBar from '@/components/SocialProofBar';
@@ -226,11 +225,10 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
                             >
                                 <MagneticButton strength={0.2}>
-                                    <GradientBorderButton>
-                                        <Link to="/signup" className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl shadow-ss-accent-lg flex items-center gap-2 text-lg" data-testid="hero-cta-primary">
-                                            Get API Keys <ArrowRight size={20} />
-                                        </Link>
-                                    </GradientBorderButton>
+                                    <Link to="/signup" className="relative group px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl shadow-ss-accent-lg flex items-center gap-2 text-lg transition-all duration-300" data-testid="hero-cta-primary">
+                                        <span className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-ss-accent via-emerald-300 to-teal-400 opacity-0 group-hover:opacity-60 blur-[2px] transition-opacity duration-500" />
+                                        <span className="relative">Get API Keys <ArrowRight size={20} className="inline" /></span>
+                                    </Link>
                                 </MagneticButton>
                                 <MagneticButton strength={0.15}>
                                     <Link to="/playground" className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300 shadow-ss" data-testid="hero-cta-playground">
