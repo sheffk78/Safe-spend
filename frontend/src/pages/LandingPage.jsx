@@ -1,11 +1,16 @@
 import React, { useRef, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CodeBlock from '@/components/CodeBlock';
 import PolicyCard from '@/components/PolicyCard';
-import HeroAnimation from '@/components/HeroAnimation';
+import TransactionSimulator from '@/components/TransactionSimulator';
 import { RevealOnScroll, staggerContainer, staggerItem, useCountUp } from '@/components/ScrollReveal';
+import MagneticButton from '@/components/MagneticButton';
+import GradientBorderButton from '@/components/GradientBorderButton';
+import TypewriterText from '@/components/TypewriterText';
+import ScrollProgress from '@/components/ScrollProgress';
+import SocialProofBar from '@/components/SocialProofBar';
 import { ArrowRight, Shield, Code, Clock, Landmark, Layers, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SeoHelmet from '@/components/SeoHelmet';
@@ -162,6 +167,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
 
     return (
         <div className="min-h-screen bg-ss-bg page-enter">
+            <ScrollProgress />
             <SeoHelmet
                 title="Safe-Spend — Fiduciary Rails for AI Agents"
                 description="Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
@@ -183,56 +189,66 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
                 />
 
                 <div className="max-w-[1200px] mx-auto relative">
-                    <div className="text-center mb-12">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-ss-accent/10 border border-ss-accent/20 rounded-full mb-8"
-                        >
-                            <Sparkles className="w-3.5 h-3.5 text-ss-accent" />
-                            <span className="text-ss-accent text-sm font-medium">Now in public beta</span>
-                        </motion.div>
+                    <div className="lg:flex lg:items-center lg:gap-16 mb-12">
+                        {/* Left: Headline + CTA */}
+                        <div className="lg:flex-1 text-center lg:text-left mb-10 lg:mb-0">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                className="inline-flex items-center gap-2 px-4 py-1.5 bg-ss-accent/10 border border-ss-accent/20 rounded-full mb-8"
+                            >
+                                <Sparkles className="w-3.5 h-3.5 text-ss-accent" />
+                                <span className="text-ss-accent text-sm font-medium">Now in public beta</span>
+                            </motion.div>
 
-                        <motion.h1
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            className="font-heading text-4xl md:text-5xl lg:text-[60px] font-bold text-ss-text leading-tight mb-6"
-                        >
-                            Your agent needs spending governance,<br className="hidden md:block" /> not a wallet.
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-                            className="text-lg md:text-xl text-ss-text-secondary max-w-3xl mx-auto mb-10 leading-relaxed"
-                        >
-                            Policy-based spend control for AI agents. Fund a spending pool. Define guardrails. Your agent spends within them. Every dollar, every decision, every receipt — logged.
-                        </motion.p>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                                className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-ss-text leading-[1.1] mb-6"
+                            >
+                                Your agent needs spending governance,<br className="hidden lg:block" /> not a wallet.
+                            </motion.h1>
+                            <motion.p
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+                                className="text-lg text-ss-text-secondary max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed"
+                            >
+                                Policy-based spend control for AI agents. Fund a spending pool. Define guardrails. Your agent spends within them. Every dollar, every decision, every receipt — logged.
+                            </motion.p>
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+                            >
+                                <MagneticButton strength={0.2}>
+                                    <GradientBorderButton>
+                                        <Link to="/signup" className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl shadow-ss-accent-lg flex items-center gap-2 text-lg" data-testid="hero-cta-primary">
+                                            Get API Keys <ArrowRight size={20} />
+                                        </Link>
+                                    </GradientBorderButton>
+                                </MagneticButton>
+                                <MagneticButton strength={0.15}>
+                                    <Link to="/playground" className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300 shadow-ss" data-testid="hero-cta-playground">
+                                        Try the API Playground →
+                                    </Link>
+                                </MagneticButton>
+                            </motion.div>
+                        </div>
+
+                        {/* Right: Transaction Simulator */}
                         <motion.div
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 40 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+                            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
+                            className="lg:flex-1"
                         >
-                            <Link to="/signup" className="px-8 py-4 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-xl magnetic-btn shadow-ss-accent-lg flex items-center gap-2 text-lg" data-testid="hero-cta-primary">
-                                Get API Keys <ArrowRight size={20} />
-                            </Link>
-                            <Link to="/playground" className="px-8 py-4 bg-white/80 backdrop-blur border border-gray-200 hover:border-ss-accent/30 hover:bg-ss-accent/5 text-ss-text font-semibold rounded-xl transition-all duration-300 shadow-ss" data-testid="hero-cta-playground">
-                                Try the API Playground →
-                            </Link>
+                            <TransactionSimulator />
                         </motion.div>
                     </div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-                        className="mb-16"
-                    >
-                        <HeroAnimation />
-                    </motion.div>
 
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -257,14 +273,7 @@ def safe_spend(amount: int, vendor: str, description: str) -> dict:
             </section>
 
             {/* ═══ STATS BAR ═══ */}
-            <section className="py-16 px-6 bg-white border-y border-gray-100">
-                <div className="max-w-[1000px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <AnimatedStat value={14} suffix="-step" label="Validation Cascade" />
-                    <AnimatedStat value={5} prefix="<" suffix=" min" label="Setup Time" />
-                    <AnimatedStat value={100} suffix="%" label="Audit Trail Coverage" />
-                    <AnimatedStat value={0} prefix="$" suffix="" label="Crypto Required" />
-                </div>
-            </section>
+            <SocialProofBar />
 
             {/* ═══ THE PROBLEM ═══ */}
             <ParallaxSection speed={0.05} className="py-24 px-6 bg-ss-elevated" data-testid="problem-section">
@@ -528,7 +537,7 @@ const ProblemRow = ({ problem, index }) => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.15 }}
             whileHover={{ x: 4, scale: 1.01 }}
-            className={`${getSeverityBg(problem.severity)} rounded-xl border-l-4 ${getSeverityBorder(problem.severity)} p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 card-hover shadow-ss`}
+            className={`${getSeverityBg(problem.severity)} rounded-xl border border-ss-border p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 card-hover shadow-ss`}
             data-testid={`problem-row-${index + 1}`}
         >
             <div className="md:min-w-[200px] flex-shrink-0">
