@@ -63,7 +63,7 @@ const SignupPage = () => {
                     <div className="text-center mb-8">
                         <Link to="/" className="inline-flex items-center mb-4">
                             <img 
-                                src="/logo-safespend-compact.svg" 
+                                src="/logo-safespend-compact-light.svg" 
                                 alt="Safe-Spend" 
                                 className="h-10"
                             />
@@ -72,7 +72,7 @@ const SignupPage = () => {
                         <p className="text-ss-text-secondary mt-2">Get started with Safe-Spend</p>
                     </div>
 
-                    <div className="bg-ss-surface p-8 rounded-xl border border-[rgba(255,255,255,0.06)]">
+                    <div className="bg-ss-surface p-8 rounded-xl border border-gray-200 shadow-ss-md">
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {error && (
                                 <div className="p-3 rounded-lg bg-[rgba(239,68,68,0.1)] border border-ss-error/30 text-ss-error text-sm" data-testid="signup-error">
@@ -89,7 +89,7 @@ const SignupPage = () => {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
                                     placeholder="Your name"
                                     data-testid="signup-name-input"
                                 />
@@ -104,7 +104,7 @@ const SignupPage = () => {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
                                     placeholder="you@example.com"
                                     data-testid="signup-email-input"
                                 />
@@ -120,7 +120,7 @@ const SignupPage = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12"
+                                        className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12"
                                         placeholder="••••••••"
                                         data-testid="signup-password-input"
                                     />
@@ -145,7 +145,7 @@ const SignupPage = () => {
                                     type={showPassword ? 'text' : 'password'}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
                                     placeholder="••••••••"
                                     data-testid="signup-confirm-password-input"
                                 />

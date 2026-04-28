@@ -39,7 +39,7 @@ const AdminLayout = () => {
     // Show loading state
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+            <div className="min-h-screen bg-ss-bg flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -51,7 +51,7 @@ const AdminLayout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0B] flex">
+        <div className="min-h-screen bg-ss-bg flex">
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div
@@ -63,21 +63,21 @@ const AdminLayout = () => {
             {/* Sidebar */}
             <aside className={`
                 fixed lg:static inset-y-0 left-0 z-50
-                w-[260px] bg-[#0F0F11] border-r border-[rgba(255,255,255,0.06)]
+                w-[260px] bg-white border-r border-gray-100
                 transform transition-transform duration-200 ease-in-out
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 flex flex-col
             `}>
                 {/* Logo/Brand */}
-                <div className="p-5 border-b border-[rgba(255,255,255,0.06)]">
+                <div className="p-5 border-b border-gray-100">
                     <Link to="/admin" className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#14B8A6]/20 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-ss-accent/20 flex items-center justify-center">
                             <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#14B8A6]" fill="currentColor">
                                 <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2zM4 9.8l7 3.5v6.4L4 16.2V9.8zm9 9.9v-6.4l7-3.5v6.4l-7 3.5z"/>
                             </svg>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="font-heading font-bold text-[#F5F5F5]">Safe-Spend</span>
+                            <span className="font-heading font-bold text-ss-text">Safe-Spend</span>
                             <span className="px-2 py-0.5 bg-[rgba(245,158,11,0.15)] text-[#F59E0B] text-[11px] font-semibold tracking-[0.05em] rounded">
                                 ADMIN
                             </span>
@@ -85,7 +85,7 @@ const AdminLayout = () => {
                     </Link>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden absolute top-4 right-4 text-[#9CA3AF]"
+                        className="lg:hidden absolute top-4 right-4 text-ss-text-tertiary"
                     >
                         <XMarkIcon className="w-5 h-5" />
                     </button>
@@ -104,7 +104,7 @@ const AdminLayout = () => {
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                                     isActive
                                         ? 'bg-[rgba(16,185,129,0.08)] text-[#14B8A6]'
-                                        : 'text-[#9CA3AF] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.04)]'
+                                        : 'text-ss-text-tertiary hover:text-ss-text hover:bg-[rgba(255,255,255,0.04)]'
                                 }`}
                                 data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
                             >
@@ -116,14 +116,14 @@ const AdminLayout = () => {
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-[rgba(255,255,255,0.06)]">
+                <div className="p-4 border-t border-gray-100">
                     <p className="text-xs text-[#6B7280] mb-2">Safe-Spend Admin v1.0</p>
                     
                     <a 
                         href="/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#14B8A6] mb-3 transition-colors"
+                        className="flex items-center gap-2 text-sm text-ss-text-tertiary hover:text-[#14B8A6] mb-3 transition-colors"
                     >
                         Back to Site
                         <ArrowTopRightOnSquareIcon className="w-4 h-4" />
@@ -137,7 +137,7 @@ const AdminLayout = () => {
                     
                     <button
                         onClick={logout}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#9CA3AF] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.04)] rounded-md transition-all duration-150"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-ss-text-tertiary hover:text-ss-text hover:bg-[rgba(255,255,255,0.04)] rounded-md transition-all duration-150"
                         data-testid="admin-logout-btn"
                     >
                         <ArrowRightOnRectangleIcon className="w-5 h-5" />
@@ -149,15 +149,15 @@ const AdminLayout = () => {
             {/* Main content */}
             <main className="flex-1 min-w-0">
                 {/* Mobile header */}
-                <div className="lg:hidden flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+                <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 text-[#9CA3AF] hover:text-[#F5F5F5]"
+                        className="p-2 text-ss-text-tertiary hover:text-ss-text"
                     >
                         <Bars3Icon className="w-6 h-6" />
                     </button>
                     <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#F5F5F5]">Admin</span>
+                        <span className="font-bold text-ss-text">Admin</span>
                         <span className="px-2 py-0.5 bg-[rgba(245,158,11,0.15)] text-[#F59E0B] text-[10px] font-bold rounded">
                             ADMIN
                         </span>

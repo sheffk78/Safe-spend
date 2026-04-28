@@ -57,9 +57,9 @@ const statusStyles = {
         dot: '#F59E0B'
     },
     agent: {
-        bg: 'rgba(59, 130, 246, 0.1)',
-        text: '#3B82F6',
-        dot: '#3B82F6'
+        bg: 'rgba(20, 184, 166, 0.1)',
+        text: '#14B8A6',
+        dot: '#14B8A6'
     }
 };
 

@@ -18,14 +18,26 @@ const Navbar = () => {
     const navLinks = [
         { label: 'Features', href: '#features' },
         { label: 'How It Works', href: '#how-it-works' },
-        { label: 'Pricing', href: '#pricing' },
+        { label: 'Pricing', href: '/#pricing' },
         { label: 'Docs', href: '/docs' },
         { label: 'Playground', href: '/playground' }
     ];
 
     const handleNavClick = (href) => {
         setMobileMenuOpen(false);
-        if (href.startsWith('#')) {
+        if (href.startsWith('/#')) {
+            const sectionId = href.substring(2);
+            if (window.location.pathname === '/') {
+                const element = document.getElementById(sectionId);
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                navigate('/');
+                setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        } else if (href.startsWith('#')) {
             const element = document.querySelector(href);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
@@ -36,19 +48,19 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-ss-bg/80 backdrop-blur-lg border-b border-[rgba(255,255,255,0.06)]">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-100 shadow-ss">
             <div className="max-w-[1200px] mx-auto px-6">
                 <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
+                    {/* Logo — using light-background version (dark text) */}
                     <Link 
                         to="/" 
-                        className="flex items-center"
+                        className="flex items-center group"
                         data-testid="navbar-logo"
                     >
                         <img 
-                            src="/logo-safespend-compact.svg" 
+                            src="/logo-safespend-compact-light.svg" 
                             alt="Safe-Spend" 
-                            className="h-8"
+                            className="h-8 transition-transform duration-200 group-hover:scale-105"
                         />
                     </Link>
 
@@ -58,7 +70,7 @@ const Navbar = () => {
                             <button
                                 key={link.label}
                                 onClick={() => handleNavClick(link.href)}
-                                className="text-ss-text-secondary hover:text-ss-text transition-colors duration-200 text-sm font-medium"
+                                className="text-ss-text-secondary hover:text-ss-accent transition-colors duration-200 text-sm font-medium link-underline"
                                 data-testid={`nav-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                             >
                                 {link.label}
@@ -68,7 +80,7 @@ const Navbar = () => {
                             href="https://github.com/AgenticTrustHQ"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-ss-text-secondary hover:text-ss-text transition-colors duration-200"
+                            className="text-ss-text-tertiary hover:text-ss-text transition-colors duration-200 icon-transition"
                             data-testid="nav-link-github"
                             aria-label="GitHub"
                         >
@@ -81,7 +93,7 @@ const Navbar = () => {
                         {isAuthenticated ? (
                             <Link
                                 to="/dashboard"
-                                className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-medium rounded-lg transition-all duration-200 text-sm"
+                                className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-lg btn-hover shadow-ss-accent text-sm"
                                 data-testid="nav-dashboard-btn"
                             >
                                 Dashboard
@@ -97,7 +109,7 @@ const Navbar = () => {
                                 </Link>
                                 <Link
                                     to="/dashboard"
-                                    className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-medium rounded-lg transition-all duration-200 text-sm"
+                                    className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-lg btn-hover shadow-ss-accent text-sm"
                                     data-testid="nav-dashboard-cta"
                                 >
                                     Dashboard
@@ -108,7 +120,7 @@ const Navbar = () => {
 
                     {/* Mobile menu button */}
                     <button
-                        className="md:hidden p-2 text-ss-text-secondary hover:text-ss-text"
+                        className="md:hidden p-2 text-ss-text-secondary hover:text-ss-accent transition-colors"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         data-testid="mobile-menu-toggle"
                     >
@@ -119,13 +131,13 @@ const Navbar = () => {
 
             {/* Mobile menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden bg-ss-surface border-t border-[rgba(255,255,255,0.06)]">
+                <div className="md:hidden bg-white border-t border-gray-100 animate-fade-in">
                     <div className="px-6 py-4 space-y-3">
                         {navLinks.map((link) => (
                             <button
                                 key={link.label}
                                 onClick={() => handleNavClick(link.href)}
-                                className="block w-full text-left text-ss-text-secondary hover:text-ss-text py-2 text-sm font-medium"
+                                className="block w-full text-left text-ss-text-secondary hover:text-ss-accent py-2 text-sm font-medium transition-colors"
                             >
                                 {link.label}
                             </button>
@@ -134,17 +146,17 @@ const Navbar = () => {
                             href="https://github.com/AgenticTrustHQ"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-ss-text-secondary hover:text-ss-text py-2 text-sm font-medium"
+                            className="flex items-center gap-2 text-ss-text-secondary hover:text-ss-accent py-2 text-sm font-medium transition-colors"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             <GitHubIcon className="w-4 h-4" />
                             GitHub
                         </a>
-                        <div className="pt-3 border-t border-[rgba(255,255,255,0.06)] space-y-2">
+                        <div className="pt-3 border-t border-gray-100 space-y-2">
                             {!isAuthenticated && (
                                 <Link
                                     to="/login"
-                                    className="block w-full text-center py-2.5 text-ss-text-secondary hover:text-ss-text text-sm font-medium"
+                                    className="block w-full text-center py-2.5 text-ss-text-secondary hover:text-ss-accent text-sm font-medium transition-colors"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Log in
@@ -152,7 +164,7 @@ const Navbar = () => {
                             )}
                             <Link
                                 to="/dashboard"
-                                className="block w-full text-center px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-ss-bg font-medium rounded-lg transition-all duration-200 text-sm"
+                                className="block w-full text-center px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-lg btn-hover shadow-ss-accent text-sm"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Dashboard

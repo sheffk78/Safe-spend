@@ -175,8 +175,8 @@ if (spend.status === 'approved') {
             <div className="grid md:grid-cols-2 gap-4 mb-8">
                 <div className="bg-ss-surface border border-[rgba(255,255,255,0.06)] rounded-lg p-5">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                            <Package size={20} className="text-blue-400" />
+                        <div className="w-10 h-10 bg-ss-accent/10 rounded-lg flex items-center justify-center">
+                            <Package size={20} className="text-ss-accent" />
                         </div>
                         <div>
                             <h3 className="font-semibold text-ss-text">Python SDK</h3>

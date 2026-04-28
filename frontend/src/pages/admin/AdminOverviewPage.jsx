@@ -54,7 +54,7 @@ const eventColors = {
     'org.created': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'spend.approved': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'spend.denied': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
-    'escrow.funded': 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
+    'escrow.funded': 'bg-[rgba(20,184,166,0.1)] text-[#14B8A6]',
     'approval.requested': 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]',
     'policy.created': 'bg-[rgba(168,85,247,0.1)] text-[#A855F7]',
     default: 'bg-[rgba(107,114,128,0.1)] text-[#6B7280]'
@@ -120,12 +120,12 @@ const AdminOverviewPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Overview</h1>
-                    <p className="text-[#9CA3AF] mt-1">Platform status and activity at a glance</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Overview</h1>
+                    <p className="text-ss-text-tertiary mt-1">Platform status and activity at a glance</p>
                 </div>
                 <button
                     onClick={fetchData}
-                    className="px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.1)] hover:bg-[#1A1A1E] rounded-lg text-[#9CA3AF] hover:text-[#F5F5F5] text-sm transition-all"
+                    className="px-4 py-2 bg-white border border-gray-200 hover:bg-ss-elevated rounded-lg text-ss-text-tertiary hover:text-ss-text text-sm transition-all"
                     data-testid="refresh-btn"
                 >
                     Refresh
@@ -148,7 +148,7 @@ const AdminOverviewPage = () => {
                         : 'bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.2)]'
                 }`}>
                     <div className={`w-2 h-2 rounded-full ${
-                        status?.services?.database?.status === 'connected' ? 'bg-[#14B8A6]' : 'bg-[#EF4444]'
+                        status?.services?.database?.status === 'connected' ? 'bg-ss-accent' : 'bg-[#EF4444]'
                     }`} />
                     <span className={`text-sm font-medium ${
                         status?.services?.database?.status === 'connected' ? 'text-[#14B8A6]' : 'text-[#EF4444]'
@@ -167,7 +167,7 @@ const AdminOverviewPage = () => {
                         : 'bg-[rgba(107,114,128,0.1)] border-[rgba(107,114,128,0.2)]'
                 }`}>
                     <div className={`w-2 h-2 rounded-full ${
-                        status?.services?.stripe?.status === 'configured' ? 'bg-[#14B8A6]' : 'bg-[#6B7280]'
+                        status?.services?.stripe?.status === 'configured' ? 'bg-ss-accent' : 'bg-[#6B7280]'
                     }`} />
                     <span className={`text-sm font-medium ${
                         status?.services?.stripe?.status === 'configured' ? 'text-[#14B8A6]' : 'text-[#6B7280]'
@@ -188,13 +188,13 @@ const AdminOverviewPage = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {/* Organizations */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-[rgba(59,130,246,0.1)] flex items-center justify-center">
-                            <BuildingOfficeIcon className="w-5 h-5 text-[#3B82F6]" />
+                        <div className="w-10 h-10 rounded-lg bg-[rgba(20,184,166,0.1)] flex items-center justify-center">
+                            <BuildingOfficeIcon className="w-5 h-5 text-[#14B8A6]" />
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                    <p className="text-2xl font-bold text-ss-text font-mono">
                         {metrics?.organizations?.total || 0}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Organizations</p>
@@ -204,29 +204,29 @@ const AdminOverviewPage = () => {
                 </div>
 
                 {/* Active Escrows */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-[rgba(16,185,129,0.1)] flex items-center justify-center">
                             <CurrencyDollarIcon className="w-5 h-5 text-[#14B8A6]" />
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                    <p className="text-2xl font-bold text-ss-text font-mono">
                         {metrics?.escrow_accounts?.active || 0}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Active Escrows</p>
-                    <p className="text-xs text-[#9CA3AF] mt-1">
+                    <p className="text-xs text-ss-text-tertiary mt-1">
                         {metrics?.escrow_accounts?.total || 0} total, {metrics?.escrow_accounts?.paused || 0} paused
                     </p>
                 </div>
 
                 {/* Spend Requests Today */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-[rgba(168,85,247,0.1)] flex items-center justify-center">
                             <CheckCircleIcon className="w-5 h-5 text-[#A855F7]" />
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                    <p className="text-2xl font-bold text-ss-text font-mono">
                         {metrics?.spend_requests?.today || 0}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Spend Requests Today</p>
@@ -236,10 +236,10 @@ const AdminOverviewPage = () => {
                 </div>
 
                 {/* Pending Approvals */}
-                <div className={`bg-[#141416] rounded-xl border p-4 ${
+                <div className={`bg-white rounded-xl border p-4 ${
                     (metrics?.approvals?.pending || 0) > 0 
                         ? 'border-[rgba(245,158,11,0.3)]' 
-                        : 'border-[rgba(255,255,255,0.06)]'
+                        : 'border-gray-100'
                 }`}>
                     <div className="flex items-center gap-3 mb-3">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -253,7 +253,7 @@ const AdminOverviewPage = () => {
                         </div>
                     </div>
                     <p className={`text-2xl font-bold font-mono ${
-                        (metrics?.approvals?.pending || 0) > 0 ? 'text-[#F59E0B]' : 'text-[#F5F5F5]'
+                        (metrics?.approvals?.pending || 0) > 0 ? 'text-[#F59E0B]' : 'text-ss-text'
                     }`}>
                         {metrics?.approvals?.pending || 0}
                     </p>
@@ -261,20 +261,20 @@ const AdminOverviewPage = () => {
                 </div>
 
                 {/* Total Balance */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-[rgba(34,197,94,0.1)] flex items-center justify-center">
                             <CurrencyDollarIcon className="w-5 h-5 text-[#22C55E]" />
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                    <p className="text-2xl font-bold text-ss-text font-mono">
                         {formatCents(metrics?.escrow_accounts?.total_balance_cents || 0)}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Total Balance Held</p>
                 </div>
 
                 {/* API Keys */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-[rgba(236,72,153,0.1)] flex items-center justify-center">
                             <svg className="w-5 h-5 text-[#EC4899]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -282,11 +282,11 @@ const AdminOverviewPage = () => {
                             </svg>
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                    <p className="text-2xl font-bold text-ss-text font-mono">
                         {metrics?.api_keys?.total_active || 0}
                     </p>
                     <p className="text-xs text-[#6B7280] mt-1">Active API Keys</p>
-                    <p className="text-xs text-[#9CA3AF] mt-1">
+                    <p className="text-xs text-ss-text-tertiary mt-1">
                         {metrics?.api_keys?.by_type?.live || 0} live, {metrics?.api_keys?.by_type?.agent || 0} agent
                     </p>
                 </div>
@@ -314,9 +314,9 @@ const AdminOverviewPage = () => {
             )}
 
             {/* Recent Activity */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)]">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.06)]">
-                    <h2 className="font-heading font-semibold text-[#F5F5F5]">Recent Activity</h2>
+            <div className="bg-white rounded-xl border border-gray-100">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h2 className="font-heading font-semibold text-ss-text">Recent Activity</h2>
                     <Link
                         to="/admin/audit"
                         className="text-sm text-[#14B8A6] hover:text-[#2DD4BF] transition-colors"
@@ -341,7 +341,7 @@ const AdminOverviewPage = () => {
                                 }`}>
                                     {event.type}
                                 </span>
-                                <span className="text-sm text-[#9CA3AF] flex-1 truncate">
+                                <span className="text-sm text-ss-text-tertiary flex-1 truncate">
                                     {event.details?.name || event.details?.amount_cents 
                                         ? `${event.details.name || formatCents(event.details.amount_cents)}`
                                         : event.type.split('.').pop()

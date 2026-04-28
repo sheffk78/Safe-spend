@@ -259,7 +259,7 @@ const KeySection = ({ title, description, keys, badgeColor, onRevoke, onToggleAc
     const badgeStyles = {
         teal: 'bg-ss-accent/10 text-ss-accent',
         amber: 'bg-ss-warning/10 text-ss-warning',
-        blue: 'bg-blue-500/10 text-blue-400'
+        blue: 'bg-ss-accent/10 text-ss-accent'
     };
 
     return (
@@ -411,7 +411,7 @@ const CreateKeyModal = ({ onClose, onSuccess }) => {
                             {[
                                 { value: 'live', label: 'Live', desc: 'Production', color: 'ss-accent' },
                                 { value: 'test', label: 'Test', desc: 'Development', color: 'ss-warning' },
-                                { value: 'agent', label: 'Agent', desc: 'AI agents', color: 'blue-400' }
+                                { value: 'agent', label: 'Agent', desc: 'AI agents', color: 'ss-accent' }
                             ].map(type => (
                                 <button
                                     key={type.value}

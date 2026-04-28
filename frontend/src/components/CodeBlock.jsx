@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-typescript';
@@ -13,18 +14,23 @@ const CodeBlock = ({ tabs, defaultTab = 0 }) => {
     }, [activeTab]);
 
     return (
-        <div className="rounded-lg overflow-hidden border border-[rgba(255,255,255,0.06)] shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+        <motion.div 
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-xl overflow-hidden border border-gray-200 shadow-ss-lg"
+        >
             {/* Tab bar */}
-            <div className="flex bg-ss-surface border-b border-[rgba(255,255,255,0.06)]">
+            <div className="flex bg-ss-surface border-b border-gray-100">
                 {tabs.map((tab, index) => (
                     <button
                         key={tab.label}
                         onClick={() => setActiveTab(index)}
                         data-testid={`code-tab-${tab.label.toLowerCase().replace(/\s+/g, '-')}`}
-                        className={`px-4 py-3 text-sm font-medium transition-all duration-200 border-b-2 ${
+                        className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 ${
                             activeTab === index
-                                ? 'text-ss-accent border-ss-accent'
-                                : 'text-ss-text-tertiary border-transparent hover:text-ss-text-secondary'
+                                ? 'text-ss-accent border-ss-accent bg-ss-accent/5'
+                                : 'text-ss-text-tertiary border-transparent hover:text-ss-text-secondary hover:bg-gray-50'
                         }`}
                     >
                         {tab.label}
@@ -39,7 +45,7 @@ const CodeBlock = ({ tabs, defaultTab = 0 }) => {
                     </code>
                 </pre>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

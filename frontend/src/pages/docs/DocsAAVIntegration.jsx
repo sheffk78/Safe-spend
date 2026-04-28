@@ -201,7 +201,7 @@ const DocsAAVIntegration = () => {
 
                 <div className="bg-ss-surface p-4 rounded-lg border border-[rgba(255,255,255,0.06)]">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="px-2 py-0.5 bg-gray-500/20 text-gray-400 text-xs font-mono rounded">none</div>
+                        <div className="px-2 py-0.5 bg-ss-text-tertiary/20 text-ss-text-tertiary text-xs font-mono rounded">none</div>
                         <span className="text-ss-text font-medium">Disabled</span>
                     </div>
                     <p className="text-ss-text-secondary text-sm">

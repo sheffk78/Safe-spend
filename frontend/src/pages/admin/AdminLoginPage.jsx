@@ -49,14 +49,14 @@ const AdminLoginPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+            <div className="min-h-screen bg-ss-bg flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0B] flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen bg-ss-bg flex flex-col items-center justify-center p-4">
             {/* Warning Banner */}
             <div className="w-full max-w-md mb-6 p-3 bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.3)] rounded-lg">
                 <div className="flex items-center gap-2 text-[#F59E0B]">
@@ -69,13 +69,13 @@ const AdminLoginPage = () => {
             </div>
 
             {/* Login Card */}
-            <div className="w-full max-w-md bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-xl p-8">
+            <div className="w-full max-w-md bg-white border border-gray-100 rounded-xl p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-[rgba(245,158,11,0.1)] flex items-center justify-center">
                         <Shield className="w-8 h-8 text-[#F59E0B]" />
                     </div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Safe-Spend</h1>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Safe-Spend</h1>
                     <p className="text-[#6B7280] mt-2 text-sm">Admin Console</p>
                 </div>
 
@@ -89,7 +89,7 @@ const AdminLoginPage = () => {
                 {/* Login Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                        <label className="block text-sm font-medium text-ss-text-tertiary mb-2">
                             Admin Key
                         </label>
                         <div className="relative">
@@ -100,7 +100,7 @@ const AdminLoginPage = () => {
                                 onChange={(e) => setAdminKey(e.target.value)}
                                 placeholder="ss_admin_..."
                                 required
-                                className="w-full pl-10 pr-4 py-3 bg-[#1A1A1E] border border-[rgba(255,255,255,0.1)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#F59E0B] font-mono text-sm"
+                                className="w-full pl-10 pr-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-[#F59E0B] font-mono text-sm"
                                 data-testid="admin-key-input"
                             />
                         </div>
@@ -112,7 +112,7 @@ const AdminLoginPage = () => {
                     <button
                         type="submit"
                         disabled={submitting || !adminKey}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F59E0B] hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F59E0B] hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-ss-text font-medium transition-all"
                         data-testid="admin-login-btn"
                     >
                         {submitting ? (
@@ -130,7 +130,7 @@ const AdminLoginPage = () => {
                 </form>
 
                 {/* Footer */}
-                <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.06)] text-center">
+                <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                     <a href="/" className="text-sm text-[#6B7280] hover:text-[#14B8A6] transition-colors">
                         ← Back to Safe-Spend
                     </a>

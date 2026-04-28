@@ -143,7 +143,7 @@ const TIMEZONES = [
 // Trust Law Callout Component
 const TrustLawCallout = ({ title, children, type = 'info' }) => {
     const styles = {
-        info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', icon: Scale, iconColor: 'text-blue-400' },
+        info: { bg: 'bg-ss-accent/10', border: 'border-ss-accent/30', icon: Scale, iconColor: 'text-ss-accent' },
         warning: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', icon: AlertTriangle, iconColor: 'text-yellow-400' },
         success: { bg: 'bg-ss-accent/10', border: 'border-ss-accent/30', icon: CheckCircle, iconColor: 'text-ss-accent' }
     };
@@ -433,7 +433,7 @@ const PatternSelectionStep = ({ patterns, selectedPattern, onSelect }) => (
         <TrustLawCallout title="Choose Your Governance Pattern" type="info">
             <p>Each pattern represents a different trust structure. Select the one that best matches your use case, 
             or choose Custom to build from scratch.</p>
-            <Link to="/docs/trust-law#pattern-marketing" target="_blank" className="text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
+            <Link to="/docs/trust-law#pattern-marketing" target="_blank" className="text-ss-accent hover:underline inline-flex items-center gap-1 mt-1">
                 Learn more about governance patterns <ExternalLink size={10} />
             </Link>
         </TrustLawCallout>

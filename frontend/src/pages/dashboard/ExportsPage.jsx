@@ -36,8 +36,8 @@ const REPORT_TYPES = {
         label: 'Audit Events',
         description: 'Export audit trail with all system events and actor information',
         icon: FileText,
-        color: 'text-blue-400',
-        bgColor: 'bg-blue-400/10',
+        color: 'text-ss-accent',
+        bgColor: 'bg-ss-accent/10',
     },
 };
 

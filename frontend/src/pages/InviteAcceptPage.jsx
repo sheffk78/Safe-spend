@@ -13,8 +13,8 @@ import { getInviteDetails, acceptInvite } from '@/lib/api';
 const ROLE_CONFIG = {
     owner: { label: 'Owner', color: 'text-amber-400' },
     finance_admin: { label: 'Finance Admin', color: 'text-teal-400' },
-    developer: { label: 'Developer', color: 'text-blue-400' },
-    read_only: { label: 'Read Only', color: 'text-gray-400' }
+    developer: { label: 'Developer', color: 'text-ss-accent' },
+    read_only: { label: 'Read Only', color: 'text-ss-text-tertiary' }
 };
 
 const InviteAcceptPage = () => {

@@ -44,14 +44,14 @@ const ROLE_CONFIG = {
     developer: {
         label: 'Developer',
         icon: Code2,
-        color: 'text-blue-400',
-        bgColor: 'bg-blue-400/10',
-        borderColor: 'border-blue-400/20'
+        color: 'text-ss-accent',
+        bgColor: 'bg-ss-accent/10',
+        borderColor: 'border-ss-accent/20'
     },
     read_only: {
         label: 'Read Only',
         icon: Eye,
-        color: 'text-gray-400',
+        color: 'text-ss-text-tertiary',
         bgColor: 'bg-gray-400/10',
         borderColor: 'border-gray-400/20'
     }

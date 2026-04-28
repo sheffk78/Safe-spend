@@ -108,13 +108,13 @@ const AdminHealthPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">System Health</h1>
-                    <p className="text-[#9CA3AF] mt-1">Service status and error monitoring</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">System Health</h1>
+                    <p className="text-ss-text-tertiary mt-1">Service status and error monitoring</p>
                 </div>
                 <button
                     onClick={fetchData}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.1)] hover:bg-[#1A1A1E] rounded-lg text-[#9CA3AF] hover:text-[#F5F5F5] text-sm transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-ss-elevated rounded-lg text-ss-text-tertiary hover:text-ss-text text-sm transition-all disabled:opacity-50"
                     data-testid="refresh-btn"
                 >
                     <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -132,7 +132,7 @@ const AdminHealthPage = () => {
             {/* Service Status Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Database Card */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                             status?.services?.database?.status === 'connected'
@@ -146,11 +146,11 @@ const AdminHealthPage = () => {
                             }`} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-[#F5F5F5]">Database</h3>
+                            <h3 className="font-semibold text-ss-text">Database</h3>
                             <div className="flex items-center gap-2 mt-1">
                                 <div className={`w-2 h-2 rounded-full ${
                                     status?.services?.database?.status === 'connected'
-                                        ? 'bg-[#14B8A6]'
+                                        ? 'bg-ss-accent'
                                         : 'bg-[#EF4444]'
                                 }`} />
                                 <span className={`text-sm ${
@@ -167,7 +167,7 @@ const AdminHealthPage = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between">
                             <span className="text-sm text-[#6B7280]">Latency</span>
-                            <span className="text-lg font-mono text-[#F5F5F5]">
+                            <span className="text-lg font-mono text-ss-text">
                                 {status?.services?.database?.latency_ms || 0}ms
                             </span>
                         </div>
@@ -175,7 +175,7 @@ const AdminHealthPage = () => {
                 </div>
 
                 {/* Stripe Card */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                             status?.services?.stripe?.status === 'configured'
@@ -189,11 +189,11 @@ const AdminHealthPage = () => {
                             }`} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-[#F5F5F5]">Stripe</h3>
+                            <h3 className="font-semibold text-ss-text">Stripe</h3>
                             <div className="flex items-center gap-2 mt-1">
                                 <div className={`w-2 h-2 rounded-full ${
                                     status?.services?.stripe?.status === 'configured'
-                                        ? 'bg-[#14B8A6]'
+                                        ? 'bg-ss-accent'
                                         : 'bg-[#6B7280]'
                                 }`} />
                                 <span className={`text-sm ${
@@ -210,7 +210,7 @@ const AdminHealthPage = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between">
                             <span className="text-sm text-[#6B7280]">Status</span>
-                            <span className="text-sm text-[#9CA3AF]">
+                            <span className="text-sm text-ss-text-tertiary">
                                 {status?.services?.stripe?.status || 'Unknown'}
                             </span>
                         </div>
@@ -218,13 +218,13 @@ const AdminHealthPage = () => {
                 </div>
 
                 {/* Application Card */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-[rgba(59,130,246,0.1)] flex items-center justify-center">
-                            <ServerIcon className="w-6 h-6 text-[#3B82F6]" />
+                        <div className="w-12 h-12 rounded-xl bg-[rgba(20,184,166,0.1)] flex items-center justify-center">
+                            <ServerIcon className="w-6 h-6 text-[#14B8A6]" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-[#F5F5F5]">Application</h3>
+                            <h3 className="font-semibold text-ss-text">Application</h3>
                             <span className="text-xs text-[#6B7280]">v{status?.version || '1.0.0'}</span>
                         </div>
                     </div>
@@ -233,7 +233,7 @@ const AdminHealthPage = () => {
                         <div>
                             <div className="flex justify-between mb-1">
                                 <span className="text-sm text-[#6B7280]">Uptime</span>
-                                <span className="text-lg font-mono text-[#F5F5F5]">
+                                <span className="text-lg font-mono text-ss-text">
                                     {status?.uptime_seconds ? formatUptime(status.uptime_seconds) : 'N/A'}
                                 </span>
                             </div>
@@ -242,16 +242,16 @@ const AdminHealthPage = () => {
                         <div>
                             <div className="flex justify-between mb-1">
                                 <span className="text-sm text-[#6B7280]">Memory</span>
-                                <span className="text-sm text-[#9CA3AF]">
+                                <span className="text-sm text-ss-text-tertiary">
                                     {formatMB(status?.memory?.heap_used_mb || 0)} / {formatMB(status?.memory?.heap_total_mb || 0)}
                                 </span>
                             </div>
-                            <div className="h-2 bg-[#1A1A1E] rounded-full overflow-hidden">
+                            <div className="h-2 bg-ss-elevated rounded-full overflow-hidden">
                                 <div 
                                     className={`h-full rounded-full transition-all ${
                                         memoryPercent > 80 ? 'bg-[#EF4444]' :
                                         memoryPercent > 60 ? 'bg-[#F59E0B]' :
-                                        'bg-[#14B8A6]'
+                                        'bg-ss-accent'
                                     }`}
                                     style={{ width: `${memoryPercent}%` }}
                                 />
@@ -260,7 +260,7 @@ const AdminHealthPage = () => {
                         
                         <div className="flex justify-between">
                             <span className="text-sm text-[#6B7280]">RSS</span>
-                            <span className="text-sm text-[#9CA3AF]">
+                            <span className="text-sm text-ss-text-tertiary">
                                 {formatMB(status?.memory?.rss_mb || 0)}
                             </span>
                         </div>
@@ -269,9 +269,9 @@ const AdminHealthPage = () => {
             </div>
 
             {/* Error Log */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)]">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.06)]">
-                    <h2 className="font-heading font-semibold text-[#F5F5F5]">Error Log</h2>
+            <div className="bg-white rounded-xl border border-gray-100">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h2 className="font-heading font-semibold text-ss-text">Error Log</h2>
                     
                     {/* Time Range Filter */}
                     <div className="flex items-center gap-2">
@@ -281,8 +281,8 @@ const AdminHealthPage = () => {
                                 onClick={() => setTimeRange(range.value)}
                                 className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
                                     timeRange === range.value
-                                        ? 'bg-[#14B8A6] text-white'
-                                        : 'bg-[#1A1A1E] text-[#9CA3AF] hover:text-[#F5F5F5]'
+                                        ? 'bg-ss-accent text-ss-text'
+                                        : 'bg-ss-elevated text-ss-text-tertiary hover:text-ss-text'
                                 }`}
                             >
                                 {range.label}
@@ -300,7 +300,7 @@ const AdminHealthPage = () => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                            <thead className="border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider w-[160px]">
                                         Timestamp
@@ -344,7 +344,7 @@ const AdminHealthPage = () => {
                                                     ) : (
                                                         <ChevronRightIcon className="w-4 h-4 text-[#6B7280] flex-shrink-0" />
                                                     )}
-                                                    <span className="text-sm text-[#F5F5F5] truncate max-w-md">
+                                                    <span className="text-sm text-ss-text truncate max-w-md">
                                                         {err.message}
                                                     </span>
                                                 </div>
@@ -357,8 +357,8 @@ const AdminHealthPage = () => {
                                         </tr>
                                         {expandedError === index && err.stack && (
                                             <tr>
-                                                <td colSpan={4} className="px-4 py-3 bg-[#0A0A0B]">
-                                                    <pre className="text-xs text-[#9CA3AF] font-mono whitespace-pre-wrap overflow-x-auto">
+                                                <td colSpan={4} className="px-4 py-3 bg-ss-bg">
+                                                    <pre className="text-xs text-ss-text-tertiary font-mono whitespace-pre-wrap overflow-x-auto">
                                                         {err.stack}
                                                     </pre>
                                                     {err.request_id && (

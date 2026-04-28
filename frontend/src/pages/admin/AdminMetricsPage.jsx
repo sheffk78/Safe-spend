@@ -36,7 +36,7 @@ const MiniBarChart = ({ data, max }) => {
             {data.map((item, i) => (
                 <div 
                     key={i}
-                    className="flex-1 bg-[#14B8A6] rounded-t hover:bg-[#2DD4BF] transition-all"
+                    className="flex-1 bg-ss-accent rounded-t hover:bg-[#2DD4BF] transition-all"
                     style={{ height: `${(item.value / maxValue) * 100}%`, minHeight: '2px' }}
                     title={`${item.label}: ${item.value}`}
                 />
@@ -97,13 +97,13 @@ const AdminMetricsPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Metrics</h1>
-                    <p className="text-[#9CA3AF] mt-1">Platform analytics and statistics</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Metrics</h1>
+                    <p className="text-ss-text-tertiary mt-1">Platform analytics and statistics</p>
                 </div>
                 <button
                     onClick={fetchData}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] hover:bg-[#1A1A1E] rounded-lg text-[#9CA3AF] hover:text-[#F5F5F5] text-sm transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 hover:bg-ss-elevated rounded-lg text-ss-text-tertiary hover:text-ss-text text-sm transition-all disabled:opacity-50"
                 >
                     <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     Refresh
@@ -120,13 +120,13 @@ const AdminMetricsPage = () => {
             {/* Main Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Organizations */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-[rgba(59,130,246,0.1)] flex items-center justify-center">
-                            <BuildingOfficeIcon className="w-6 h-6 text-[#3B82F6]" />
+                        <div className="w-12 h-12 rounded-xl bg-[rgba(20,184,166,0.1)] flex items-center justify-center">
+                            <BuildingOfficeIcon className="w-6 h-6 text-[#14B8A6]" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                            <p className="text-2xl font-bold text-ss-text font-mono">
                                 {metrics?.organizations?.total || 0}
                             </p>
                             <p className="text-xs text-[#6B7280]">Organizations</p>
@@ -139,19 +139,19 @@ const AdminMetricsPage = () => {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">This month</span>
-                            <span className="text-[#9CA3AF]">+{metrics?.organizations?.created_this_month || 0}</span>
+                            <span className="text-ss-text-tertiary">+{metrics?.organizations?.created_this_month || 0}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Escrow Accounts */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-[rgba(16,185,129,0.1)] flex items-center justify-center">
                             <CurrencyDollarIcon className="w-6 h-6 text-[#14B8A6]" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                            <p className="text-2xl font-bold text-ss-text font-mono">
                                 {formatCents(metrics?.escrow_accounts?.total_balance_cents || 0)}
                             </p>
                             <p className="text-xs text-[#6B7280]">Total Balance</p>
@@ -168,19 +168,19 @@ const AdminMetricsPage = () => {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Total</span>
-                            <span className="text-[#9CA3AF]">{metrics?.escrow_accounts?.total || 0}</span>
+                            <span className="text-ss-text-tertiary">{metrics?.escrow_accounts?.total || 0}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Spend Requests */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-[rgba(168,85,247,0.1)] flex items-center justify-center">
                             <ChartPieIcon className="w-6 h-6 text-[#A855F7]" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                            <p className="text-2xl font-bold text-ss-text font-mono">
                                 {metrics?.spend_requests?.this_month || 0}
                             </p>
                             <p className="text-xs text-[#6B7280]">Spends This Month</p>
@@ -189,23 +189,23 @@ const AdminMetricsPage = () => {
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Today</span>
-                            <span className="text-[#9CA3AF]">{metrics?.spend_requests?.today || 0}</span>
+                            <span className="text-ss-text-tertiary">{metrics?.spend_requests?.today || 0}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">This week</span>
-                            <span className="text-[#9CA3AF]">{metrics?.spend_requests?.this_week || 0}</span>
+                            <span className="text-ss-text-tertiary">{metrics?.spend_requests?.this_week || 0}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* API Keys */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-[rgba(236,72,153,0.1)] flex items-center justify-center">
                             <KeyIcon className="w-6 h-6 text-[#EC4899]" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-[#F5F5F5] font-mono">
+                            <p className="text-2xl font-bold text-ss-text font-mono">
                                 {metrics?.api_keys?.total_active || 0}
                             </p>
                             <p className="text-xs text-[#6B7280]">Active API Keys</p>
@@ -218,11 +218,11 @@ const AdminMetricsPage = () => {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Test</span>
-                            <span className="text-[#9CA3AF]">{metrics?.api_keys?.by_type?.test || 0}</span>
+                            <span className="text-ss-text-tertiary">{metrics?.api_keys?.by_type?.test || 0}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-[#6B7280]">Agent</span>
-                            <span className="text-[#9CA3AF]">{metrics?.api_keys?.by_type?.agent || 0}</span>
+                            <span className="text-ss-text-tertiary">{metrics?.api_keys?.by_type?.agent || 0}</span>
                         </div>
                     </div>
                 </div>
@@ -231,8 +231,8 @@ const AdminMetricsPage = () => {
             {/* Approval Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Approval Rate */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
-                    <h3 className="font-heading font-semibold text-[#F5F5F5] mb-4">Approval Breakdown</h3>
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
+                    <h3 className="font-heading font-semibold text-ss-text mb-4">Approval Breakdown</h3>
                     
                     {/* Donut representation using bars */}
                     <div className="space-y-3">
@@ -240,13 +240,13 @@ const AdminMetricsPage = () => {
                             <div className="flex justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                     <CheckCircleIcon className="w-4 h-4 text-[#14B8A6]" />
-                                    <span className="text-sm text-[#9CA3AF]">Approved</span>
+                                    <span className="text-sm text-ss-text-tertiary">Approved</span>
                                 </div>
                                 <span className="text-sm font-mono text-[#14B8A6]">{approvedRate.toFixed(0)}%</span>
                             </div>
-                            <div className="h-2 bg-[#1A1A1E] rounded-full overflow-hidden">
+                            <div className="h-2 bg-ss-elevated rounded-full overflow-hidden">
                                 <div 
-                                    className="h-full bg-[#14B8A6] rounded-full transition-all"
+                                    className="h-full bg-ss-accent rounded-full transition-all"
                                     style={{ width: `${approvedRate}%` }}
                                 />
                             </div>
@@ -256,11 +256,11 @@ const AdminMetricsPage = () => {
                             <div className="flex justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                     <XCircleIcon className="w-4 h-4 text-[#EF4444]" />
-                                    <span className="text-sm text-[#9CA3AF]">Denied</span>
+                                    <span className="text-sm text-ss-text-tertiary">Denied</span>
                                 </div>
                                 <span className="text-sm font-mono text-[#EF4444]">{deniedRate.toFixed(0)}%</span>
                             </div>
-                            <div className="h-2 bg-[#1A1A1E] rounded-full overflow-hidden">
+                            <div className="h-2 bg-ss-elevated rounded-full overflow-hidden">
                                 <div 
                                     className="h-full bg-[#EF4444] rounded-full transition-all"
                                     style={{ width: `${deniedRate}%` }}
@@ -272,11 +272,11 @@ const AdminMetricsPage = () => {
                             <div className="flex justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                     <ClockIcon className="w-4 h-4 text-[#F59E0B]" />
-                                    <span className="text-sm text-[#9CA3AF]">Pending</span>
+                                    <span className="text-sm text-ss-text-tertiary">Pending</span>
                                 </div>
                                 <span className="text-sm font-mono text-[#F59E0B]">{pendingRate.toFixed(0)}%</span>
                             </div>
-                            <div className="h-2 bg-[#1A1A1E] rounded-full overflow-hidden">
+                            <div className="h-2 bg-ss-elevated rounded-full overflow-hidden">
                                 <div 
                                     className="h-full bg-[#F59E0B] rounded-full transition-all"
                                     style={{ width: `${pendingRate}%` }}
@@ -291,12 +291,12 @@ const AdminMetricsPage = () => {
                 </div>
 
                 {/* Stripe Stats */}
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
-                    <h3 className="font-heading font-semibold text-[#F5F5F5] mb-4">Stripe Integration</h3>
+                <div className="bg-white rounded-xl border border-gray-100 p-6">
+                    <h3 className="font-heading font-semibold text-ss-text mb-4">Stripe Integration</h3>
                     
                     <div className="flex items-center gap-2 mb-4">
                         <div className={`w-2 h-2 rounded-full ${
-                            stripeMetrics?.status === 'configured' ? 'bg-[#14B8A6]' : 'bg-[#6B7280]'
+                            stripeMetrics?.status === 'configured' ? 'bg-ss-accent' : 'bg-[#6B7280]'
                         }`} />
                         <span className={`text-sm ${
                             stripeMetrics?.status === 'configured' ? 'text-[#14B8A6]' : 'text-[#6B7280]'
@@ -309,7 +309,7 @@ const AdminMetricsPage = () => {
                         <div className="space-y-3">
                             <div className="flex justify-between">
                                 <span className="text-sm text-[#6B7280]">Fundings this month</span>
-                                <span className="text-sm font-mono text-[#F5F5F5]">
+                                <span className="text-sm font-mono text-ss-text">
                                     {stripeMetrics.fundings_this_month.count}
                                 </span>
                             </div>

@@ -377,7 +377,7 @@ const AdminAnalyticsPage = () => {
                                                 e.status === 'active' ? 'bg-teal-500/10 text-teal-400' :
                                                 e.status === 'paused' ? 'bg-amber-500/10 text-amber-400' :
                                                 e.status === 'depleted' ? 'bg-red-500/10 text-red-400' :
-                                                'bg-gray-500/10 text-gray-400'
+                                                'bg-ss-text-tertiary/10 text-ss-text-tertiary'
                                             }`}>
                                                 {e.status}
                                             </span>
@@ -417,9 +417,9 @@ const AdminAnalyticsPage = () => {
                                         <td className="py-2 text-ss-text">{o.name}</td>
                                         <td className="py-2">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                                o.plan === 'enterprise' ? 'bg-purple-500/10 text-purple-400' :
-                                                o.plan === 'growth' ? 'bg-blue-500/10 text-blue-400' :
-                                                'bg-gray-500/10 text-gray-400'
+                                                o.plan === 'enterprise' ? 'bg-ss-accent/10 text-ss-accent' :
+                                                o.plan === 'growth' ? 'bg-ss-accent/10 text-ss-accent' :
+                                                'bg-ss-text-tertiary/10 text-ss-text-tertiary'
                                             }`}>
                                                 {o.plan}
                                             </span>

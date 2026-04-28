@@ -58,8 +58,8 @@ const QUICK_START_TEMPLATES = [
         id: 'procurement-tools',
         name: 'Procurement Tools',
         icon: ShoppingCart,
-        color: 'text-blue-400',
-        bgColor: 'bg-blue-500/10',
+        color: 'text-ss-accent',
+        bgColor: 'bg-ss-accent/10',
         description: 'Enable SaaS subscriptions and developer tool purchases',
         escrow: {
             name: 'Procurement Agent Budget',
@@ -118,8 +118,8 @@ const QUICK_START_TEMPLATES = [
         id: 'devops-infra',
         name: 'DevOps Infrastructure',
         icon: Bot,
-        color: 'text-purple-400',
-        bgColor: 'bg-purple-500/10',
+        color: 'text-ss-accent',
+        bgColor: 'bg-ss-accent/10',
         description: 'Cloud infrastructure and monitoring tool budget for DevOps agents',
         escrow: {
             name: 'DevOps Agent Budget',
@@ -155,7 +155,7 @@ const TemplateCard = ({ template, selected, onSelect }) => {
             className={`w-full p-4 rounded-xl border text-left transition-all ${
                 selected
                     ? 'bg-ss-accent/10 border-ss-accent'
-                    : 'bg-ss-surface border-[rgba(255,255,255,0.06)] hover:border-ss-accent/50'
+                    : 'bg-ss-surface border-gray-200 hover:border-ss-accent/50'
             }`}
             data-testid={`template-${template.id}`}
         >
@@ -199,7 +199,7 @@ const ProgressStep = ({ step, current, label }) => {
         <div className="flex items-center gap-2">
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                 isComplete
-                    ? 'bg-ss-accent text-white'
+                    ? 'bg-ss-accent text-ss-text'
                     : isCurrent
                     ? 'bg-ss-accent/20 text-ss-accent border border-ss-accent'
                     : 'bg-ss-elevated text-ss-text-tertiary'
@@ -266,7 +266,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" data-testid="quickstart-modal">
             <div className="bg-ss-code border border-[rgba(255,255,255,0.1)] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-[rgba(255,255,255,0.06)] flex-shrink-0">
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 flex-shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center">
                             <Rocket className="w-5 h-5 text-ss-accent" />
@@ -328,7 +328,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 <h3 className="font-semibold text-ss-text text-lg">{selectedTemplate.name}</h3>
                             </div>
 
-                            <div className="p-4 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)]">
+                            <div className="p-4 bg-ss-surface rounded-lg border border-gray-200">
                                 <h4 className="text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider mb-3 flex items-center gap-2">
                                     <DollarSign size={12} />
                                     Escrow Account
@@ -339,7 +339,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 </p>
                             </div>
 
-                            <div className="p-4 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)]">
+                            <div className="p-4 bg-ss-surface rounded-lg border border-gray-200">
                                 <h4 className="text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider mb-3 flex items-center gap-2">
                                     <Shield size={12} />
                                     Spending Policy
@@ -408,11 +408,11 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                             </p>
 
                             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto text-left">
-                                <div className="p-3 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)]">
+                                <div className="p-3 bg-ss-surface rounded-lg border border-gray-200">
                                     <p className="text-[10px] text-ss-text-tertiary uppercase">Escrow</p>
                                     <p className="text-sm text-ss-text font-mono truncate">{createdItems.escrow?.id}</p>
                                 </div>
-                                <div className="p-3 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)]">
+                                <div className="p-3 bg-ss-surface rounded-lg border border-gray-200">
                                     <p className="text-[10px] text-ss-text-tertiary uppercase">Policy</p>
                                     <p className="text-sm text-ss-text font-mono truncate">{createdItems.policy?.id}</p>
                                 </div>
@@ -428,7 +428,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 </Link>
                                 <Link
                                     to="/dashboard/accounts"
-                                    className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-ss-accent-hover rounded-lg text-white text-sm font-medium transition-all"
+                                    className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-ss-accent-hover rounded-lg text-ss-text text-sm font-medium transition-all"
                                 >
                                     View Escrow
                                     <ArrowRight size={14} />
@@ -440,7 +440,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
 
                 {/* Footer */}
                 {(step === 1 || step === 2) && (
-                    <div className="flex items-center justify-between p-5 border-t border-[rgba(255,255,255,0.06)] flex-shrink-0">
+                    <div className="flex items-center justify-between p-5 border-t border-gray-200 flex-shrink-0">
                         <div>
                             {step === 2 && (
                                 <button
@@ -464,7 +464,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 <button
                                     onClick={() => setStep(2)}
                                     disabled={!selectedTemplate}
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-ss-text font-medium transition-all"
                                     data-testid="quickstart-continue-btn"
                                 >
                                     Continue
@@ -474,7 +474,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 <button
                                     onClick={handleCreate}
                                     disabled={loading}
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-ss-text font-medium transition-all"
                                     data-testid="quickstart-create-btn"
                                 >
                                     <Rocket size={16} />
@@ -487,7 +487,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
 
                 {/* Done Footer */}
                 {step === 4 && (
-                    <div className="flex items-center justify-center p-5 border-t border-[rgba(255,255,255,0.06)]">
+                    <div className="flex items-center justify-center p-5 border-t border-gray-200">
                         <button
                             onClick={handleDone}
                             className="px-6 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text font-medium transition-all"

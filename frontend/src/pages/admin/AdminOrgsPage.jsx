@@ -142,7 +142,7 @@ const AdminOrgsPage = () => {
                 <button
                     onClick={fetchOrgs}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-gray-200 hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
                     data-testid="refresh-orgs-btn"
                 >
                     <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -159,13 +159,13 @@ const AdminOrgsPage = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name or email..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-ss-surface border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
+                        className="w-full pl-10 pr-4 py-2.5 bg-ss-surface border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                         data-testid="search-input"
                     />
                 </div>
                 <button
                     type="submit"
-                    className="px-4 py-2.5 bg-ss-accent hover:bg-ss-accent-hover rounded-lg text-white font-medium transition-all"
+                    className="px-4 py-2.5 bg-ss-accent hover:bg-ss-accent-hover rounded-lg text-ss-text font-medium transition-all"
                 >
                     Search
                 </button>
@@ -180,10 +180,10 @@ const AdminOrgsPage = () => {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <Building2 className="text-blue-400" size={20} />
+                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center">
+                            <Building2 className="text-ss-accent" size={20} />
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-ss-text">{orgs.length}</p>
@@ -191,7 +191,7 @@ const AdminOrgsPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                             <DollarSign className="text-green-400" size={20} />
@@ -204,10 +204,10 @@ const AdminOrgsPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                            <Activity className="text-purple-400" size={20} />
+                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center">
+                            <Activity className="text-ss-accent" size={20} />
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-ss-text">
@@ -217,7 +217,7 @@ const AdminOrgsPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
                             <Users className="text-orange-400" size={20} />
@@ -233,7 +233,7 @@ const AdminOrgsPage = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+            <div className="bg-ss-surface rounded-xl border border-gray-100 overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-2 border-ss-accent border-t-transparent rounded-full animate-spin" />
@@ -246,7 +246,7 @@ const AdminOrgsPage = () => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                            <thead className="border-b border-gray-100">
                                 <tr>
                                     <SortHeader field="name">Organization</SortHeader>
                                     <SortHeader field="createdAt">Created</SortHeader>

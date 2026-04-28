@@ -182,7 +182,7 @@ const DocsConcepts = () => {
                 <div className="bg-ss-surface p-4 rounded-lg border border-[rgba(255,255,255,0.06)]">
                     <div className="flex items-center gap-2 mb-2">
                         <code className="text-ss-accent font-mono">sk_agent_...</code>
-                        <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">Agent</span>
+                        <span className="px-2 py-0.5 bg-ss-accent/20 text-ss-accent text-xs rounded">Agent</span>
                     </div>
                     <p className="text-ss-text-secondary text-sm">
                         <strong>Restricted key for AI agents.</strong> Can only make spend requests and view transactions. 

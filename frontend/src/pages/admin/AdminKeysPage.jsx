@@ -166,12 +166,12 @@ const AdminKeysPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Admin Keys</h1>
-                    <p className="text-[#9CA3AF] mt-1">Manage admin API keys for internal tools</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Admin Keys</h1>
+                    <p className="text-ss-text-tertiary mt-1">Manage admin API keys for internal tools</p>
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-[#2DD4BF] rounded-lg text-ss-text font-medium transition-all"
                     data-testid="create-key-btn"
                 >
                     <PlusIcon className="w-5 h-5" />
@@ -207,14 +207,14 @@ const AdminKeysPage = () => {
                         </button>
                     </div>
                     
-                    <div className="bg-[#0A0A0B] rounded-lg p-4">
+                    <div className="bg-ss-bg rounded-lg p-4">
                         <div className="flex items-center justify-between">
                             <code className="text-sm text-[#14B8A6] font-mono break-all">
                                 {newKey.key}
                             </code>
                             <button
                                 onClick={() => copyToClipboard(newKey.key)}
-                                className="ml-3 p-2 bg-[#141416] rounded-lg text-[#14B8A6] hover:bg-[#1A1A1E] transition-all flex-shrink-0"
+                                className="ml-3 p-2 bg-white rounded-lg text-[#14B8A6] hover:bg-ss-elevated transition-all flex-shrink-0"
                             >
                                 {copied ? (
                                     <CheckIcon className="w-4 h-4" />
@@ -235,12 +235,12 @@ const AdminKeysPage = () => {
             {/* Create Key Modal */}
             {showCreate && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] w-full max-w-md">
-                        <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
-                            <h2 className="font-heading font-semibold text-[#F5F5F5]">Create Admin Key</h2>
+                    <div className="bg-white rounded-xl border border-gray-100 w-full max-w-md">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <h2 className="font-heading font-semibold text-ss-text">Create Admin Key</h2>
                             <button
                                 onClick={() => { setShowCreate(false); setLabel(''); setSelectedScopes([]); }}
-                                className="text-[#6B7280] hover:text-[#F5F5F5]"
+                                className="text-[#6B7280] hover:text-ss-text"
                             >
                                 <XMarkIcon className="w-5 h-5" />
                             </button>
@@ -249,20 +249,20 @@ const AdminKeysPage = () => {
                         <div className="p-6 space-y-4">
                             {/* Label */}
                             <div>
-                                <label className="block text-sm text-[#9CA3AF] mb-1">Label</label>
+                                <label className="block text-sm text-ss-text-tertiary mb-1">Label</label>
                                 <input
                                     type="text"
                                     value={label}
                                     onChange={(e) => setLabel(e.target.value)}
                                     placeholder="e.g., Kit Operations, Blog Publisher"
-                                    className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
+                                    className="w-full px-3 py-2 bg-ss-elevated border border-gray-100 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                                     data-testid="key-label-input"
                                 />
                             </div>
 
                             {/* Scopes */}
                             <div>
-                                <label className="block text-sm text-[#9CA3AF] mb-2">Scopes</label>
+                                <label className="block text-sm text-ss-text-tertiary mb-2">Scopes</label>
                                 <div className="space-y-2">
                                     {AVAILABLE_SCOPES.map((scope) => (
                                         <label
@@ -270,7 +270,7 @@ const AdminKeysPage = () => {
                                             className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                                                 selectedScopes.includes(scope.value)
                                                     ? 'bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)]'
-                                                    : 'bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)]'
+                                                    : 'bg-ss-elevated border border-gray-100 hover:border-[rgba(255,255,255,0.12)]'
                                             }`}
                                         >
                                             <input
@@ -281,7 +281,7 @@ const AdminKeysPage = () => {
                                             />
                                             <div>
                                                 <p className={`text-sm font-medium ${
-                                                    selectedScopes.includes(scope.value) ? 'text-[#14B8A6]' : 'text-[#F5F5F5]'
+                                                    selectedScopes.includes(scope.value) ? 'text-[#14B8A6]' : 'text-ss-text'
                                                 }`}>
                                                     {scope.label}
                                                 </p>
@@ -293,17 +293,17 @@ const AdminKeysPage = () => {
                             </div>
                         </div>
                         
-                        <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgba(255,255,255,0.06)]">
+                        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100">
                             <button
                                 onClick={() => { setShowCreate(false); setLabel(''); setSelectedScopes([]); }}
-                                className="px-4 py-2 text-[#9CA3AF] hover:text-[#F5F5F5] transition-all"
+                                className="px-4 py-2 text-ss-text-tertiary hover:text-ss-text transition-all"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleCreate}
                                 disabled={creating || !label || selectedScopes.length === 0}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all disabled:opacity-50"
+                                className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-[#2DD4BF] rounded-lg text-ss-text font-medium transition-all disabled:opacity-50"
                                 data-testid="create-key-submit-btn"
                             >
                                 {creating ? (
@@ -319,7 +319,7 @@ const AdminKeysPage = () => {
             )}
 
             {/* Keys Table */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
@@ -339,7 +339,7 @@ const AdminKeysPage = () => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                            <thead className="border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">
                                         Key
@@ -373,7 +373,7 @@ const AdminKeysPage = () => {
                                             </code>
                                         </td>
                                         <td className="py-4 px-4">
-                                            <span className="text-sm text-[#F5F5F5]">{key.label}</span>
+                                            <span className="text-sm text-ss-text">{key.label}</span>
                                         </td>
                                         <td className="py-4 px-4">
                                             <div className="flex flex-wrap gap-1">
@@ -383,7 +383,7 @@ const AdminKeysPage = () => {
                                                         className={`px-1.5 py-0.5 text-xs rounded ${
                                                             scope === '*'
                                                                 ? 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]'
-                                                                : 'bg-[#1A1A1E] text-[#9CA3AF]'
+                                                                : 'bg-ss-elevated text-ss-text-tertiary'
                                                         }`}
                                                     >
                                                         {scope === '*' ? 'superadmin' : scope}
@@ -391,7 +391,7 @@ const AdminKeysPage = () => {
                                                 ))}
                                             </div>
                                         </td>
-                                        <td className="py-4 px-4 text-sm text-[#9CA3AF]">
+                                        <td className="py-4 px-4 text-sm text-ss-text-tertiary">
                                             {formatDate(key.created_at)}
                                         </td>
                                         <td className="py-4 px-4 text-sm text-[#6B7280]">
@@ -422,9 +422,9 @@ const AdminKeysPage = () => {
             </div>
 
             {/* Help Text */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
-                <h3 className="font-medium text-[#F5F5F5] mb-2">About Admin Keys</h3>
-                <ul className="text-sm text-[#9CA3AF] space-y-1">
+            <div className="bg-white rounded-xl border border-gray-100 p-4">
+                <h3 className="font-medium text-ss-text mb-2">About Admin Keys</h3>
+                <ul className="text-sm text-ss-text-tertiary space-y-1">
                     <li>• Admin keys use the format <code className="text-[#14B8A6]">ss_admin_...</code></li>
                     <li>• Keys are hashed and cannot be recovered after creation</li>
                     <li>• Assign minimal scopes needed for each use case</li>

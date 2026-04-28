@@ -54,10 +54,10 @@ export const DocsLink = ({ href, children, external = false }) => (
 // Callout Component
 const calloutStyles = {
     info: {
-        bg: 'bg-blue-500/10',
-        border: 'border-blue-500/30',
+        bg: 'bg-ss-accent/10',
+        border: 'border-ss-accent/30',
         icon: Info,
-        iconColor: 'text-blue-400'
+        iconColor: 'text-ss-accent'
     },
     warning: {
         bg: 'bg-yellow-500/10',
@@ -109,7 +109,7 @@ export const InlineCode = ({ children }) => (
 export const ApiEndpoint = ({ method, path, description, playgroundScenario }) => {
     const methodColors = {
         GET: 'bg-green-500/20 text-green-400',
-        POST: 'bg-blue-500/20 text-blue-400',
+        POST: 'bg-ss-accent/20 text-ss-accent',
         PATCH: 'bg-yellow-500/20 text-yellow-400',
         PUT: 'bg-orange-500/20 text-orange-400',
         DELETE: 'bg-red-500/20 text-red-400'

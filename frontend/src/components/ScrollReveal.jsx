@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 
 // Easing curve: snappy without bouncy
@@ -57,5 +58,3 @@ export const useCountUp = (end, duration = 1500) => {
     
     return [count, ref];
 };
-
-import React from 'react';

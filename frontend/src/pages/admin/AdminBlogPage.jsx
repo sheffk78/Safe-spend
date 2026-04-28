@@ -155,12 +155,12 @@ const AdminBlogPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Blog Manager</h1>
-                    <p className="text-[#9CA3AF] mt-1">Create and manage blog content</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Blog Manager</h1>
+                    <p className="text-ss-text-tertiary mt-1">Create and manage blog content</p>
                 </div>
                 <Link
                     to="/admin/blog/new"
-                    className="flex items-center gap-2 px-4 py-2 bg-[#14B8A6] hover:bg-[#2DD4BF] rounded-lg text-white font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-[#2DD4BF] rounded-lg text-ss-text font-medium transition-all"
                     data-testid="new-post-btn"
                 >
                     <PlusIcon className="w-5 h-5" />
@@ -185,8 +185,8 @@ const AdminBlogPage = () => {
                             onClick={() => setFilter(status)}
                             className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                                 filter === status
-                                    ? 'bg-[#14B8A6] text-white'
-                                    : 'bg-[#141416] text-[#9CA3AF] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.06)]'
+                                    ? 'bg-ss-accent text-ss-text'
+                                    : 'bg-white text-ss-text-tertiary hover:text-ss-text border border-gray-100'
                             }`}
                         >
                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -203,13 +203,13 @@ const AdminBlogPage = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search posts..."
-                        className="pl-9 pr-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6] text-sm w-64"
+                        className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent text-sm w-64"
                     />
                 </div>
             </div>
 
             {/* Posts Table */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
@@ -233,7 +233,7 @@ const AdminBlogPage = () => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                            <thead className="border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">
                                         Title
@@ -263,7 +263,7 @@ const AdminBlogPage = () => {
                                                 to={`/admin/blog/edit/${post.id}`}
                                                 className="hover:text-[#14B8A6] transition-colors"
                                             >
-                                                <p className="font-medium text-[#F5F5F5]">{post.title}</p>
+                                                <p className="font-medium text-ss-text">{post.title}</p>
                                                 {post.subtitle && (
                                                     <p className="text-xs text-[#6B7280] mt-0.5 truncate max-w-md">
                                                         {post.subtitle}
@@ -276,7 +276,7 @@ const AdminBlogPage = () => {
                                                 {post.status}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4 text-sm text-[#9CA3AF]">
+                                        <td className="py-4 px-4 text-sm text-ss-text-tertiary">
                                             {formatDate(post.published_at)}
                                         </td>
                                         <td className="py-4 px-4">
@@ -284,7 +284,7 @@ const AdminBlogPage = () => {
                                                 {(post.tags || []).slice(0, 3).map((tag, i) => (
                                                     <span 
                                                         key={i}
-                                                        className="px-1.5 py-0.5 text-xs bg-[#1A1A1E] text-[#9CA3AF] rounded"
+                                                        className="px-1.5 py-0.5 text-xs bg-ss-elevated text-ss-text-tertiary rounded"
                                                     >
                                                         {tag}
                                                     </span>
@@ -304,7 +304,7 @@ const AdminBlogPage = () => {
                                                         href={`/blog/${post.slug}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="p-2 text-[#6B7280] hover:text-[#F5F5F5] hover:bg-[#1A1A1E] rounded-lg transition-all"
+                                                        className="p-2 text-[#6B7280] hover:text-ss-text hover:bg-ss-elevated rounded-lg transition-all"
                                                         title="View on site"
                                                     >
                                                         <EyeIcon className="w-4 h-4" />
@@ -344,7 +344,7 @@ const AdminBlogPage = () => {
                                                 {/* Edit */}
                                                 <Link
                                                     to={`/admin/blog/edit/${post.id}`}
-                                                    className="p-2 text-[#6B7280] hover:text-[#F5F5F5] hover:bg-[#1A1A1E] rounded-lg transition-all"
+                                                    className="p-2 text-[#6B7280] hover:text-ss-text hover:bg-ss-elevated rounded-lg transition-all"
                                                     title="Edit"
                                                 >
                                                     <PencilIcon className="w-4 h-4" />

@@ -8,22 +8,22 @@ import {
 const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const CATEGORIES = [
-  { id: 'api', label: 'API', color: 'bg-blue-500/20 text-blue-400' },
+  { id: 'api', label: 'API', color: 'bg-ss-accent/20 text-ss-accent' },
   { id: 'sdk', label: 'SDK', color: 'bg-purple-500/20 text-purple-400' },
   { id: 'dashboard', label: 'Dashboard', color: 'bg-teal-500/20 text-teal-400' },
   { id: 'integrations', label: 'Integrations', color: 'bg-orange-500/20 text-orange-400' },
   { id: 'docs', label: 'Docs', color: 'bg-cyan-500/20 text-cyan-400' },
   { id: 'billing', label: 'Billing', color: 'bg-pink-500/20 text-pink-400' },
-  { id: 'other', label: 'Other', color: 'bg-gray-500/20 text-gray-400' }
+  { id: 'other', label: 'Other', color: 'bg-ss-text-tertiary/20 text-ss-text-tertiary' }
 ];
 
 const STATUS_CONFIG = {
-  new: { label: 'New', color: 'bg-gray-500/20 text-gray-400', icon: Clock },
+  new: { label: 'New', color: 'bg-ss-text-tertiary/20 text-ss-text-tertiary', icon: Clock },
   under_review: { label: 'Under Review', color: 'bg-amber-500/20 text-amber-400', icon: Eye },
   planned: { label: 'Planned', color: 'bg-teal-500/20 text-teal-400', icon: Check },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400', icon: Rocket },
+  in_progress: { label: 'In Progress', color: 'bg-ss-accent/20 text-ss-accent', icon: Rocket },
   shipped: { label: 'Shipped', color: 'bg-teal-500/20 text-teal-400', icon: CheckCircle },
-  declined: { label: 'Declined', color: 'bg-gray-500/20 text-gray-400', icon: XCircle }
+  declined: { label: 'Declined', color: 'bg-ss-text-tertiary/20 text-ss-text-tertiary', icon: XCircle }
 };
 
 const FeedbackPage = () => {
@@ -98,18 +98,18 @@ const FeedbackPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B]">
+    <div className="min-h-screen bg-ss-bg">
       {/* Header */}
-      <div className="border-b border-white/6 bg-[#141416]">
+      <div className="border-b border-gray-200 bg-white">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">Feature Requests & Ideas</h1>
-              <p className="text-gray-400">Help us build what matters to you.</p>
+              <h1 className="text-2xl font-bold text-ss-text mb-2">Feature Requests & Ideas</h1>
+              <p className="text-ss-text-tertiary">Help us build what matters to you.</p>
             </div>
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-ss-text rounded-lg transition-colors"
               data-testid="submit-idea-btn"
             >
               <Plus className="w-4 h-4" />
@@ -126,18 +126,18 @@ const FeedbackPage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search ideas..."
-                className="w-full pl-10 pr-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
+                className="w-full pl-10 pr-4 py-2 bg-ss-bg border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
               />
             </div>
-            <div className="flex gap-1 bg-[#0A0A0B] rounded-lg p-1 border border-white/6">
+            <div className="flex gap-1 bg-ss-bg rounded-lg p-1 border border-gray-200">
               {['all', 'top', 'new'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setSort(s)}
                   className={`px-4 py-1.5 rounded text-sm transition-colors ${
                     sort === s
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-white/10 text-ss-text'
+                      : 'text-ss-text-tertiary hover:text-ss-text'
                   }`}
                 >
                   {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -151,13 +151,13 @@ const FeedbackPage = () => {
       {/* Request List */}
       <div className="max-w-5xl mx-auto px-6 py-8">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading...</div>
+          <div className="text-center py-12 text-ss-text-tertiary">Loading...</div>
         ) : requests.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 mb-4">No feature requests yet. Be the first!</p>
+            <p className="text-ss-text-tertiary mb-4">No feature requests yet. Be the first!</p>
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-ss-text rounded-lg"
             >
               Submit an Idea
             </button>
@@ -172,11 +172,11 @@ const FeedbackPage = () => {
               return (
                 <div
                   key={request.id}
-                  className="flex bg-[#141416] border border-white/6 rounded-lg overflow-hidden hover:border-white/12 transition-colors"
+                  className="flex bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-colors"
                   data-testid={`request-${request.id}`}
                 >
                   {/* Vote Column */}
-                  <div className="w-16 flex flex-col items-center justify-center py-4 border-r border-white/6">
+                  <div className="w-16 flex flex-col items-center justify-center py-4 border-r border-gray-200">
                     <button
                       onClick={() => handleVote(request.id)}
                       className={`p-1 rounded transition-colors ${
@@ -189,7 +189,7 @@ const FeedbackPage = () => {
                       <ChevronUp className="w-5 h-5" />
                     </button>
                     <span className={`text-sm font-mono ${
-                      request.has_voted ? 'text-teal-400' : 'text-white'
+                      request.has_voted ? 'text-teal-400' : 'text-ss-text'
                     }`}>
                       {request.vote_count}
                     </span>
@@ -202,11 +202,11 @@ const FeedbackPage = () => {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="text-white font-medium mb-1 hover:text-teal-400 transition-colors">
+                        <h3 className="text-ss-text font-medium mb-1 hover:text-teal-400 transition-colors">
                           {request.is_pinned && <span className="mr-2">📌</span>}
                           {request.title}
                         </h3>
-                        <p className="text-sm text-gray-400 line-clamp-2">
+                        <p className="text-sm text-ss-text-tertiary line-clamp-2">
                           {request.description}
                         </p>
                         <div className="flex items-center gap-3 mt-2">
@@ -242,8 +242,8 @@ const FeedbackPage = () => {
                 onClick={() => setPage(p)}
                 className={`w-8 h-8 rounded ${
                   page === p
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    ? 'bg-teal-600 text-ss-text'
+                    : 'bg-ss-elevated/50 text-ss-text-tertiary hover:bg-ss-elevated'
                 }`}
               >
                 {p}
@@ -323,10 +323,10 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1A1A1E] border border-white/6 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b border-white/6">
-          <h2 className="text-lg font-semibold text-white">Submit an Idea</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+      <div className="bg-white border border-gray-200 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-ss-text">Submit an Idea</h2>
+          <button onClick={onClose} className="text-ss-text-tertiary hover:text-ss-text">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -346,7 +346,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
               placeholder='e.g., "Slack notifications for approval requests"'
-              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
+              className="w-full px-4 py-2 bg-ss-bg border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
               required
               data-testid="idea-title"
             />
@@ -361,7 +361,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               maxLength={1000}
               rows={4}
               placeholder="What problem does this solve? How would you use it?"
-              className="w-full px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500 resize-none"
+              className="w-full px-4 py-2 bg-ss-bg border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent resize-none"
               required
               data-testid="idea-description"
             />
@@ -380,8 +380,8 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
                   onClick={() => setCategory(cat.id)}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                     category === cat.id
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                      ? 'bg-teal-600 text-ss-text'
+                      : 'bg-ss-elevated/50 text-ss-text-tertiary hover:bg-ss-elevated'
                   }`}
                   data-testid={`category-${cat.id}`}
                 >
@@ -400,7 +400,7 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               }`}
             >
               {isAnonymous && (
-                <Check className="w-3 h-3 text-white" />
+                <Check className="w-3 h-3 text-ss-text" />
               )}
             </div>
             <input
@@ -409,21 +409,21 @@ const SubmitIdeaModal = ({ onClose, onSubmit }) => {
               onChange={(e) => setIsAnonymous(e.target.checked)}
               className="sr-only"
             />
-            <span className="text-sm text-gray-400">Submit anonymously</span>
+            <span className="text-sm text-ss-text-tertiary">Submit anonymously</span>
           </label>
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+              className="flex-1 py-2 bg-ss-elevated/50 hover:bg-ss-elevated text-ss-text rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title || !description || !category || submitting}
-              className="flex-1 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="flex-1 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-ss-text rounded-lg transition-colors"
               data-testid="submit-idea"
             >
               {submitting ? 'Submitting...' : 'Submit Idea →'}
@@ -492,8 +492,8 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1A1A1E] border border-white/6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-white/6">
+      <div className="bg-white border border-gray-200 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <span className={`px-2 py-0.5 rounded text-xs ${category.color}`}>
               {category.label}
@@ -502,7 +502,7 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
               {status?.label}
             </span>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-ss-text-tertiary hover:text-ss-text">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -516,13 +516,13 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
                 className={`p-2 rounded-lg border transition-colors ${
                   request.has_voted
                     ? 'bg-teal-900/50 border-teal-500 text-teal-400'
-                    : 'border-white/6 text-gray-400 hover:border-teal-500'
+                    : 'border-gray-200 text-ss-text-tertiary hover:border-teal-500'
                 }`}
               >
                 <ChevronUp className="w-6 h-6" />
               </button>
               <span className={`text-lg font-mono ${
-                request.has_voted ? 'text-teal-400' : 'text-white'
+                request.has_voted ? 'text-teal-400' : 'text-ss-text'
               }`}>
                 {request.vote_count}
               </span>
@@ -530,7 +530,7 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
 
             {/* Content */}
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-white mb-2">{request.title}</h2>
+              <h2 className="text-xl font-semibold text-ss-text mb-2">{request.title}</h2>
               <p className="text-gray-300 whitespace-pre-wrap">{request.description}</p>
               <p className="text-sm text-gray-500 mt-4">
                 Submitted by {request.submitted_by} · {new Date(request.created_at).toLocaleDateString()}
@@ -541,14 +541,14 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
           {/* Status History */}
           {fullRequest?.status_history && fullRequest.status_history.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Status Timeline</h3>
+              <h3 className="text-sm font-medium text-ss-text-tertiary mb-3">Status Timeline</h3>
               <div className="space-y-2">
                 {fullRequest.status_history.map((entry, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm">
                     <span className={`w-2 h-2 rounded-full ${STATUS_CONFIG[entry.status]?.color.replace('text-', 'bg-').split(' ')[0]}`} />
                     <span className="text-gray-300 capitalize">{entry.status.replace('_', ' ')}</span>
                     <span className="text-gray-500">{new Date(entry.changed_at).toLocaleDateString()}</span>
-                    {entry.note && <span className="text-gray-400">— {entry.note}</span>}
+                    {entry.note && <span className="text-ss-text-tertiary">— {entry.note}</span>}
                   </div>
                 ))}
               </div>
@@ -557,16 +557,16 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
 
           {/* Comments */}
           <div>
-            <h3 className="text-sm font-medium text-gray-400 mb-3">
+            <h3 className="text-sm font-medium text-ss-text-tertiary mb-3">
               Comments ({comments.length})
             </h3>
             
             <div className="space-y-4 mb-4">
               {comments.map((comment) => (
-                <div key={comment.id} className="bg-[#141416] rounded-lg p-4">
+                <div key={comment.id} className="bg-white rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-sm font-medium ${
-                      comment.is_team ? 'text-teal-400' : 'text-white'
+                      comment.is_team ? 'text-teal-400' : 'text-ss-text'
                     }`}>
                       {comment.org_name}
                     </span>
@@ -591,12 +591,12 @@ const RequestDetailModal = ({ request, onClose, onVote, onRefresh }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-teal-500"
+                className="flex-1 px-4 py-2 bg-ss-bg border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
               />
               <button
                 onClick={handleComment}
                 disabled={!newComment.trim() || submitting}
-                className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-ss-text rounded-lg transition-colors"
               >
                 Comment
               </button>

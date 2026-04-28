@@ -277,12 +277,12 @@ const EscrowAccountsPage = () => {
                                         </td>
                                         <td className="px-4 py-3">
                                             {account.aav_enabled && (account.authorized_agent_ids?.length > 0 || account.aav_grant_ids?.length > 0) ? (
-                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400" data-testid={`aav-indicator-${account.id}`}>
+                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-ss-accent/10 border border-ss-accent/30 rounded-full text-xs font-medium text-ss-accent" data-testid={`aav-indicator-${account.id}`}>
                                                     <Shield size={12} />
                                                     {(account.authorized_agent_ids?.length || 0) + (account.aav_grant_ids?.length || 0)} Agent{((account.authorized_agent_ids?.length || 0) + (account.aav_grant_ids?.length || 0)) !== 1 ? 's' : ''}
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-400" data-testid={`aav-indicator-${account.id}`}>
+                                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-ss-text-tertiary/10 border border-[rgba(255,255,255,0.06)] rounded-full text-xs font-medium text-ss-text-tertiary" data-testid={`aav-indicator-${account.id}`}>
                                                     <Key size={12} />
                                                     Any Key
                                                 </span>
@@ -535,7 +535,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                     <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 mt-4">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                                <Shield size={16} className="text-blue-400" />
+                                <Shield size={16} className="text-ss-accent" />
                                 <span className="text-sm font-medium text-ss-text">Agent Authorization</span>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
@@ -548,18 +548,18 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                 />
                                 <div 
                                     onClick={() => setAavEnabled(!aavEnabled)}
-                                    className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
+                                    className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-ss-accent after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
                                     data-testid="aav-toggle-visual"
                                 ></div>
                             </label>
                         </div>
                         
                         {aavEnabled && (
-                            <div className="space-y-3 pl-6 border-l-2 border-blue-500/30">
-                                <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                            <div className="space-y-3 pl-6 border-l-2 border-ss-accent/30">
+                                <div className="p-3 bg-ss-accent/5 border border-ss-accent/20 rounded-lg">
                                     <div className="flex items-start gap-2">
-                                        <Info size={14} className="text-blue-400 mt-0.5" />
-                                        <p className="text-xs text-blue-300">
+                                        <Info size={14} className="text-ss-accent mt-0.5" />
+                                        <p className="text-xs text-ss-accent">
                                             When enabled, only agents with matching IDs can spend from this account. Leave empty to allow any agent initially.
                                         </p>
                                     </div>
@@ -612,7 +612,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                             value={aavApiKey}
                                             onChange={(e) => setAavApiKey(e.target.value)}
                                             placeholder="aav_live_sk_..."
-                                            className="w-full px-3 py-2 pr-10 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-blue-500"
+                                            className="w-full px-3 py-2 pr-10 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                                             data-testid="aav-api-key-input"
                                         />
                                         <button
@@ -624,7 +624,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                         </button>
                                     </div>
                                     <p className="text-[11px] text-ss-text-tertiary mt-1">
-                                        Get from <a href="https://agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">agentictrust.app</a> for server-to-server verification
+                                        Get from <a href="https://agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-ss-accent hover:underline">agentictrust.app</a> for server-to-server verification
                                     </p>
                                 </div>
                                 
@@ -637,7 +637,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                         value={agentIdsInput}
                                         onChange={(e) => setAgentIdsInput(e.target.value)}
                                         placeholder="agent_xyz123, agent_abc456"
-                                        className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-blue-500"
+                                        className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-sm text-ss-text placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                                         data-testid="authorized-agents-input"
                                     />
                                     <p className="text-[11px] text-ss-text-tertiary mt-1">Comma-separated list of AAV agent identifiers</p>
@@ -658,7 +658,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
                                         />
                                         <div 
                                             onClick={() => setAavRequireCertificate(!aavRequireCertificate)}
-                                            className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
+                                            className="w-9 h-5 bg-ss-elevated rounded-full peer peer-checked:bg-ss-accent after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full cursor-pointer"
                                         ></div>
                                     </label>
                                 </div>
@@ -821,7 +821,7 @@ const FundAccountModal = ({ account, onClose, onSuccess }) => {
                     )}
 
                     {useStripe && (
-                        <div className="flex items-center gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 text-sm">
+                        <div className="flex items-center gap-2 p-3 bg-ss-accent/10 border border-ss-accent/20 rounded-lg text-ss-accent text-sm">
                             <ExternalLink size={16} className="flex-shrink-0" />
                             <span>You'll be redirected to Stripe to complete payment</span>
                         </div>
@@ -889,7 +889,7 @@ const FundingHistoryModal = ({ account, onClose }) => {
             failed: 'bg-red-500/20 text-red-400',
             refunded: 'bg-purple-500/20 text-purple-400',
         };
-        return colors[status] || 'bg-gray-500/20 text-gray-400';
+        return colors[status] || 'bg-ss-text-tertiary/20 text-ss-text-tertiary';
     };
 
     return (

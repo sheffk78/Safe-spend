@@ -134,7 +134,7 @@ const PricingPage = () => {
       period: null,
       description: 'For testing and development',
       icon: Rocket,
-      color: 'from-slate-500 to-slate-600',
+      color: 'from-ss-text-tertiary to-ss-elevated',
       features: [
         { name: '1 test escrow account', included: true },
         { name: 'Fake money (no real transactions)', included: true },
@@ -204,14 +204,14 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12">
+    <div className="min-h-screen bg-ss-bg py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
             Choose Your Plan
           </h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-xl text-ss-text-tertiary max-w-2xl mx-auto">
             Scale your AI agent spending control from development to production
           </p>
         </div>
@@ -230,9 +230,9 @@ const PricingPage = () => {
 
         {/* Current Plan Status */}
         {currentPlan && (
-          <div className="mb-8 p-4 bg-slate-800/50 border border-slate-700 rounded-lg flex items-center justify-between">
+          <div className="mb-8 p-4 bg-ss-elevated/50 border border-[rgba(255,255,255,0.06)] rounded-lg flex items-center justify-between">
             <div>
-              <span className="text-slate-400">Current plan: </span>
+              <span className="text-ss-text-tertiary">Current plan: </span>
               <span className="text-white font-semibold capitalize">{currentPlan.plan}</span>
               {currentPlan.status !== 'active' && (
                 <span className="ml-2 px-2 py-0.5 text-xs rounded bg-amber-500/20 text-amber-400">
@@ -244,7 +244,7 @@ const PricingPage = () => {
               <button
                 onClick={handleManageBilling}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-ss-elevated hover:bg-ss-elevated text-white rounded-lg transition-colors"
               >
                 <CreditCard className="w-4 h-4" />
                 Manage Billing
@@ -264,8 +264,8 @@ const PricingPage = () => {
             return (
               <div
                 key={plan.id}
-                className={`relative bg-slate-900 rounded-2xl border ${
-                  plan.popular ? 'border-teal-500/50' : 'border-slate-700'
+                className={`relative bg-ss-surface rounded-2xl border ${
+                  plan.popular ? 'border-teal-500/50' : 'border-[rgba(255,255,255,0.06)]'
                 } overflow-hidden`}
               >
                 {/* Popular Badge */}
@@ -278,7 +278,7 @@ const PricingPage = () => {
                 {/* Plan Header */}
                 <div className={`p-6 bg-gradient-to-r ${plan.color}`}>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-white/20 rounded-lg">
+                    <div className="p-2 bg-ss-accent/20 rounded-lg">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
@@ -300,9 +300,9 @@ const PricingPage = () => {
                         {feature.included ? (
                           <Check className="w-5 h-5 text-teal-400 flex-shrink-0" />
                         ) : (
-                          <X className="w-5 h-5 text-slate-600 flex-shrink-0" />
+                          <X className="w-5 h-5 text-ss-text-tertiary flex-shrink-0" />
                         )}
-                        <span className={feature.included ? 'text-slate-300' : 'text-slate-600'}>
+                        <span className={feature.included ? 'text-ss-text-secondary' : 'text-ss-text-tertiary'}>
                           {feature.name}
                         </span>
                       </li>
@@ -315,10 +315,10 @@ const PricingPage = () => {
                     disabled={isCurrent || !canUpgrade || checkoutLoading === plan.id}
                     className={`mt-6 w-full py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
                       isCurrent
-                        ? 'bg-slate-700 text-slate-400 cursor-default'
+                        ? 'bg-ss-elevated text-ss-text-tertiary cursor-default'
                         : canUpgrade
                         ? `bg-gradient-to-r ${plan.color} text-white hover:opacity-90`
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        : 'bg-ss-elevated text-ss-text-tertiary cursor-not-allowed'
                     }`}
                   >
                     {checkoutLoading === plan.id ? (
@@ -346,23 +346,23 @@ const PricingPage = () => {
             Frequently Asked Questions
           </h2>
           <div className="max-w-2xl mx-auto space-y-4 text-left">
-            <details className="bg-slate-900 border border-slate-700 rounded-lg p-4 cursor-pointer">
+            <details className="bg-ss-surface border border-[rgba(255,255,255,0.06)] rounded-lg p-4 cursor-pointer">
               <summary className="text-white font-medium">Can I switch plans anytime?</summary>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-ss-text-tertiary">
                 Yes! You can upgrade anytime and only pay the prorated difference. 
                 Downgrades take effect at the end of your billing period.
               </p>
             </details>
-            <details className="bg-slate-900 border border-slate-700 rounded-lg p-4 cursor-pointer">
+            <details className="bg-ss-surface border border-[rgba(255,255,255,0.06)] rounded-lg p-4 cursor-pointer">
               <summary className="text-white font-medium">What happens if I exceed my volume limit?</summary>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-ss-text-tertiary">
                 Spend requests that would exceed your monthly volume limit will be denied until you upgrade 
                 or the limit resets at the start of your next billing period.
               </p>
             </details>
-            <details className="bg-slate-900 border border-slate-700 rounded-lg p-4 cursor-pointer">
+            <details className="bg-ss-surface border border-[rgba(255,255,255,0.06)] rounded-lg p-4 cursor-pointer">
               <summary className="text-white font-medium">How are transaction fees calculated?</summary>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-ss-text-tertiary">
                 Transaction fees are calculated on the amount of each approved spend request. 
                 Builder: 0.5%, Scale: 0.3%. Fees are tracked and invoiced separately.
               </p>

@@ -26,14 +26,15 @@ import {
     MessageSquare
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getMyRole } from '@/lib/api';
 
 // Role configuration
 const ROLE_CONFIG = {
-    owner: { label: 'Owner', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-    finance_admin: { label: 'Finance Admin', icon: ShieldCheck, color: 'text-teal-400', bg: 'bg-teal-400/10' },
-    developer: { label: 'Developer', icon: Code2, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    read_only: { label: 'Read Only', icon: Eye, color: 'text-gray-400', bg: 'bg-gray-400/10' }
+    owner: { label: 'Owner', icon: Crown, color: 'text-amber-600', bg: 'bg-amber-50' },
+    finance_admin: { label: 'Finance Admin', icon: ShieldCheck, color: 'text-ss-accent', bg: 'bg-ss-accent/10' },
+    developer: { label: 'Developer', icon: Code2, color: 'text-ss-accent', bg: 'bg-ss-accent/10' },
+    read_only: { label: 'Read Only', icon: Eye, color: 'text-ss-text-tertiary', bg: 'bg-gray-100' }
 };
 
 const navItems = [
@@ -83,7 +84,6 @@ const DashboardLayout = () => {
         setTourDismissed(true);
     };
 
-    // Only show tour if localStorage says we should AND user hasn't dismissed it this session
     const tourActive = shouldShowTour && !tourDismissed;
 
     const isActive = (path) => {
@@ -94,24 +94,30 @@ const DashboardLayout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-ss-bg flex">
+        <div className="min-h-screen bg-ss-bg flex page-enter">
             {/* Mobile sidebar overlay */}
-            {sidebarOpen && (
-                <div 
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
+            <AnimatePresence>
+                {sidebarOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Sidebar */}
-            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-ss-code border-r border-[rgba(255,255,255,0.06)] flex flex-col transform transition-transform duration-200 lg:transform-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-white border-r border-gray-100 flex flex-col transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:transform-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} shadow-ss-lg lg:shadow-none`}>
                 {/* Logo */}
-                <div className="p-6 border-b border-[rgba(255,255,255,0.06)]">
-                    <Link to="/" className="flex items-center">
+                <div className="p-6 border-b border-gray-100">
+                    <Link to="/" className="flex items-center group">
                         <img 
-                            src="/logo-safespend-compact.svg" 
+                            src="/logo-safespend-compact-light.svg" 
                             alt="Safe-Spend" 
-                            className="h-7"
+                            className="h-7 transition-transform duration-200 group-hover:scale-105"
                         />
                     </Link>
                 </div>
@@ -126,14 +132,14 @@ const DashboardLayout = () => {
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setSidebarOpen(false)}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-150 ${
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                                     active
-                                        ? 'bg-[rgba(16,185,129,0.08)] text-ss-accent'
-                                        : 'text-ss-text-secondary hover:bg-[rgba(255,255,255,0.04)] hover:text-ss-text'
+                                        ? 'bg-ss-accent/8 text-ss-accent shadow-sm'
+                                        : 'text-ss-text-secondary hover:bg-gray-50 hover:text-ss-text'
                                 }`}
                                 data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                             >
-                                <Icon size={20} />
+                                <Icon size={20} className={active ? 'text-ss-accent' : ''} />
                                 {item.label}
                             </Link>
                         );
@@ -141,7 +147,7 @@ const DashboardLayout = () => {
                 </nav>
 
                 {/* User section */}
-                <div className="p-4 border-t border-[rgba(255,255,255,0.06)]">
+                <div className="p-4 border-t border-gray-100">
                     <div className="mb-3">
                         <p className="text-xs text-ss-text-tertiary truncate">{user?.email}</p>
                         {userRole && (
@@ -163,7 +169,7 @@ const DashboardLayout = () => {
                         <TourHelpButton className="flex-1 justify-center" />
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 flex-1 justify-center px-3 py-2 text-sm text-ss-text-secondary hover:text-ss-text hover:bg-[rgba(255,255,255,0.04)] rounded-md transition-all duration-150"
+                            className="flex items-center gap-2 flex-1 justify-center px-3 py-2 text-sm text-ss-text-secondary hover:text-ss-error hover:bg-red-50 rounded-lg transition-all duration-200"
                             data-testid="logout-btn"
                         >
                             <LogOut size={16} />
@@ -176,22 +182,22 @@ const DashboardLayout = () => {
             {/* Main content */}
             <main className="flex-1 min-w-0">
                 {/* Mobile header */}
-                <div className="lg:hidden flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+                <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-white">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 text-ss-text-secondary hover:text-ss-text"
+                        className="p-2 text-ss-text-secondary hover:text-ss-accent transition-colors"
                         data-testid="mobile-menu-btn"
                     >
                         <Menu size={24} />
                     </button>
                     <Link to="/" className="flex items-center">
                         <img 
-                            src="/logo-safespend-icon-only.svg" 
+                            src="/logo-safespend-compact-light.svg" 
                             alt="Safe-Spend" 
                             className="h-7"
                         />
                     </Link>
-                    <div className="w-10" /> {/* Spacer for centering */}
+                    <div className="w-10" />
                 </div>
 
                 {/* Page content */}

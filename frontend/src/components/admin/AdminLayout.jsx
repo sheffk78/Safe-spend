@@ -32,8 +32,8 @@ const AdminLayout = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-                <div className="animate-spin h-8 w-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
+            <div className="min-h-screen bg-ss-bg flex items-center justify-center">
+                <div className="animate-spin h-8 w-8 border-2 border-ss-accent border-t-transparent rounded-full"></div>
             </div>
         );
     }
@@ -48,13 +48,13 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0A0B] flex">
+        <div className="min-h-screen bg-ss-bg flex">
             {/* Sidebar */}
-            <aside className="w-[260px] bg-[#0F0F11] border-r border-white/[0.06] flex flex-col fixed h-screen">
+            <aside className="w-[260px] bg-white border-r border-gray-100 flex flex-col fixed h-screen">
                 {/* Logo & Admin Badge */}
-                <div className="p-6 border-b border-white/[0.06]">
+                <div className="p-6 border-b border-gray-100">
                     <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl mb-3">
-                        <span className="text-teal-500">◆</span>
+                        <span className="text-ss-accent">◆</span>
                         Safe-Spend
                     </Link>
                     <span className="inline-block px-2 py-1 bg-amber-500/15 text-amber-500 text-[11px] font-semibold tracking-wider rounded">
@@ -74,7 +74,7 @@ const AdminLayout = () => {
                                 to={item.path}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                                     active
-                                        ? 'bg-teal-500/10 text-teal-500'
+                                        ? 'bg-ss-accent/10 text-ss-accent'
                                         : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                                 }`}
                             >
@@ -86,7 +86,7 @@ const AdminLayout = () => {
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-white/[0.06] space-y-3">
+                <div className="p-4 border-t border-gray-100 space-y-3">
                     <div className="text-xs text-zinc-500">
                         Key: <span className="text-zinc-400">{keyInfo?.label || 'Admin'}</span>
                     </div>

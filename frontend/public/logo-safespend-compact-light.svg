@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 44" width="400" height="44">
+  <defs>
+    <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Small shield icon -->
+  <g transform="translate(2, 2) scale(0.42)">
+    <path d="M44 4 L82 18 L82 52 C82 74 66 92 44 100 C22 92 6 74 6 52 L6 18 Z" 
+          fill="url(#sg2)" opacity="0.12" stroke="url(#sg2)" stroke-width="3"/>
+    <line x1="44" y1="30" x2="44" y2="74" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+    <path d="M56 38 C56 32 50 28 44 28 C38 28 32 32 32 38 C32 44 38 46 44 48" 
+          fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+    <path d="M32 60 C32 66 38 70 44 70 C50 70 56 66 56 60 C56 54 50 52 44 50" 
+          fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+    <g opacity="0.5">
+      <line x1="68" y1="42" x2="80" y2="42" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="77,39 80,42 77,45" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g opacity="0.3">
+      <line x1="72" y1="54" x2="84" y2="54" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="81,51 84,54 81,57" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Wordmark (dark text for light backgrounds) -->
+  <text x="48" y="31" font-family="'Space Grotesk', system-ui, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#0A0A0B">Safe</tspan><tspan fill="#10B981">-</tspan><tspan fill="#0A0A0B">Spend</tspan>
+  </text>
+</svg>

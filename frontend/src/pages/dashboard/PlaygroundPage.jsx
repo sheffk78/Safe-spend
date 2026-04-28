@@ -71,7 +71,7 @@ const SCENARIO_PRESETS = [
         name: 'Requires Human Approval',
         description: 'Above auto-approve threshold',
         icon: Clock,
-        color: 'text-blue-400',
+        color: 'text-ss-accent',
         values: {
             amount: '75.00',
             vendor: 'Anthropic',
@@ -459,10 +459,10 @@ if (result.status === "approved") {
             approved: 'bg-green-500/20 text-green-400',
             denied: 'bg-red-500/20 text-red-400',
             pending_approval: 'bg-yellow-500/20 text-yellow-400',
-            cancelled: 'bg-gray-500/20 text-gray-400',
+            cancelled: 'bg-ss-text-tertiary/20 text-ss-text-tertiary',
             expired: 'bg-orange-500/20 text-orange-400'
         };
-        return styles[status] || 'bg-gray-500/20 text-gray-400';
+        return styles[status] || 'bg-ss-text-tertiary/20 text-ss-text-tertiary';
     };
 
     // Get category suggestions based on policies

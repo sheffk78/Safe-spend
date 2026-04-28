@@ -606,14 +606,14 @@ const simulateSpendRequest = (body) => {
 
 const MethodBadge = ({ method }) => {
     const colors = {
-        GET: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        GET: 'bg-ss-accent/20 text-ss-accent border-ss-accent/20',
         POST: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
         PATCH: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
         PUT: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
         DELETE: 'bg-red-500/20 text-red-400 border-red-500/30'
     };
     return (
-        <span className={`px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded border ${colors[method] || 'bg-gray-500/20 text-gray-400'}`}>
+        <span className={`px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded border ${colors[method] || 'bg-ss-text-tertiary/20 text-ss-text-tertiary'}`}>
             {method}
         </span>
     );
@@ -629,7 +629,7 @@ const StatusBadge = ({ status }) => {
     if (status >= 500) {
         return <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-sm font-mono">{status} Server Error</span>;
     }
-    return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-sm font-mono">{status}</span>;
+    return <span className="px-2 py-1 bg-ss-text-tertiary/20 text-ss-text-tertiary rounded text-sm font-mono">{status}</span>;
 };
 
 const CodeBlock = ({ code, language, onCopy }) => {
@@ -646,12 +646,12 @@ const CodeBlock = ({ code, language, onCopy }) => {
         <div className="relative">
             <button
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-2 bg-[#1A1A1E] hover:bg-[#242428] rounded-lg text-[#6B7280] hover:text-[#F5F5F5] transition-all z-10"
+                className="absolute top-3 right-3 p-2 bg-ss-elevated hover:bg-gray-100 rounded-lg text-ss-text-tertiary hover:text-ss-text transition-all z-10"
             >
                 {copied ? <Check size={14} className="text-teal-400" /> : <Copy size={14} />}
             </button>
-            <pre className="bg-[#0A0A0B] rounded-lg p-4 overflow-x-auto text-sm border border-[rgba(255,255,255,0.06)]">
-                <code className="text-[#9CA3AF] font-mono whitespace-pre">{code}</code>
+            <pre className="bg-ss-bg rounded-lg p-4 overflow-x-auto text-sm border border-gray-200">
+                <code className="text-ss-text-tertiary font-mono whitespace-pre">{code}</code>
             </pre>
         </div>
     );
@@ -896,7 +896,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
     const currentEscrow = demoState.escrowAccounts.find(a => a.id === 'esc_demo_mktg01');
     
     return (
-        <div className="min-h-screen bg-[#0A0A0B]">
+        <div className="min-h-screen bg-ss-bg">
             <Navbar />
             
             <main className="pt-20 pb-12">
@@ -905,10 +905,10 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h1 className="font-heading text-3xl md:text-4xl font-bold text-[#F5F5F5]">
+                                <h1 className="font-heading text-3xl md:text-4xl font-bold text-ss-text">
                                     API Playground
                                 </h1>
-                                <p className="text-[#9CA3AF] mt-2">
+                                <p className="text-ss-text-tertiary mt-2">
                                     Test every endpoint. No setup required.
                                 </p>
                             </div>
@@ -920,7 +920,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                         mode === 'demo'
                                             ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
-                                            : 'bg-[#141416] text-[#9CA3AF] border border-[rgba(255,255,255,0.06)] hover:text-[#F5F5F5]'
+                                            : 'bg-white text-ss-text-tertiary border border-gray-200 hover:text-ss-text'
                                     }`}
                                 >
                                     Demo Mode
@@ -930,7 +930,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                         mode === 'live'
                                             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                            : 'bg-[#141416] text-[#9CA3AF] border border-[rgba(255,255,255,0.06)] hover:text-[#F5F5F5]'
+                                            : 'bg-white text-ss-text-tertiary border border-gray-200 hover:text-ss-text'
                                     }`}
                                 >
                                     Live Mode
@@ -939,29 +939,29 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         </div>
                         
                         {/* API Key Bar */}
-                        <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4">
                             {mode === 'live' && !apiKey ? (
                                 <div className="flex items-center gap-4">
-                                    <Key size={20} className="text-[#6B7280] flex-shrink-0" />
+                                    <Key size={20} className="text-ss-text-tertiary flex-shrink-0" />
                                     <input
                                         type="password"
                                         value={apiKeyInput}
                                         onChange={(e) => setApiKeyInput(e.target.value)}
                                         placeholder="sk_live_... or sk_test_..."
-                                        className="flex-1 px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500"
+                                        className="flex-1 px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text font-mono text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                                         data-testid="api-key-input"
                                     />
                                     <button
                                         onClick={handleConnect}
                                         disabled={connecting || !apiKeyInput}
-                                        className="px-6 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
+                                        className="px-6 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-ss-text font-medium text-sm transition-all"
                                         data-testid="connect-btn"
                                     >
                                         {connecting ? 'Connecting...' : 'Connect'}
                                     </button>
                                     <button
                                         onClick={() => setMode('demo')}
-                                        className="text-sm text-[#9CA3AF] hover:text-[#F5F5F5] transition-colors"
+                                        className="text-sm text-ss-text-tertiary hover:text-ss-text transition-colors"
                                     >
                                         Use Demo Mode
                                     </button>
@@ -972,15 +972,15 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                         <div className="w-2 h-2 rounded-full bg-teal-400" />
                                         <span className="text-teal-400 font-medium">Connected</span>
                                         {connectedOrg && (
-                                            <span className="text-[#9CA3AF]">— {connectedOrg.name}</span>
+                                            <span className="text-ss-text-tertiary">— {connectedOrg.name}</span>
                                         )}
-                                        <span className="text-[#6B7280] font-mono text-sm">
+                                        <span className="text-ss-text-tertiary font-mono text-sm">
                                             {apiKey.substring(0, 12)}...
                                         </span>
                                     </div>
                                     <button
                                         onClick={handleDisconnect}
-                                        className="text-sm text-[#9CA3AF] hover:text-red-400 transition-colors"
+                                        className="text-sm text-ss-text-tertiary hover:text-red-400 transition-colors"
                                     >
                                         Disconnect
                                     </button>
@@ -990,11 +990,11 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     <div className="flex items-center gap-3">
                                         <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
                                         <span className="text-teal-400 font-medium">Demo Mode</span>
-                                        <span className="text-[#9CA3AF]">— Using simulated data</span>
+                                        <span className="text-ss-text-tertiary">— Using simulated data</span>
                                     </div>
                                     <button
                                         onClick={() => resetDemoState()}
-                                        className="flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#F5F5F5] transition-colors"
+                                        className="flex items-center gap-2 text-sm text-ss-text-tertiary hover:text-ss-text transition-colors"
                                     >
                                         <RefreshCw size={14} />
                                         Reset Demo Data
@@ -1012,11 +1012,11 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         {/* Left Panel - Endpoint Selector */}
                         <div className="w-[320px] flex-shrink-0 space-y-6">
                             {/* Quick Scenarios */}
-                            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                                <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
+                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <div className="px-4 py-3 border-b border-gray-200">
                                     <div className="flex items-center gap-2">
                                         <Play size={16} className="text-teal-400" />
-                                        <h2 className="font-semibold text-[#F5F5F5]">Quick Scenarios</h2>
+                                        <h2 className="font-semibold text-ss-text">Quick Scenarios</h2>
                                     </div>
                                 </div>
                                 <div className="divide-y divide-[rgba(255,255,255,0.04)]">
@@ -1032,27 +1032,27 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                             data-testid={`scenario-${scenario.id}`}
                                         >
                                             <p className={`font-medium text-sm ${
-                                                selectedScenario?.id === scenario.id ? 'text-teal-400' : 'text-[#F5F5F5]'
+                                                selectedScenario?.id === scenario.id ? 'text-teal-400' : 'text-ss-text'
                                             }`}>
                                                 {scenario.name}
                                             </p>
-                                            <p className="text-xs text-[#6B7280] mt-0.5">{scenario.description}</p>
+                                            <p className="text-xs text-ss-text-tertiary mt-0.5">{scenario.description}</p>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                             
                             {/* All Endpoints */}
-                            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                                <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
-                                    <h2 className="font-semibold text-[#F5F5F5]">All Endpoints</h2>
+                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <div className="px-4 py-3 border-b border-gray-200">
+                                    <h2 className="font-semibold text-ss-text">All Endpoints</h2>
                                 </div>
                                 <div className="max-h-[400px] overflow-y-auto">
                                     {ALL_ENDPOINTS.map((category) => (
                                         <div key={category.category}>
                                             <button
                                                 onClick={() => toggleCategory(category.category)}
-                                                className="w-full px-4 py-2 flex items-center justify-between text-sm text-[#9CA3AF] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.02)] transition-all"
+                                                className="w-full px-4 py-2 flex items-center justify-between text-sm text-ss-text-tertiary hover:text-ss-text hover:bg-[rgba(255,255,255,0.02)] transition-all"
                                             >
                                                 <span>{category.category}</span>
                                                 {expandedCategories.includes(category.category) ? (
@@ -1076,7 +1076,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                                 }`}
                                                             >
                                                                 <MethodBadge method={endpoint.method} />
-                                                                <span className="text-xs font-mono text-[#9CA3AF] truncate flex-1">
+                                                                <span className="text-xs font-mono text-ss-text-tertiary truncate flex-1">
                                                                     {endpoint.path}
                                                                 </span>
                                                             </button>
@@ -1095,28 +1095,28 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             {/* Scenario Description */}
                             {selectedScenario && (
                                 <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-4">
-                                    <p className="text-[#9CA3AF] text-sm leading-relaxed">
+                                    <p className="text-ss-text-tertiary text-sm leading-relaxed">
                                         {selectedScenario.plainEnglish}
                                     </p>
                                 </div>
                             )}
                             
                             {/* Request Builder */}
-                            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                                 {/* Tabs */}
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                                     <div className="flex items-center gap-4">
                                         <div className="flex items-center gap-2">
                                             <MethodBadge method={selectedEndpoint.method} />
-                                            <span className="font-mono text-sm text-[#F5F5F5]">{selectedEndpoint.path}</span>
+                                            <span className="font-mono text-sm text-ss-text">{selectedEndpoint.path}</span>
                                         </div>
-                                        <div className="flex bg-[#1A1A1E] rounded-lg p-0.5">
+                                        <div className="flex bg-ss-elevated rounded-lg p-0.5">
                                             <button
                                                 onClick={() => setActiveTab('form')}
                                                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                                                     activeTab === 'form'
-                                                        ? 'bg-[#242428] text-[#F5F5F5]'
-                                                        : 'text-[#6B7280] hover:text-[#9CA3AF]'
+                                                        ? 'bg-gray-100 text-ss-text'
+                                                        : 'text-ss-text-tertiary hover:text-ss-text-tertiary'
                                                 }`}
                                             >
                                                 Form
@@ -1125,8 +1125,8 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                 onClick={() => setActiveTab('code')}
                                                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                                                     activeTab === 'code'
-                                                        ? 'bg-[#242428] text-[#F5F5F5]'
-                                                        : 'text-[#6B7280] hover:text-[#9CA3AF]'
+                                                        ? 'bg-gray-100 text-ss-text'
+                                                        : 'text-ss-text-tertiary hover:text-ss-text-tertiary'
                                                 }`}
                                             >
                                                 Code
@@ -1136,7 +1136,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     <button
                                         onClick={handleSendRequest}
                                         disabled={sending}
-                                        className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-white font-medium text-sm transition-all"
+                                        className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 rounded-lg text-ss-text font-medium text-sm transition-all"
                                         data-testid="send-request-btn"
                                     >
                                         {sending ? (
@@ -1158,7 +1158,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     <div className="p-4 space-y-4">
                                         {Object.entries(formData).map(([key, value]) => (
                                             <div key={key}>
-                                                <label className="block text-sm text-[#9CA3AF] mb-1">
+                                                <label className="block text-sm text-ss-text-tertiary mb-1">
                                                     {key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                                                     {['escrow_id', 'amount_cents', 'vendor'].includes(key) && (
                                                         <span className="text-teal-400 ml-1">*</span>
@@ -1173,25 +1173,25 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                             } catch {}
                                                         }}
                                                         rows={3}
-                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500 resize-none"
+                                                        className="w-full px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text font-mono text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent resize-none"
                                                     />
                                                 ) : (
                                                     <input
                                                         type={key.includes('cents') ? 'number' : 'text'}
                                                         value={value}
                                                         onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                                                        className="w-full px-4 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-teal-500"
+                                                        className="w-full px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text font-mono text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                                                     />
                                                 )}
                                                 {key === 'amount_cents' && value && (
-                                                    <p className="text-xs text-[#6B7280] mt-1">
+                                                    <p className="text-xs text-ss-text-tertiary mt-1">
                                                         {value} cents = {formatCents(parseInt(value) || 0)}
                                                     </p>
                                                 )}
                                             </div>
                                         ))}
                                         {Object.keys(formData).length === 0 && (
-                                            <p className="text-[#6B7280] text-sm text-center py-8">
+                                            <p className="text-ss-text-tertiary text-sm text-center py-8">
                                                 No parameters required for this endpoint.
                                             </p>
                                         )}
@@ -1209,7 +1209,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                     className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                                                         codeLanguage === lang
                                                             ? 'bg-teal-500/20 text-teal-400'
-                                                            : 'bg-[#1A1A1E] text-[#6B7280] hover:text-[#9CA3AF]'
+                                                            : 'bg-ss-elevated text-ss-text-tertiary hover:text-ss-text-tertiary'
                                                     }`}
                                                 >
                                                     {lang === 'nodejs' ? 'Node.js' : lang.charAt(0).toUpperCase() + lang.slice(1)}
@@ -1226,22 +1226,22 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                             
                             {/* Response Viewer */}
                             {response && (
-                                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+                                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                                     {/* Response Header */}
-                                    <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
+                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                                         <div className="flex items-center gap-4">
                                             <StatusBadge status={response.status} />
-                                            <span className="text-[#6B7280] font-mono text-sm">
+                                            <span className="text-ss-text-tertiary font-mono text-sm">
                                                 {response.responseTime}ms
                                             </span>
                                         </div>
-                                        <div className="flex bg-[#1A1A1E] rounded-lg p-0.5">
+                                        <div className="flex bg-ss-elevated rounded-lg p-0.5">
                                             <button
                                                 onClick={() => setResponseTab('pretty')}
                                                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                                                     responseTab === 'pretty'
-                                                        ? 'bg-[#242428] text-[#F5F5F5]'
-                                                        : 'text-[#6B7280] hover:text-[#9CA3AF]'
+                                                        ? 'bg-gray-100 text-ss-text'
+                                                        : 'text-ss-text-tertiary hover:text-ss-text-tertiary'
                                                 }`}
                                             >
                                                 Pretty
@@ -1250,8 +1250,8 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                                 onClick={() => setResponseTab('plain')}
                                                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                                                     responseTab === 'plain'
-                                                        ? 'bg-[#242428] text-[#F5F5F5]'
-                                                        : 'text-[#6B7280] hover:text-[#9CA3AF]'
+                                                        ? 'bg-gray-100 text-ss-text'
+                                                        : 'text-ss-text-tertiary hover:text-ss-text-tertiary'
                                                 }`}
                                             >
                                                 Plain English
@@ -1271,14 +1271,14 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     {/* Response Body */}
                                     <div className="p-4">
                                         {responseTab === 'pretty' ? (
-                                            <pre className="bg-[#0A0A0B] rounded-lg p-4 overflow-x-auto text-sm border border-[rgba(255,255,255,0.06)]">
-                                                <code className="text-[#9CA3AF] font-mono whitespace-pre">
+                                            <pre className="bg-ss-bg rounded-lg p-4 overflow-x-auto text-sm border border-gray-200">
+                                                <code className="text-ss-text-tertiary font-mono whitespace-pre">
                                                     {JSON.stringify(response.data, null, 2)}
                                                 </code>
                                             </pre>
                                         ) : (
-                                            <div className="bg-[#0A0A0B] rounded-lg p-4 border border-[rgba(255,255,255,0.06)]">
-                                                <pre className="text-[#F5F5F5] whitespace-pre-wrap text-sm leading-relaxed">
+                                            <div className="bg-ss-bg rounded-lg p-4 border border-gray-200">
+                                                <pre className="text-ss-text whitespace-pre-wrap text-sm leading-relaxed">
                                                     {response.plainEnglish}
                                                 </pre>
                                             </div>
@@ -1290,7 +1290,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                     </div>
                     
                     {/* Status Bar */}
-                    <div className="mt-6 px-4 py-2 bg-[#141416] rounded-lg border border-[rgba(255,255,255,0.06)] flex items-center justify-between text-xs text-[#6B7280]">
+                    <div className="mt-6 px-4 py-2 bg-white rounded-lg border border-gray-200 flex items-center justify-between text-xs text-ss-text-tertiary">
                         <div className="flex items-center gap-4">
                             {mode === 'demo' ? (
                                 <>
@@ -1310,7 +1310,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         </div>
                         <button
                             onClick={() => setShowShortcuts(true)}
-                            className="flex items-center gap-1 hover:text-[#9CA3AF] transition-colors"
+                            className="flex items-center gap-1 hover:text-ss-text-tertiary transition-colors"
                         >
                             <Keyboard size={12} />
                             Shortcuts
@@ -1322,22 +1322,22 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
             {/* Onboarding Overlay */}
             {showOnboarding && (
                 <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] max-w-lg w-full p-6">
-                        <h2 className="font-heading text-xl font-bold text-[#F5F5F5] mb-4">
+                    <div className="bg-white rounded-xl border border-gray-200 max-w-lg w-full p-6">
+                        <h2 className="font-heading text-xl font-bold text-ss-text mb-4">
                             Welcome to the Safe-Spend Playground
                         </h2>
-                        <ol className="space-y-3 text-sm text-[#9CA3AF] mb-6">
+                        <ol className="space-y-3 text-sm text-ss-text-tertiary mb-6">
                             <li className="flex items-start gap-3">
                                 <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                                <span>Start with a <strong className="text-[#F5F5F5]">Quick Scenario</strong> on the left — click one and we'll pre-fill everything.</span>
+                                <span>Start with a <strong className="text-ss-text">Quick Scenario</strong> on the left — click one and we'll pre-fill everything.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                                <span>Hit <strong className="text-[#F5F5F5]">"Send Request"</strong> to see how the API responds.</span>
+                                <span>Hit <strong className="text-ss-text">"Send Request"</strong> to see how the API responds.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                                <span>Switch between <strong className="text-[#F5F5F5]">"Pretty"</strong> and <strong className="text-[#F5F5F5]">"Plain English"</strong> tabs to understand the response.</span>
+                                <span>Switch between <strong className="text-ss-text">"Pretty"</strong> and <strong className="text-ss-text">"Plain English"</strong> tabs to understand the response.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
@@ -1347,13 +1347,13 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                         <div className="flex items-center justify-between">
                             <button
                                 onClick={() => dismissOnboarding(true)}
-                                className="text-sm text-[#6B7280] hover:text-[#9CA3AF]"
+                                className="text-sm text-ss-text-tertiary hover:text-ss-text-tertiary"
                             >
                                 Don't show again
                             </button>
                             <button
                                 onClick={() => dismissOnboarding(false)}
-                                className="px-6 py-2 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-medium text-sm transition-all"
+                                className="px-6 py-2 bg-teal-500 hover:bg-teal-600 rounded-lg text-ss-text font-medium text-sm transition-all"
                             >
                                 Got it
                             </button>
@@ -1365,21 +1365,21 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
             {/* Shortcuts Modal */}
             {showShortcuts && (
                 <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowShortcuts(false)}>
-                    <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-xl border border-gray-200 max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold text-[#F5F5F5]">Keyboard Shortcuts</h3>
-                            <button onClick={() => setShowShortcuts(false)} className="text-[#6B7280] hover:text-[#F5F5F5]">
+                            <h3 className="font-semibold text-ss-text">Keyboard Shortcuts</h3>
+                            <button onClick={() => setShowShortcuts(false)} className="text-ss-text-tertiary hover:text-ss-text">
                                 <X size={18} />
                             </button>
                         </div>
                         <div className="space-y-3 text-sm">
                             <div className="flex items-center justify-between">
-                                <span className="text-[#9CA3AF]">Send request</span>
-                                <kbd className="px-2 py-1 bg-[#1A1A1E] rounded text-[#6B7280] font-mono text-xs">⌘ Enter</kbd>
+                                <span className="text-ss-text-tertiary">Send request</span>
+                                <kbd className="px-2 py-1 bg-ss-elevated rounded text-ss-text-tertiary font-mono text-xs">⌘ Enter</kbd>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-[#9CA3AF]">Search endpoints</span>
-                                <kbd className="px-2 py-1 bg-[#1A1A1E] rounded text-[#6B7280] font-mono text-xs">⌘ K</kbd>
+                                <span className="text-ss-text-tertiary">Search endpoints</span>
+                                <kbd className="px-2 py-1 bg-ss-elevated rounded text-ss-text-tertiary font-mono text-xs">⌘ K</kbd>
                             </div>
                         </div>
                     </div>

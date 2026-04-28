@@ -49,13 +49,13 @@ const StatusBadge = ({ status }) => {
         denied: 'bg-red-500/20 text-red-400',
         pending: 'bg-yellow-500/20 text-yellow-400',
         paused: 'bg-orange-500/20 text-orange-400',
-        expired: 'bg-gray-500/20 text-gray-400',
+        expired: 'bg-ss-text-tertiary/20 text-ss-text-tertiary',
         depleted: 'bg-red-500/20 text-red-400',
-        closed: 'bg-gray-500/20 text-gray-400'
+        closed: 'bg-ss-text-tertiary/20 text-ss-text-tertiary'
     };
 
     return (
-        <span className={`px-2 py-0.5 rounded text-xs font-medium ${styles[status] || 'bg-gray-500/20 text-gray-400'}`}>
+        <span className={`px-2 py-0.5 rounded text-xs font-medium ${styles[status] || 'bg-ss-text-tertiary/20 text-ss-text-tertiary'}`}>
             {status?.toUpperCase()}
         </span>
     );
@@ -160,7 +160,7 @@ const AdminOrgDetailPage = () => {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={fetchOrgDetail}
-                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-[rgba(255,255,255,0.1)] hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-ss-surface border border-gray-200 hover:bg-ss-elevated rounded-lg text-ss-text-secondary hover:text-ss-text transition-all"
                     >
                         <RefreshCw size={16} />
                         Refresh
@@ -168,7 +168,7 @@ const AdminOrgDetailPage = () => {
                     <button
                         onClick={handleImpersonate}
                         disabled={impersonating}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 rounded-lg text-white font-medium transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 rounded-lg text-ss-text font-medium transition-all"
                         data-testid="impersonate-btn"
                     >
                         {impersonating ? (
@@ -183,10 +183,10 @@ const AdminOrgDetailPage = () => {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <Calendar className="text-blue-400" size={20} />
+                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center">
+                            <Calendar className="text-ss-accent" size={20} />
                         </div>
                         <div>
                             <p className="text-xs text-ss-text-tertiary">Created</p>
@@ -194,7 +194,7 @@ const AdminOrgDetailPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                             <DollarSign className="text-green-400" size={20} />
@@ -207,10 +207,10 @@ const AdminOrgDetailPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                            <Activity className="text-purple-400" size={20} />
+                        <div className="w-10 h-10 rounded-lg bg-ss-accent/10 flex items-center justify-center">
+                            <Activity className="text-ss-accent" size={20} />
                         </div>
                         <div>
                             <p className="text-xs text-ss-text-tertiary">30-Day Volume</p>
@@ -218,7 +218,7 @@ const AdminOrgDetailPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 p-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
                             <Key className="text-orange-400" size={20} />
@@ -234,8 +234,8 @@ const AdminOrgDetailPage = () => {
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Escrow Accounts */}
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                    <div className="p-4 border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                         <h2 className="font-semibold text-ss-text flex items-center gap-2">
                             <Wallet size={18} className="text-ss-accent" />
                             Escrow Accounts ({escrows.length})
@@ -277,8 +277,8 @@ const AdminOrgDetailPage = () => {
                 </div>
 
                 {/* Policies */}
-                <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                    <div className="p-4 border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between">
+                <div className="bg-ss-surface rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                         <h2 className="font-semibold text-ss-text flex items-center gap-2">
                             <Shield size={18} className="text-ss-accent" />
                             Spending Policies ({policies.length})
@@ -309,8 +309,8 @@ const AdminOrgDetailPage = () => {
             </div>
 
             {/* Recent Transactions */}
-            <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                <div className="p-4 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="bg-ss-surface rounded-xl border border-gray-100 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
                     <h2 className="font-semibold text-ss-text flex items-center gap-2">
                         <Activity size={18} className="text-ss-accent" />
                         Recent Transactions
@@ -323,7 +323,7 @@ const AdminOrgDetailPage = () => {
                         </div>
                     ) : (
                         <table className="w-full">
-                            <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                            <thead className="border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-ss-text-tertiary uppercase">Time</th>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-ss-text-tertiary uppercase">Amount</th>
@@ -355,8 +355,8 @@ const AdminOrgDetailPage = () => {
             </div>
 
             {/* Recent Audit Events */}
-            <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                <div className="p-4 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="bg-ss-surface rounded-xl border border-gray-100 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
                     <h2 className="font-semibold text-ss-text flex items-center gap-2">
                         <FileText size={18} className="text-ss-accent" />
                         Recent Audit Events

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/StatusBadge';
-import { 
-    Scale, 
-    Plus, 
-    RefreshCw, 
+import {
+    Scale,
+    Plus,
+    RefreshCw,
     X,
     Pencil,
     Trash2,
@@ -199,40 +199,40 @@ const FiduciaryPoliciesPage = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <StatsCard 
-                    icon={Scale} 
-                    label="Total Policies" 
-                    value={stats.total} 
-                    color="text-ss-accent" 
-                    bg="bg-ss-accent/10" 
+                <StatsCard
+                    icon={Scale}
+                    label="Total Policies"
+                    value={stats.total}
+                    color="text-ss-accent"
+                    bg="bg-ss-accent/10"
                 />
-                <StatsCard 
-                    icon={Lock} 
-                    label="Active (Locked)" 
-                    value={stats.active} 
-                    color="text-teal-400" 
-                    bg="bg-teal-500/10" 
+                <StatsCard
+                    icon={Lock}
+                    label="Active (Locked)"
+                    value={stats.active}
+                    color="text-teal-400"
+                    bg="bg-teal-500/10"
                 />
-                <StatsCard 
-                    icon={FileText} 
-                    label="Drafts Pending" 
-                    value={stats.drafts} 
-                    color="text-amber-400" 
-                    bg="bg-amber-500/10" 
+                <StatsCard
+                    icon={FileText}
+                    label="Drafts Pending"
+                    value={stats.drafts}
+                    color="text-amber-400"
+                    bg="bg-amber-500/10"
                 />
-                <StatsCard 
-                    icon={Shield} 
-                    label="AAV Restricted" 
-                    value={stats.aavRestricted} 
-                    color="text-blue-400" 
-                    bg="bg-blue-500/10" 
+                <StatsCard
+                    icon={Shield}
+                    label="AAV Restricted"
+                    value={stats.aavRestricted}
+                    color="text-ss-accent"
+                    bg="bg-ss-accent/10"
                 />
-                <StatsCard 
-                    icon={Eye} 
-                    label="Archived" 
-                    value={stats.archived} 
-                    color="text-slate-400" 
-                    bg="bg-slate-500/10" 
+                <StatsCard
+                    icon={Eye}
+                    label="Archived"
+                    value={stats.archived}
+                    color="text-ss-text-tertiary"
+                    bg="bg-ss-text-tertiary/10"
                 />
             </div>
 
@@ -350,17 +350,17 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
     const isDraft = policy.status === 'draft';
     const isLocked = policy.is_locked;
     const isArchived = policy.status === 'archived';
-    
+
     // Calculate AAV status
     const hasAgentIds = policy.authorized_agent_ids?.length > 0;
     const hasGrantIds = policy.aav_grant_ids?.length > 0;
     const isAAVRestricted = policy.aav_enabled && (hasAgentIds || hasGrantIds);
     const agentCount = (policy.authorized_agent_ids?.length || 0) + (policy.aav_grant_ids?.length || 0);
-    
+
     return (
         <div className={`bg-ss-surface rounded-xl border overflow-hidden transition-all ${
-            isDraft ? 'border-amber-500/50' : 
-            isLocked ? 'border-teal-500/30' : 
+            isDraft ? 'border-amber-500/50' :
+            isLocked ? 'border-teal-500/30' :
             'border-[rgba(255,255,255,0.06)]'
         }`} data-testid={`policy-card-${policy.id}`}>
             {/* Draft Banner */}
@@ -370,13 +370,13 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                     <span className="text-xs font-medium text-amber-400">DRAFT - Review and activate to enforce this Trust Mandate</span>
                 </div>
             )}
-            
+
             {/* Header */}
             <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        isDraft ? 'bg-amber-500/10' : 
-                        isLocked ? 'bg-teal-500/10' : 
+                        isDraft ? 'bg-amber-500/10' :
+                        isLocked ? 'bg-teal-500/10' :
                         'bg-ss-accent/10'
                     }`}>
                         {isLocked ? (
@@ -402,17 +402,17 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                 <div className="flex items-center gap-3">
                     {/* AAV Status Badges */}
                     {isAAVRestricted ? (
-                        <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs font-medium text-blue-400 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
+                        <span className="px-2.5 py-1 bg-ss-accent/10 border border-ss-accent/30 rounded-full text-xs font-medium text-ss-accent flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
                             <Shield size={12} />
                             {agentCount} Agent{agentCount !== 1 ? 's' : ''}
                         </span>
                     ) : policy.aav_enabled ? (
-                        <span className="px-2.5 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-400 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
+                        <span className="px-2.5 py-1 bg-ss-text-tertiary/10 border border-[rgba(255,255,255,0.06)] rounded-full text-xs font-medium text-ss-text-tertiary flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
                             <Shield size={12} />
                             AAV (No IDs)
                         </span>
                     ) : (
-                        <span className="px-2.5 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-500 flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
+                        <span className="px-2.5 py-1 bg-ss-text-tertiary/10 border border-[rgba(255,255,255,0.06)] rounded-full text-xs font-medium text-ss-text-tertiary flex items-center gap-1.5" data-testid={`aav-badge-${policy.id}`}>
                             <Key size={12} />
                             Any Key
                         </span>
@@ -429,7 +429,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                         </span>
                     )}
                     {isArchived && (
-                        <span className="px-2.5 py-1 bg-slate-500/10 border border-slate-500/30 rounded-full text-xs font-medium text-slate-400">
+                        <span className="px-2.5 py-1 bg-ss-text-tertiary/10 border border-[rgba(255,255,255,0.06)] rounded-full text-xs font-medium text-ss-text-tertiary">
                             Archived
                         </span>
                     )}
@@ -471,7 +471,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
             {expanded && (
                 <div className="border-t border-[rgba(255,255,255,0.06)] p-4 space-y-4 bg-ss-elevated/50">
                     {/* Approval Thresholds Visualization */}
-                    <ThresholdVisualization 
+                    <ThresholdVisualization
                         autoApprove={policy.auto_approve_under_cents}
                         humanReview={policy.require_human_above_cents}
                         perTxLimit={policy.per_transaction_limit_cents}
@@ -479,25 +479,25 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
 
                     {/* Limits Section */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <LimitItem 
-                            icon={DollarSign} 
-                            label="Per Transaction" 
-                            value={policy.per_transaction_limit_cents ? formatCents(policy.per_transaction_limit_cents) : 'No limit'} 
+                        <LimitItem
+                            icon={DollarSign}
+                            label="Per Transaction"
+                            value={policy.per_transaction_limit_cents ? formatCents(policy.per_transaction_limit_cents) : 'No limit'}
                         />
-                        <LimitItem 
-                            icon={DollarSign} 
-                            label="Daily" 
-                            value={policy.daily_limit_cents ? formatCents(policy.daily_limit_cents) : 'No limit'} 
+                        <LimitItem
+                            icon={DollarSign}
+                            label="Daily"
+                            value={policy.daily_limit_cents ? formatCents(policy.daily_limit_cents) : 'No limit'}
                         />
-                        <LimitItem 
-                            icon={DollarSign} 
-                            label="Weekly" 
-                            value={policy.weekly_limit_cents ? formatCents(policy.weekly_limit_cents) : 'No limit'} 
+                        <LimitItem
+                            icon={DollarSign}
+                            label="Weekly"
+                            value={policy.weekly_limit_cents ? formatCents(policy.weekly_limit_cents) : 'No limit'}
                         />
-                        <LimitItem 
-                            icon={DollarSign} 
-                            label="Monthly" 
-                            value={policy.monthly_limit_cents ? formatCents(policy.monthly_limit_cents) : 'No limit'} 
+                        <LimitItem
+                            icon={DollarSign}
+                            label="Monthly"
+                            value={policy.monthly_limit_cents ? formatCents(policy.monthly_limit_cents) : 'No limit'}
                         />
                     </div>
 
@@ -568,12 +568,12 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                         {isAAVRestricted ? (
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded text-xs font-medium">
+                                    <span className="px-2 py-0.5 bg-ss-accent/10 border border-ss-accent/30 text-ss-accent rounded text-xs font-medium">
                                         AAV Restricted
                                     </span>
                                     {policy.aav_enforcement_mode && (
                                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                            policy.aav_enforcement_mode === 'strict' 
+                                            policy.aav_enforcement_mode === 'strict'
                                                 ? 'bg-red-500/10 border border-red-500/30 text-red-400'
                                                 : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
                                         }`}>
@@ -586,7 +586,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                                         <span className="text-xs text-ss-text-tertiary">Authorized Agents: </span>
                                         <div className="flex flex-wrap gap-1 mt-1">
                                             {policy.authorized_agent_ids.map((id, i) => (
-                                                <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-xs flex items-center gap-1">
+                                                <span key={i} className="px-2 py-0.5 bg-ss-accent/10 text-ss-accent rounded text-xs flex items-center gap-1">
                                                     <Bot size={10} />
                                                     {id}
                                                 </span>
@@ -665,7 +665,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                                 </>
                             )}
                             {isLocked && (
-                                <span className="text-xs text-slate-500">
+                                <span className="text-xs text-ss-text-tertiary">
                                     Unlock to edit or delete
                                 </span>
                             )}
@@ -693,19 +693,19 @@ const ThresholdVisualization = ({ autoApprove, humanReview, perTxLimit }) => {
             </h4>
             <div className="relative h-8 bg-ss-elevated rounded-full overflow-hidden">
                 {/* Auto-approve zone */}
-                <div 
+                <div
                     className="absolute inset-y-0 left-0 bg-teal-500/30 border-r-2 border-teal-500"
                     style={{ width: `${autoPercent}%` }}
                 />
                 {/* Human review zone (if different from auto-approve) */}
                 {humanReview && humanReview > (autoApprove || 0) && (
-                    <div 
+                    <div
                         className="absolute inset-y-0 bg-amber-500/20 border-r-2 border-amber-500"
                         style={{ left: `${autoPercent}%`, width: `${humanPercent - autoPercent}%` }}
                     />
                 )}
                 {/* Deny zone */}
-                <div 
+                <div
                     className="absolute inset-y-0 right-0 bg-red-500/10"
                     style={{ left: `${Math.max(autoPercent, humanPercent)}%` }}
                 />
@@ -828,7 +828,7 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
             } else {
                 await createPolicy(payload);
             }
-            
+
             onSuccess();
         } catch (err) {
             setError(err.message);
@@ -917,27 +917,27 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                     )}
 
                     {currentStep === 0 && (
-                        <Step1Basics 
-                            formData={formData} 
-                            escrowAccounts={escrowAccounts} 
-                            onChange={handleChange} 
+                        <Step1Basics
+                            formData={formData}
+                            escrowAccounts={escrowAccounts}
+                            onChange={handleChange}
                         />
                     )}
                     {currentStep === 1 && (
-                        <Step2Thresholds 
-                            formData={formData} 
-                            onChange={handleChange} 
+                        <Step2Thresholds
+                            formData={formData}
+                            onChange={handleChange}
                         />
                     )}
                     {currentStep === 2 && (
-                        <Step3Restrictions 
-                            formData={formData} 
+                        <Step3Restrictions
+                            formData={formData}
                             onChange={handleChange}
                             toggleDay={toggleDay}
                         />
                     )}
                     {currentStep === 3 && (
-                        <Step4Review 
+                        <Step4Review
                             formData={formData}
                             escrowAccounts={escrowAccounts}
                         />
@@ -1011,7 +1011,7 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
 const Step1Basics = ({ formData, escrowAccounts, onChange }) => (
     <div className="space-y-6">
         <TrustLawCallout>
-            A <strong>Fiduciary Policy</strong> is like a trust instrument that governs how funds can be spent. 
+            A <strong>Fiduciary Policy</strong> is like a trust instrument that governs how funds can be spent.
             Define the purpose (Trust Mandate) to ensure spending aligns with your organization's intent.
         </TrustLawCallout>
 
@@ -1097,7 +1097,7 @@ const Step2Thresholds = ({ formData, onChange }) => {
     return (
         <div className="space-y-6">
             <TrustLawCallout>
-                Set spending limits and approval thresholds. The dual-slider below visualizes how transactions 
+                Set spending limits and approval thresholds. The dual-slider below visualizes how transactions
                 will be handled: auto-approved, sent for human review, or denied.
             </TrustLawCallout>
 
@@ -1107,11 +1107,11 @@ const Step2Thresholds = ({ formData, onChange }) => {
                     <Activity size={16} className="text-ss-accent" />
                     Approval Threshold Configuration
                 </h4>
-                
+
                 {/* Visual representation */}
                 <div className="relative h-12 bg-ss-elevated rounded-lg overflow-hidden mb-4">
                     {autoApprove > 0 && (
-                        <div 
+                        <div
                             className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-500/40 to-teal-500/20 flex items-center justify-center"
                             style={{ width: `${Math.min((autoApprove / maxLimit) * 100, 100)}%` }}
                         >
@@ -1119,11 +1119,11 @@ const Step2Thresholds = ({ formData, onChange }) => {
                         </div>
                     )}
                     {humanReview > autoApprove && (
-                        <div 
+                        <div
                             className="absolute inset-y-0 bg-gradient-to-r from-amber-500/30 to-amber-500/10 flex items-center justify-center"
-                            style={{ 
-                                left: `${(autoApprove / maxLimit) * 100}%`, 
-                                width: `${((humanReview - autoApprove) / maxLimit) * 100}%` 
+                            style={{
+                                left: `${(autoApprove / maxLimit) * 100}%`,
+                                width: `${((humanReview - autoApprove) / maxLimit) * 100}%`
                             }}
                         >
                             <span className="text-xs font-medium text-amber-400">Review</span>
@@ -1253,7 +1253,7 @@ const Step2Thresholds = ({ formData, onChange }) => {
 const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
     <div className="space-y-6">
         <TrustLawCallout>
-            Define vendor and category restrictions to ensure funds are only used for their intended purpose. 
+            Define vendor and category restrictions to ensure funds are only used for their intended purpose.
             Time windows can limit when the agent can spend.
         </TrustLawCallout>
 
@@ -1400,9 +1400,9 @@ const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
                 <Shield size={14} className="text-ss-accent" />
                 Agent Authorization (AAV Integration)
             </h4>
-            <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <p className="text-xs text-blue-400">
-                    Restrict this policy to specific AI agents verified through Agent Authority Vault (AAV). 
+            <div className="p-3 bg-ss-accent/10 border border-ss-accent/30 rounded-lg">
+                <p className="text-xs text-ss-accent">
+                    Restrict this policy to specific AI agents verified through Agent Authority Vault (AAV).
                     When enabled, only agents with matching IDs can spend under this mandate.
                 </p>
             </div>
@@ -1415,11 +1415,11 @@ const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
                         className="sr-only peer"
                         data-testid="wizard-aav-enabled"
                     />
-                    <div className="w-11 h-6 bg-ss-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ss-accent"></div>
+                    <div className="w-11 h-6 bg-ss-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-ss-text after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ss-accent"></div>
                 </label>
                 <span className="text-sm text-ss-text">Enable AAV agent verification</span>
             </div>
-            
+
             {formData.aav_enabled && (
                 <div className="space-y-3 pt-2">
                     <div>
@@ -1474,7 +1474,7 @@ const Step4Review = ({ formData, escrowAccounts }) => {
     return (
         <div className="space-y-4">
             <TrustLawCallout type="success">
-                Review your Trust Mandate below. You can save as a draft for later review, or activate immediately 
+                Review your Trust Mandate below. You can save as a draft for later review, or activate immediately
                 to begin enforcement.
             </TrustLawCallout>
 
@@ -1594,12 +1594,12 @@ const Step4Review = ({ formData, escrowAccounts }) => {
                                 Agent Authorization (AAV)
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                                <span className="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs">
+                                <span className="px-2.5 py-1 bg-ss-accent/10 border border-ss-accent/30 text-ss-accent rounded-lg text-xs">
                                     AAV Enabled
                                 </span>
                                 {formData.aav_enforcement_mode && (
                                     <span className={`px-2.5 py-1 rounded-lg text-xs ${
-                                        formData.aav_enforcement_mode === 'strict' 
+                                        formData.aav_enforcement_mode === 'strict'
                                             ? 'bg-red-500/10 border border-red-500/30 text-red-400'
                                             : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
                                     }`}>
@@ -1628,7 +1628,7 @@ const Step4Review = ({ formData, escrowAccounts }) => {
 // Trust Law Callout Component
 const TrustLawCallout = ({ children, type = 'info' }) => {
     const styles = {
-        info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', icon: Scale, iconColor: 'text-blue-400' },
+        info: { bg: 'bg-ss-accent/10', border: 'border-ss-accent/30', icon: Scale, iconColor: 'text-ss-accent' },
         success: { bg: 'bg-ss-accent/10', border: 'border-ss-accent/30', icon: CheckCircle, iconColor: 'text-ss-accent' }
     };
     const style = styles[type];

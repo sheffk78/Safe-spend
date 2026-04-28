@@ -10,8 +10,8 @@ const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 const TYPE_CONFIG = {
   inline_reaction: { label: 'Reaction', color: 'bg-yellow-500/20 text-yellow-400' },
-  pulse_check: { label: 'Pulse', color: 'bg-blue-500/20 text-blue-400' },
-  milestone_feedback: { label: 'Milestone', color: 'bg-purple-500/20 text-purple-400' },
+  pulse_check: { label: 'Pulse', color: 'bg-ss-accent/20 text-ss-accent' },
+  milestone_feedback: { label: 'Milestone', color: 'bg-ss-accent/10 text-ss-accent' },
   error_clarity: { label: 'Error', color: 'bg-red-500/20 text-red-400' },
   doc_feedback: { label: 'Docs', color: 'bg-cyan-500/20 text-cyan-400' }
 };
@@ -19,7 +19,7 @@ const TYPE_CONFIG = {
 const SENTIMENT_COLORS = {
   great: 'text-teal-400',
   good: 'text-teal-300',
-  neutral: 'text-gray-400',
+  neutral: 'text-ss-text-tertiary',
   negative: 'text-red-400'
 };
 
@@ -156,20 +156,20 @@ const AdminFeedbackPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Feedback Dashboard</h1>
-          <p className="text-gray-400">Review and manage user feedback</p>
+          <h1 className="text-2xl font-bold text-ss-text">Feedback Dashboard</h1>
+          <p className="text-ss-text-tertiary">Review and manage user feedback</p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-ss-text rounded-lg transition-colors"
           >
             <Download className="w-4 h-4" />
             Export CSV
           </button>
           <button
             onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-ss-text rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -178,15 +178,15 @@ const AdminFeedbackPage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#141416] rounded-lg p-1 border border-white/6 mb-8 w-fit">
+      <div className="flex gap-1 bg-white rounded-lg p-1 border border-gray-200 mb-8 w-fit">
         {['overview', 'triage', 'requests'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded text-sm transition-colors ${
               activeTab === tab
-                ? 'bg-teal-600 text-white'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-teal-600 text-ss-text'
+                : 'text-ss-text-tertiary hover:text-ss-text'
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -200,13 +200,13 @@ const AdminFeedbackPage = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-6 mb-8">
             {/* NPS Score */}
-            <div className="bg-[#141416] border border-white/6 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-400 text-sm">NPS Score</span>
+                <span className="text-ss-text-tertiary text-sm">NPS Score</span>
                 <BarChart2 className="w-5 h-5 text-gray-500" />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-ss-text">
                   {stats.nps.current !== null ? stats.nps.current.toFixed(1) : 'N/A'}
                 </span>
                 {stats.nps.trend && (
@@ -226,21 +226,21 @@ const AdminFeedbackPage = () => {
             </div>
 
             {/* Feature Requests */}
-            <div className="bg-[#141416] border border-white/6 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-400 text-sm">Feature Requests</span>
+                <span className="text-ss-text-tertiary text-sm">Feature Requests</span>
                 <MessageSquare className="w-5 h-5 text-gray-500" />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-white">{stats.feature_requests.total}</span>
+                <span className="text-3xl font-bold text-ss-text">{stats.feature_requests.total}</span>
                 <span className="text-teal-400 text-sm">{stats.feature_requests.new} new</span>
               </div>
             </div>
 
             {/* Inline Reactions */}
-            <div className="bg-[#141416] border border-white/6 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-400 text-sm">Inline Reactions</span>
+                <span className="text-ss-text-tertiary text-sm">Inline Reactions</span>
                 {stats.inline_reactions.positive_percent >= 70 ? (
                   <CheckCircle className="w-5 h-5 text-teal-400" />
                 ) : (
@@ -248,13 +248,13 @@ const AdminFeedbackPage = () => {
                 )}
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-white">{stats.inline_reactions.total}</span>
+                <span className="text-3xl font-bold text-ss-text">{stats.inline_reactions.total}</span>
                 <span className="text-teal-400 text-sm">{stats.inline_reactions.positive_percent}% positive</span>
               </div>
               <div className="flex gap-2 mt-3">
                 <span className="text-xs text-teal-400">Great: {stats.inline_reactions.breakdown.great}</span>
                 <span className="text-xs text-teal-300">Good: {stats.inline_reactions.breakdown.good}</span>
-                <span className="text-xs text-gray-400">Neutral: {stats.inline_reactions.breakdown.neutral}</span>
+                <span className="text-xs text-ss-text-tertiary">Neutral: {stats.inline_reactions.breakdown.neutral}</span>
                 <span className="text-xs text-red-400">Negative: {stats.inline_reactions.breakdown.negative}</span>
               </div>
             </div>
@@ -262,8 +262,8 @@ const AdminFeedbackPage = () => {
 
           {/* Top Requests & Pain Points */}
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-[#141416] border border-white/6 rounded-xl p-6">
-              <h3 className="text-white font-medium mb-4">Top Requested Features</h3>
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-ss-text font-medium mb-4">Top Requested Features</h3>
               {stats.top_requests.length > 0 ? (
                 <div className="space-y-3">
                   {stats.top_requests.map((req, i) => (
@@ -279,8 +279,8 @@ const AdminFeedbackPage = () => {
               )}
             </div>
 
-            <div className="bg-[#141416] border border-white/6 rounded-xl p-6">
-              <h3 className="text-white font-medium mb-4">Recent Pain Points</h3>
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-ss-text font-medium mb-4">Recent Pain Points</h3>
               {stats.pain_points.length > 0 ? (
                 <div className="space-y-3">
                   {stats.pain_points.map((point, i) => (
@@ -304,15 +304,15 @@ const AdminFeedbackPage = () => {
           {/* Filter */}
           <div className="flex items-center gap-3 mb-6">
             <Filter className="w-4 h-4 text-gray-500" />
-            <div className="flex gap-1 bg-[#0A0A0B] rounded-lg p-1 border border-white/6">
+            <div className="flex gap-1 bg-ss-bg rounded-lg p-1 border border-gray-200">
               {['all', 'inline_reaction', 'pulse_check', 'error_clarity', 'doc_feedback'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
                   className={`px-3 py-1 rounded text-xs transition-colors ${
                     filterType === type
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-500 hover:text-white'
+                      ? 'bg-white/10 text-ss-text'
+                      : 'text-gray-500 hover:text-ss-text'
                   }`}
                 >
                   {type === 'all' ? 'All' : TYPE_CONFIG[type]?.label || type}
@@ -329,8 +329,8 @@ const AdminFeedbackPage = () => {
               return (
                 <div
                   key={item.id}
-                  className={`bg-[#141416] border rounded-lg p-4 ${
-                    item.is_acknowledged ? 'border-white/6 opacity-60' : 'border-white/12'
+                  className={`bg-white border rounded-lg p-4 ${
+                    item.is_acknowledged ? 'border-gray-200 opacity-60' : 'border-white/12'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -348,7 +348,7 @@ const AdminFeedbackPage = () => {
                           </span>
                         )}
                         {item.nps_score && (
-                          <span className="text-xs text-blue-400">NPS: {item.nps_score}</span>
+                          <span className="text-xs text-ss-accent">NPS: {item.nps_score}</span>
                         )}
                         <span className="text-xs text-gray-500">
                           <Clock className="w-3 h-3 inline mr-1" />
@@ -398,7 +398,7 @@ const AdminFeedbackPage = () => {
           {featureRequests.map((request) => (
             <div
               key={request.id}
-              className="bg-[#141416] border border-white/6 rounded-lg p-4"
+              className="bg-white border border-gray-200 rounded-lg p-4"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -410,8 +410,8 @@ const AdminFeedbackPage = () => {
                     )}
                   </div>
                   
-                  <h3 className="text-white font-medium mb-1">{request.title}</h3>
-                  <p className="text-gray-400 text-sm line-clamp-2 mb-2">{request.description}</p>
+                  <h3 className="text-ss-text font-medium mb-1">{request.title}</h3>
+                  <p className="text-ss-text-tertiary text-sm line-clamp-2 mb-2">{request.description}</p>
                   
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-gray-500">{request.submitted_by_org_name}</span>
@@ -425,7 +425,7 @@ const AdminFeedbackPage = () => {
                   <select
                     value={request.status}
                     onChange={(e) => handleUpdateRequestStatus(request.id, e.target.value)}
-                    className="px-3 py-1 text-xs bg-[#0A0A0B] border border-white/6 rounded text-white focus:outline-none focus:border-teal-500"
+                    className="px-3 py-1 text-xs bg-ss-bg border border-gray-200 rounded text-ss-text focus:outline-none focus:border-teal-500"
                   >
                     <option value="new">New</option>
                     <option value="under_review">Under Review</option>

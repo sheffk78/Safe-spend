@@ -127,7 +127,7 @@ const AuditLogPage = () => {
 
     const getActorBadgeStyle = (actorType) => {
         switch (actorType) {
-            case 'human': return 'bg-blue-500/10 text-blue-400';
+            case 'human': return 'bg-ss-accent/10 text-ss-accent';
             case 'agent': return 'bg-purple-500/10 text-purple-400';
             case 'system': return 'bg-ss-text-tertiary/10 text-ss-text-secondary';
             default: return 'bg-ss-text-tertiary/10 text-ss-text-secondary';

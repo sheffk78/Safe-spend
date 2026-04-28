@@ -32,13 +32,13 @@ const eventColors = {
     'approval.requested': 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]',
     'approval.approved': 'bg-[rgba(16,185,129,0.1)] text-[#14B8A6]',
     'approval.denied': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
-    'escrow.created': 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
+    'escrow.created': 'bg-[rgba(20,184,166,0.1)] text-[#14B8A6]',
     'escrow.funded': 'bg-[rgba(34,197,94,0.1)] text-[#22C55E]',
     'escrow.paused': 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B]',
     'escrow.closed': 'bg-[rgba(107,114,128,0.1)] text-[#6B7280]',
     'policy.created': 'bg-[rgba(168,85,247,0.1)] text-[#A855F7]',
     'policy.updated': 'bg-[rgba(168,85,247,0.1)] text-[#A855F7]',
-    'org.created': 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
+    'org.created': 'bg-[rgba(20,184,166,0.1)] text-[#14B8A6]',
     'key.created': 'bg-[rgba(236,72,153,0.1)] text-[#EC4899]',
     'key.revoked': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]',
     default: 'bg-[rgba(107,114,128,0.1)] text-[#6B7280]'
@@ -135,16 +135,16 @@ const AdminAuditPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-[#F5F5F5]">Audit Log</h1>
-                    <p className="text-[#9CA3AF] mt-1">Cross-org event history</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Audit Log</h1>
+                    <p className="text-ss-text-tertiary mt-1">Cross-org event history</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
                             showFilters || hasActiveFilters
-                                ? 'bg-[#14B8A6] text-white'
-                                : 'bg-[#141416] border border-[rgba(255,255,255,0.06)] text-[#9CA3AF] hover:text-[#F5F5F5]'
+                                ? 'bg-ss-accent text-ss-text'
+                                : 'bg-white border border-gray-100 text-ss-text-tertiary hover:text-ss-text'
                         }`}
                     >
                         <FunnelIcon className="w-4 h-4" />
@@ -154,7 +154,7 @@ const AdminAuditPage = () => {
                     <button
                         onClick={() => { setOffset(0); fetchEvents(); }}
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#141416] border border-[rgba(255,255,255,0.06)] hover:bg-[#1A1A1E] rounded-lg text-[#9CA3AF] hover:text-[#F5F5F5] text-sm transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 hover:bg-ss-elevated rounded-lg text-ss-text-tertiary hover:text-ss-text text-sm transition-all disabled:opacity-50"
                     >
                         <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
@@ -164,15 +164,15 @@ const AdminAuditPage = () => {
 
             {/* Filters Panel */}
             {showFilters && (
-                <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] p-4">
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {/* Event Type */}
                         <div>
-                            <label className="block text-sm text-[#9CA3AF] mb-1">Event Type</label>
+                            <label className="block text-sm text-ss-text-tertiary mb-1">Event Type</label>
                             <select
                                 value={eventType}
                                 onChange={(e) => { setEventType(e.target.value); setOffset(0); }}
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#14B8A6]"
+                                className="w-full px-3 py-2 bg-ss-elevated border border-gray-100 rounded-lg text-ss-text text-sm focus:outline-none focus:border-ss-accent"
                             >
                                 {EVENT_TYPES.map((type) => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -182,11 +182,11 @@ const AdminAuditPage = () => {
 
                         {/* Actor Type */}
                         <div>
-                            <label className="block text-sm text-[#9CA3AF] mb-1">Actor Type</label>
+                            <label className="block text-sm text-ss-text-tertiary mb-1">Actor Type</label>
                             <select
                                 value={actorType}
                                 onChange={(e) => { setActorType(e.target.value); setOffset(0); }}
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] text-sm focus:outline-none focus:border-[#14B8A6]"
+                                className="w-full px-3 py-2 bg-ss-elevated border border-gray-100 rounded-lg text-ss-text text-sm focus:outline-none focus:border-ss-accent"
                             >
                                 {ACTOR_TYPES.map((type) => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -196,13 +196,13 @@ const AdminAuditPage = () => {
 
                         {/* Org ID */}
                         <div>
-                            <label className="block text-sm text-[#9CA3AF] mb-1">Organization ID</label>
+                            <label className="block text-sm text-ss-text-tertiary mb-1">Organization ID</label>
                             <input
                                 type="text"
                                 value={orgId}
                                 onChange={(e) => { setOrgId(e.target.value); setOffset(0); }}
                                 placeholder="org_..."
-                                className="w-full px-3 py-2 bg-[#1A1A1E] border border-[rgba(255,255,255,0.06)] rounded-lg text-[#F5F5F5] font-mono text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#14B8A6]"
+                                className="w-full px-3 py-2 bg-ss-elevated border border-gray-100 rounded-lg text-ss-text font-mono text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
                             />
                         </div>
                     </div>
@@ -226,7 +226,7 @@ const AdminAuditPage = () => {
             )}
 
             {/* Events Table */}
-            <div className="bg-[#141416] rounded-xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 {loading && events.length === 0 ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-2 border-[#14B8A6] border-t-transparent rounded-full animate-spin" />
@@ -240,7 +240,7 @@ const AdminAuditPage = () => {
                     <>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="border-b border-[rgba(255,255,255,0.06)]">
+                                <thead className="border-b border-gray-100">
                                     <tr>
                                         <th className="text-left py-3 px-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider w-[160px]">
                                             Timestamp
@@ -279,7 +279,7 @@ const AdminAuditPage = () => {
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-4">
-                                                    <span className="text-xs text-[#9CA3AF]">
+                                                    <span className="text-xs text-ss-text-tertiary">
                                                         {event.actor_type || '-'}
                                                     </span>
                                                 </td>
@@ -295,7 +295,7 @@ const AdminAuditPage = () => {
                                                         ) : (
                                                             <ChevronRightIcon className="w-4 h-4 text-[#6B7280] flex-shrink-0" />
                                                         )}
-                                                        <span className="text-xs text-[#9CA3AF] truncate max-w-xs">
+                                                        <span className="text-xs text-ss-text-tertiary truncate max-w-xs">
                                                             {event.details?.amount_cents && `$${(event.details.amount_cents / 100).toFixed(2)}`}
                                                             {event.details?.name && event.details.name}
                                                             {event.details?.reason && ` (${event.details.reason})`}
@@ -306,35 +306,35 @@ const AdminAuditPage = () => {
                                             </tr>
                                             {expandedEvent === index && (
                                                 <tr>
-                                                    <td colSpan={5} className="px-4 py-3 bg-[#0A0A0B]">
+                                                    <td colSpan={5} className="px-4 py-3 bg-ss-bg">
                                                         <div className="grid grid-cols-2 gap-4 text-sm">
                                                             <div>
                                                                 <p className="text-[#6B7280] mb-1">Event ID</p>
-                                                                <p className="text-[#9CA3AF] font-mono text-xs">{event.id}</p>
+                                                                <p className="text-ss-text-tertiary font-mono text-xs">{event.id}</p>
                                                             </div>
                                                             {event.actor_id && (
                                                                 <div>
                                                                     <p className="text-[#6B7280] mb-1">Actor ID</p>
-                                                                    <p className="text-[#9CA3AF] font-mono text-xs">{event.actor_id}</p>
+                                                                    <p className="text-ss-text-tertiary font-mono text-xs">{event.actor_id}</p>
                                                                 </div>
                                                             )}
                                                             {event.escrow_id && (
                                                                 <div>
                                                                     <p className="text-[#6B7280] mb-1">Escrow ID</p>
-                                                                    <p className="text-[#9CA3AF] font-mono text-xs">{event.escrow_id}</p>
+                                                                    <p className="text-ss-text-tertiary font-mono text-xs">{event.escrow_id}</p>
                                                                 </div>
                                                             )}
                                                             {event.ip_address && (
                                                                 <div>
                                                                     <p className="text-[#6B7280] mb-1">IP Address</p>
-                                                                    <p className="text-[#9CA3AF] font-mono text-xs">{event.ip_address}</p>
+                                                                    <p className="text-ss-text-tertiary font-mono text-xs">{event.ip_address}</p>
                                                                 </div>
                                                             )}
                                                         </div>
                                                         {event.details && Object.keys(event.details).length > 0 && (
                                                             <div className="mt-3">
                                                                 <p className="text-[#6B7280] mb-1">Full Details</p>
-                                                                <pre className="text-xs text-[#9CA3AF] font-mono bg-[#141416] p-2 rounded overflow-x-auto">
+                                                                <pre className="text-xs text-ss-text-tertiary font-mono bg-white p-2 rounded overflow-x-auto">
                                                                     {JSON.stringify(event.details, null, 2)}
                                                                 </pre>
                                                             </div>
@@ -349,7 +349,7 @@ const AdminAuditPage = () => {
                         </div>
 
                         {/* Pagination */}
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-[rgba(255,255,255,0.06)]">
+                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
                             <p className="text-sm text-[#6B7280]">
                                 Showing {offset + 1} - {Math.min(offset + limit, total)} of {total} events
                             </p>
@@ -357,14 +357,14 @@ const AdminAuditPage = () => {
                                 <button
                                     onClick={() => setOffset(Math.max(0, offset - limit))}
                                     disabled={offset === 0}
-                                    className="px-3 py-1.5 bg-[#1A1A1E] text-[#9CA3AF] rounded-lg text-sm disabled:opacity-50 hover:text-[#F5F5F5] transition-all"
+                                    className="px-3 py-1.5 bg-ss-elevated text-ss-text-tertiary rounded-lg text-sm disabled:opacity-50 hover:text-ss-text transition-all"
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={() => setOffset(offset + limit)}
                                     disabled={offset + limit >= total}
-                                    className="px-3 py-1.5 bg-[#1A1A1E] text-[#9CA3AF] rounded-lg text-sm disabled:opacity-50 hover:text-[#F5F5F5] transition-all"
+                                    className="px-3 py-1.5 bg-ss-elevated text-ss-text-tertiary rounded-lg text-sm disabled:opacity-50 hover:text-ss-text transition-all"
                                 >
                                     Next
                                 </button>

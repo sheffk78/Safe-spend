@@ -66,48 +66,48 @@ export const PageFeedbackFooter = ({ page }) => {
 
   if (submitted) {
     return (
-      <div className="mt-8 py-4 px-6 bg-[#141416] border border-white/6 rounded-lg text-center">
-        <span className="text-teal-400 text-sm">Thanks — noted.</span>
+      <div className="mt-8 py-4 px-6 bg-white border border-gray-200 rounded-lg text-center">
+        <span className="text-ss-accent text-sm">Thanks — noted.</span>
       </div>
     );
   }
 
   return (
-    <div className="mt-8 py-4 px-6 bg-[#141416] border border-white/6 rounded-lg" data-testid="page-feedback-footer">
+    <div className="mt-8 py-4 px-6 bg-white border border-gray-200 rounded-lg" data-testid="page-feedback-footer">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <span className="text-sm text-gray-400">How's this page working for you?</span>
+        <span className="text-sm text-ss-text-tertiary">How's this page working for you?</span>
         
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleSentimentClick('neutral')}
             className={`p-2 rounded-lg border transition-all ${
               selectedSentiment === 'neutral' 
-                ? 'bg-gray-700 border-gray-500' 
-                : 'border-white/6 hover:border-white/12 hover:bg-white/5'
+                ? 'bg-ss-accent/10 border-gray-300' 
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
             title="Neutral"
             data-testid="feedback-neutral"
           >
-            <XCircle className="w-5 h-5 text-gray-400" />
+            <XCircle className="w-5 h-5 text-ss-text-tertiary" />
           </button>
           <button
             onClick={() => handleSentimentClick('good')}
             className={`p-2 rounded-lg border transition-all ${
               selectedSentiment === 'good' 
-                ? 'bg-teal-900/50 border-teal-500' 
-                : 'border-white/6 hover:border-white/12 hover:bg-white/5'
+                ? 'bg-ss-accent/10 border-ss-accent' 
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
             title="Good"
             data-testid="feedback-good"
           >
-            <CheckCircle className="w-5 h-5 text-teal-400" />
+            <CheckCircle className="w-5 h-5 text-ss-accent" />
           </button>
           <button
             onClick={() => handleSentimentClick('great')}
             className={`p-2 rounded-lg border transition-all ${
               selectedSentiment === 'great' 
-                ? 'bg-teal-900/50 border-teal-500' 
-                : 'border-white/6 hover:border-white/12 hover:bg-white/5'
+                ? 'bg-ss-accent/10 border-ss-accent' 
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
             title="Great"
             data-testid="feedback-great"
@@ -117,7 +117,7 @@ export const PageFeedbackFooter = ({ page }) => {
           
           <button
             onClick={() => setShowNote(!showNote)}
-            className="ml-2 text-sm text-teal-400 hover:text-teal-300 flex items-center gap-1"
+            className="ml-2 text-sm text-ss-accent hover:text-ss-accent-hover flex items-center gap-1"
             data-testid="add-note-btn"
           >
             <MessageSquare className="w-4 h-4" />
@@ -133,13 +133,13 @@ export const PageFeedbackFooter = ({ page }) => {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What would make this better?"
-            className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
+            className="flex-1 px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-gray-500 text-sm focus:outline-none focus:border-ss-accent"
             data-testid="feedback-note-input"
           />
           <button
             onClick={handleNoteSubmit}
             disabled={!selectedSentiment}
-            className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-ss-accent hover:bg-ss-accent-hover disabled:bg-gray-300 disabled:cursor-not-allowed text-ss-text rounded-lg text-sm transition-colors"
             data-testid="submit-note-btn"
           >
             Send
@@ -194,27 +194,27 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
 
   if (submitted) {
     return (
-      <div className="fixed bottom-6 right-6 w-80 bg-[#1A1A1E] border border-white/6 rounded-xl shadow-2xl p-4 animate-slideIn z-50">
-        <p className="text-teal-400 text-center">Thanks for the feedback!</p>
+      <div className="fixed bottom-6 right-6 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 animate-slideIn z-50">
+        <p className="text-ss-accent text-center">Thanks for the feedback!</p>
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-80 bg-[#1A1A1E] border border-white/6 rounded-xl shadow-2xl p-4 animate-slideIn z-50" data-testid="milestone-toast">
+    <div className="fixed bottom-6 right-6 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 animate-slideIn z-50" data-testid="milestone-toast">
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 text-gray-400 hover:text-white"
+        className="absolute top-3 right-3 text-ss-text-tertiary hover:text-ss-text"
       >
         <X className="w-4 h-4" />
       </button>
       
       <div className="flex items-center gap-2 mb-3">
         <span className="text-lg">🎯</span>
-        <span className="text-white font-medium">{title}</span>
+        <span className="text-ss-text font-medium">{title}</span>
       </div>
       
-      <p className="text-sm text-gray-400 mb-4">How was the setup experience?</p>
+      <p className="text-sm text-ss-text-tertiary mb-4">How was the setup experience?</p>
       
       <div className="flex gap-2 mb-4">
         {['confusing', 'fine', 'easy'].map((sentiment) => (
@@ -225,8 +225,8 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
               (sentiment === 'confusing' && selectedSentiment === 'negative') ||
               (sentiment === 'fine' && selectedSentiment === 'neutral') ||
               (sentiment === 'easy' && selectedSentiment === 'great')
-                ? 'bg-teal-900/50 border-teal-500 text-white'
-                : 'border-white/6 text-gray-400 hover:border-white/12'
+                ? 'bg-ss-accent/10 border-ss-accent text-ss-text'
+                : 'border-gray-200 text-ss-text-tertiary hover:border-gray-300'
             }`}
           >
             {sentiment.charAt(0).toUpperCase() + sentiment.slice(1)}
@@ -239,13 +239,13 @@ export const MilestoneFeedbackToast = ({ milestone, title, onClose }) => {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional: tell us more..."
-        className="w-full px-3 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm mb-3 focus:outline-none focus:border-teal-500"
+        className="w-full px-3 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-gray-500 text-sm mb-3 focus:outline-none focus:border-ss-accent"
       />
       
       <button
         onClick={submitFeedback}
         disabled={!selectedSentiment}
-        className="w-full py-2 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+        className="w-full py-2 bg-ss-accent hover:bg-ss-accent-hover disabled:bg-gray-300 disabled:cursor-not-allowed text-ss-text rounded-lg text-sm transition-colors"
       >
         Send
       </button>
@@ -300,13 +300,13 @@ export const ErrorClarityFeedback = ({ errorCode, endpoint, errorMessage }) => {
   }
 
   return (
-    <div className="mt-3 pt-3 border-t border-white/6" data-testid="error-clarity-feedback">
+    <div className="mt-3 pt-3 border-t border-gray-200" data-testid="error-clarity-feedback">
       {!showNote ? (
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500">Was this error message clear?</span>
           <button
             onClick={() => handleResponse(true)}
-            className="text-xs text-teal-400 hover:text-teal-300"
+            className="text-xs text-ss-accent hover:text-ss-accent-hover"
           >
             Yes
           </button>
@@ -324,11 +324,11 @@ export const ErrorClarityFeedback = ({ errorCode, endpoint, errorMessage }) => {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What was confusing?"
-            className="flex-1 px-3 py-1 bg-[#0A0A0B] border border-white/6 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-teal-500"
+            className="flex-1 px-3 py-1 bg-ss-elevated border border-gray-200 rounded text-ss-text placeholder-gray-500 text-xs focus:outline-none focus:border-ss-accent"
           />
           <button
             onClick={() => submitFeedback(false, note)}
-            className="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded text-xs"
+            className="px-3 py-1 bg-ss-accent hover:bg-ss-accent-hover text-ss-text rounded text-xs"
           >
             Send
           </button>
@@ -381,20 +381,20 @@ export const DocFeedback = ({ page }) => {
 
   if (submitted) {
     return (
-      <div className="mt-8 py-4 text-center text-teal-400 text-sm">
+      <div className="mt-8 py-4 text-center text-ss-accent text-sm">
         Thanks for the feedback!
       </div>
     );
   }
 
   return (
-    <div className="mt-8 py-4 border-t border-white/6" data-testid="doc-feedback">
+    <div className="mt-8 py-4 border-t border-gray-200" data-testid="doc-feedback">
       {!showNote ? (
         <div className="flex items-center justify-center gap-4">
-          <span className="text-sm text-gray-400">Did this page help you integrate?</span>
+          <span className="text-sm text-ss-text-tertiary">Did this page help you integrate?</span>
           <button
             onClick={() => handleResponse(true)}
-            className="flex items-center gap-1 px-3 py-1 text-sm text-teal-400 hover:text-teal-300 border border-teal-500/30 rounded hover:bg-teal-500/10"
+            className="flex items-center gap-1 px-3 py-1 text-sm text-ss-accent hover:text-ss-accent-hover border border-ss-accent/30 rounded hover:bg-ss-accent-hover/10"
           >
             👍 Yes
           </button>
@@ -407,18 +407,18 @@ export const DocFeedback = ({ page }) => {
         </div>
       ) : (
         <div className="max-w-md mx-auto">
-          <p className="text-sm text-gray-400 mb-2 text-center">What were you trying to do?</p>
+          <p className="text-sm text-ss-text-tertiary mb-2 text-center">What were you trying to do?</p>
           <div className="flex gap-2">
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Tell us what's missing..."
-              className="flex-1 px-4 py-2 bg-[#0A0A0B] border border-white/6 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-teal-500"
+              className="flex-1 px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-gray-500 text-sm focus:outline-none focus:border-ss-accent"
             />
             <button
               onClick={() => submitFeedback(false, note)}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm"
+              className="px-4 py-2 bg-ss-accent hover:bg-ss-accent-hover text-ss-text rounded-lg text-sm"
             >
               Send
             </button>

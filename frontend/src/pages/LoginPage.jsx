@@ -53,7 +53,7 @@ const LoginPage = () => {
                     <div className="text-center mb-8">
                         <Link to="/" className="inline-flex items-center mb-4">
                             <img 
-                                src="/logo-safespend-compact.svg" 
+                                src="/logo-safespend-compact-light.svg" 
                                 alt="Safe-Spend" 
                                 className="h-10"
                             />
@@ -79,7 +79,7 @@ const LoginPage = () => {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
                                     placeholder="you@example.com"
                                     data-testid="login-email-input"
                                 />
@@ -95,7 +95,7 @@ const LoginPage = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12"
+                                        className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12"
                                         placeholder="••••••••"
                                         data-testid="login-password-input"
                                     />
