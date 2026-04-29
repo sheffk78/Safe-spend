@@ -254,7 +254,7 @@ def handle_webhook():
             <CodeBlock 
                 language="bash"
                 title="Create Webhook"
-                code={`curl -X POST https://api.safespend.app/v1/webhooks \\
+                code={`curl -X POST https://api.safe-spend.dev/v1/webhooks \\
   -H "Authorization: Bearer sk_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -419,7 +419,7 @@ def handle_webhook():
 
             <CodeBlock 
                 language="bash"
-                code={`curl -X POST https://api.safespend.app/v1/webhooks/whk_abc123/test \\
+                code={`curl -X POST https://api.safe-spend.dev/v1/webhooks/whk_abc123/test \\
   -H "Authorization: Bearer sk_live_..."`}
             />
 

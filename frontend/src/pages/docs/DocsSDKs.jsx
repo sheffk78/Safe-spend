@@ -15,7 +15,7 @@ pip install safespend[langchain]`;
 # Initialize the client
 client = SafeSpendClient(
     api_key="sk_agent_...",
-    base_url="https://api.safespend.app"  # Optional
+    base_url="https://api.safe-spend.dev"  # Optional
 )
 
 # Check balance
@@ -142,7 +142,7 @@ yarn add @safespend/sdk`;
 
 const client = new SafeSpendClient({
   apiKey: 'sk_agent_...',
-  baseUrl: 'https://api.safespend.app'
+  baseUrl: 'https://api.safe-spend.dev'
 });
 
 // Check balance

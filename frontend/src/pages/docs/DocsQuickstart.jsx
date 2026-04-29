@@ -9,7 +9,7 @@ const DocsQuickstart = () => {
         {
             label: 'cURL',
             language: 'bash',
-            code: `curl -X POST https://api.safespend.app/v1/escrow-accounts \\
+            code: `curl -X POST https://api.safe-spend.dev/v1/escrow-accounts \\
   -H "Authorization: Bearer sk_test_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -23,7 +23,7 @@ const DocsQuickstart = () => {
             code: `import requests
 
 API_KEY = "sk_test_..."
-BASE_URL = "https://api.safespend.app"
+BASE_URL = "https://api.safe-spend.dev"
 
 response = requests.post(
     f"{BASE_URL}/v1/escrow-accounts",
@@ -40,7 +40,7 @@ print(f"Created escrow: {escrow['id']}")`
         {
             label: 'TypeScript',
             language: 'typescript',
-            code: `const response = await fetch('https://api.safespend.app/v1/escrow-accounts', {
+            code: `const response = await fetch('https://api.safe-spend.dev/v1/escrow-accounts', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer sk_test_...',
@@ -61,7 +61,7 @@ console.log(\`Created escrow: \${escrow.id}\`);`
         {
             label: 'cURL',
             language: 'bash',
-            code: `curl -X POST https://api.safespend.app/v1/escrow-accounts/esc_xxx/fund \\
+            code: `curl -X POST https://api.safe-spend.dev/v1/escrow-accounts/esc_xxx/fund \\
   -H "Authorization: Bearer sk_test_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -85,7 +85,7 @@ print(f"New balance: \${response.json()['balance_cents'] / 100:.2f}")`
         {
             label: 'cURL',
             language: 'bash',
-            code: `curl -X POST https://api.safespend.app/v1/policies \\
+            code: `curl -X POST https://api.safe-spend.dev/v1/policies \\
   -H "Authorization: Bearer sk_test_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -126,7 +126,7 @@ print(f"Created policy: {policy['id']}")`
         {
             label: 'cURL',
             language: 'bash',
-            code: `curl -X POST https://api.safespend.app/v1/spend \\
+            code: `curl -X POST https://api.safe-spend.dev/v1/spend \\
   -H "Authorization: Bearer sk_agent_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -145,7 +145,7 @@ print(f"Created policy: {policy['id']}")`
             code: `import requests
 
 API_KEY = "sk_agent_..."  # Use agent key for spend requests
-BASE_URL = "https://api.safespend.app"
+BASE_URL = "https://api.safe-spend.dev"
 
 response = requests.post(
     f"{BASE_URL}/v1/spend",
@@ -168,7 +168,7 @@ print(f"Status: {result['status']}")
         {
             label: 'TypeScript',
             language: 'typescript',
-            code: `const response = await fetch('https://api.safespend.app/v1/spend', {
+            code: `const response = await fetch('https://api.safe-spend.dev/v1/spend', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer sk_agent_...',
@@ -441,7 +441,7 @@ console.log(\`Status: \${result.status}\`);
             <CodeBlock 
                 language="bash"
                 code={`# Human owner locks the policy after review
-curl -X POST https://api.safespend.app/v1/policies/pol_xxx/lock \\
+curl -X POST https://api.safe-spend.dev/v1/policies/pol_xxx/lock \\
   -H "Authorization: Bearer sk_live_owner_key..."`}
             />
 

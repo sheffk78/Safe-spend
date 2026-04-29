@@ -4,14 +4,14 @@ import { CodeBlock, TabbedCodeBlock } from '@/components/docs/DocsCodeBlock';
 
 const DocsIntegrations = () => {
     const curlExamples = {
-        createEscrow: `curl -X POST https://api.safespend.app/v1/escrow-accounts \\
+        createEscrow: `curl -X POST https://api.safe-spend.dev/v1/escrow-accounts \\
   -H "Authorization: Bearer sk_test_..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "Agent Budget",
     "description": "Budget for my AI agent"
   }'`,
-        createPolicy: `curl -X POST https://api.safespend.app/v1/policies \\
+        createPolicy: `curl -X POST https://api.safe-spend.dev/v1/policies \\
   -H "Authorization: Bearer sk_test_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -22,7 +22,7 @@ const DocsIntegrations = () => {
     "allowed_vendors": ["Anthropic", "OpenAI"],
     "auto_approve_under_cents": 5000
   }'`,
-        makeSpend: `curl -X POST https://api.safespend.app/v1/spend \\
+        makeSpend: `curl -X POST https://api.safe-spend.dev/v1/spend \\
   -H "Authorization: Bearer sk_agent_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -43,7 +43,7 @@ import requests
 from typing import Optional, Dict, Any, List
 
 class SafeSpendClient:
-    def __init__(self, api_key: str, base_url: str = "https://api.safespend.app"):
+    def __init__(self, api_key: str, base_url: str = "https://api.safe-spend.dev"):
         self.api_key = api_key
         self.base_url = base_url
         self.session = requests.Session()
@@ -165,7 +165,7 @@ class SafeSpendClient {
   private apiKey: string;
   private baseUrl: string;
 
-  constructor(apiKey: string, baseUrl = 'https://api.safespend.app') {
+  constructor(apiKey: string, baseUrl = 'https://api.safe-spend.dev') {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
   }

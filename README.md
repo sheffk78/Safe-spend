@@ -109,12 +109,12 @@ See [.env.example](./.env.example) for the complete list.
 
 ```bash
 # Sign up
-curl -X POST https://api.yourdomain.com/api/v1/auth/signup \
+curl -X POST https://api.safe-spend.dev/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password", "name": "My Org"}'
 
 # Login
-curl -X POST https://api.yourdomain.com/api/v1/auth/login \
+curl -X POST https://api.safe-spend.dev/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password"}'
 ```
@@ -122,7 +122,7 @@ curl -X POST https://api.yourdomain.com/api/v1/auth/login \
 ### Spend Request (Agent API)
 
 ```bash
-curl -X POST https://api.yourdomain.com/api/v1/spend \
+curl -X POST https://api.safe-spend.dev/api/v1/spend \
   -H "X-API-Key: your-agent-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -202,6 +202,6 @@ MIT
 
 ## Support
 
-- Documentation: [docs.yourdomain.com](https://docs.yourdomain.com)
-- Issues: [GitHub Issues](https://github.com/your-repo/issues)
-- Email: support@yourdomain.com
+- Documentation: [docs.yourdomain.com](https://safe-spend.dev/docs)
+- Issues: [GitHub Issues](https://github.com/agentictrust/safe-spend/issues)
+- Email: support@agentictrust.app

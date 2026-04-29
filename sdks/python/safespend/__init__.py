@@ -44,6 +44,7 @@ def __getattr__(name):
 
 __all__ = [
     "SafeSpendClient",
+    "SafeSpend",  # Alias for SafeSpendClient
     "AsyncSafeSpendClient",
     "SafeSpendError",
     "AuthenticationError",
@@ -54,3 +55,6 @@ __all__ = [
     "APIError",
     "__version__",
 ]
+
+# Backward-compatible alias
+SafeSpend = SafeSpendClient

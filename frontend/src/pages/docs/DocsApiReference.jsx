@@ -13,7 +13,7 @@ const DocsApiReference = () => {
 
             <CodeBlock 
                 language="bash"
-                code="https://api.safespend.app/v1/"
+                code="https://api.safe-spend.dev/v1/"
             />
 
             <DocsHeading level={2} id="authentication">Authentication</DocsHeading>

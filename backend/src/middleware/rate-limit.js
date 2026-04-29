@@ -82,7 +82,7 @@ const authRateLimiter = rateLimit({
     // Use default IP-based key generator (handles IPv6)
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
 });
 
 /**
@@ -112,7 +112,7 @@ const keyCreationRateLimiter = rateLimit({
     // Use default IP key generator to avoid IPv6 issues
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
 });
 
 /**
@@ -231,7 +231,7 @@ const globalRateLimiter = rateLimit({
         if (req.path === '/api/health') return true;
         return false;
     },
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
 });
 
 module.exports = {
