@@ -112,12 +112,26 @@ ORG_JSONLD = {
                 "@type": "ContactPoint",
                 "email": "support@agentictrust.app",
                 "contactType": "customer support",
+                "availableLanguage": ["English"],
+            },
+            "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "US",
+                "addressRegion": "UT",
+            },
+            "areaServed": "Worldwide",
+            "priceRange": "$$",
+            "founder": {
+                "@type": "Person",
+                "name": "Kenneth Kohler",
+                "jobTitle": "Founder",
             },
             "sameAs": [
                 "https://github.com/sheffk78/safe-spend",
                 "https://github.com/sheffk78/safespend-python",
                 "https://discord.com/invite/clawd",
                 "https://x.com/agentictrust",
+                "https://www.linkedin.com/company/agentictrust/",
             ],
             "knowsAbout": [
                 "AI agent spending controls",
@@ -135,7 +149,53 @@ ORG_JSONLD = {
                 "trust law AI agents",
                 "card rails vs fiduciary rails",
                 "agent authority vault",
+                "AI escrow management",
+                "autonomous agent compliance",
+                "spending policy automation",
+                "agent budget controls",
+                "fiduciary technology",
             ],
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://safe-spend.dev/docs?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+            },
+            "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Safe-Spend Plans",
+                "itemListElement": [
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "Sandbox",
+                            "description": "Test mode for evaluating Safe-Spend — no real transactions",
+                        },
+                        "price": "0",
+                        "priceCurrency": "USD",
+                    },
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "Builder",
+                            "description": "For teams building agent infrastructure",
+                        },
+                        "price": "29",
+                        "priceCurrency": "USD",
+                    },
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "Scale",
+                            "description": "For organizations running agents in production",
+                        },
+                        "price": "149",
+                        "priceCurrency": "USD",
+                    },
+                ],
+            },
         },
         {
             "@id": "https://safe-spend.dev/#website",
