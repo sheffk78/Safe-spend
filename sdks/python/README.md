@@ -225,7 +225,7 @@ spend = client.cancel_spend_request("sr_123")
 # For approval management, initialize with an org token instead of API key
 human_client = SafeSpendClient(
     api_key="<org_jwt_token>",  # JWT from /v1/auth/login
-    base_url="https://api.safespend.app",
+    base_url="https://api.safe-spend.dev",
 )
 
 # List pending approvals
@@ -329,7 +329,7 @@ from safespend.integrations import create_safespend_toolkit
 # Initialize clients
 client = SafeSpendClient(
     api_key="sk_agent_...",
-    base_url="https://api.safespend.app"
+    base_url="https://api.safe-spend.dev"
 )
 
 # Create toolkit with default escrow

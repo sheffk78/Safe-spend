@@ -44,7 +44,7 @@ python budget_aware_agent.py
 | `SAFESPEND_API_KEY` | Yes | Your Safe-Spend API key (get from dashboard) |
 | `OPENAI_API_KEY` | Yes | Your OpenAI API key |
 | `SAFESPEND_ESCROW_ID` | No | Default escrow account ID |
-| `SAFESPEND_BASE_URL` | No | API base URL (default: https://api.safespend.app) |
+| `SAFESPEND_BASE_URL` | No | API base URL (default: https://api.safe-spend.dev) |
 
 ## Getting Started
 

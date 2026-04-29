@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 authors = [
     { name = "Agentic Trust", email = "support@agentictrust.app" },
 ]
-license = { text = "Proprietary" }
+license = {text = "MIT"}
 keywords = ["safe-spend", "escrow", "ai agents", "payments", "agentic trust", "spending control"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -55,10 +55,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://agentictrust.app"
-Documentation = "https://agentictrust.app/docs"
-Source = "https://github.com/agentictrust/safespend-python"
-Issues = "https://github.com/agentictrust/safespend-python/issues"
+Homepage = "https://safe-spend.dev"
+Documentation = "https://safe-spend.dev/docs"
+Source = "https://github.com/agentictrust/safe-spend"
+Issues = "https://github.com/agentictrust/safe-spend/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

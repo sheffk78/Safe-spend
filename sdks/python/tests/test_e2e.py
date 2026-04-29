@@ -15,7 +15,7 @@ from safespend import SafeSpendClient
 from safespend.errors import SafeSpendError, AuthenticationError, ValidationError
 
 # Configuration
-API_KEY = "sk_test_zfg1u4wlxibyzagxp7oxkg2u"
+API_KEY = "sk_test_placeholder_replace_with_your_key"
 ESCROW_ID = "esc_bkxnao6ul6xs"
 BASE_URL = "https://agent-vault-demo.preview.emergentagent.com"
 
@@ -110,7 +110,7 @@ def test_error_handling():
     print("\n[E1] Testing invalid API key...")
     try:
         bad_client = SafeSpendClient(
-            api_key="sk_test_invalid_key",
+            api_key="sk_test_placeholder_invalid",
             base_url=BASE_URL,
         )
         # This should fail when we try to use it

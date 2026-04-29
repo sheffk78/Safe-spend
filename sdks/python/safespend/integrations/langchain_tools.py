@@ -438,7 +438,7 @@ def create_safespend_toolkit(
         >>>
         >>> client = SafeSpendClient(
         ...     api_key="sk_test_...",
-        ...     base_url="https://api.safespend.app"
+        ...     base_url="https://api.safe-spend.dev"
         ... )
         >>> tools = create_safespend_toolkit(
         ...     client=client,

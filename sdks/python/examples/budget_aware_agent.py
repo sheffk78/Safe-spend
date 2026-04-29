@@ -37,7 +37,7 @@ def create_budget_aware_agent(
     safespend_api_key: str,
     openai_api_key: str,
     escrow_id: str,
-    safespend_base_url: str = "https://api.safespend.app",
+    safespend_base_url: str = "https://api.safe-spend.dev",
     model: str = "gpt-4",
     verbose: bool = True,
 ) -> AgentExecutor:
@@ -229,7 +229,7 @@ def main():
     safespend_api_key = os.environ.get("SAFESPEND_API_KEY")
     openai_api_key = os.environ.get("OPENAI_API_KEY")
     escrow_id = os.environ.get("SAFESPEND_ESCROW_ID", "esc_demo")
-    base_url = os.environ.get("SAFESPEND_BASE_URL", "https://api.safespend.app")
+    base_url = os.environ.get("SAFESPEND_BASE_URL", "https://api.safe-spend.dev")
     
     # Validate required keys
     if not safespend_api_key:

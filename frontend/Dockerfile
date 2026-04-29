@@ -1,5 +1,8 @@
 FROM node:18-alpine AS build
 
+# Install python for prerender script
+RUN apk add --no-cache python3
+
 WORKDIR /app
 
 # Copy package files
@@ -17,6 +20,9 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 # Build the app
 RUN npm run build
+
+# Prerender routes for SEO and AI crawler visibility
+RUN python3 prerender.py
 
 # Production stage with nginx
 FROM nginx:alpine

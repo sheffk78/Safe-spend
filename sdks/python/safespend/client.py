@@ -39,7 +39,7 @@ class SafeSpendClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.safespend.app",
+        base_url: str = "https://api.safe-spend.dev",
         timeout: float = 10.0,
         max_retries: int = 3,
         retry_delay: float = 1.0,
@@ -60,7 +60,7 @@ class SafeSpendClient:
         self.api_key = api_key
         # Normalize base URL - ensure it ends with /api if it's a custom deployment
         base_url = base_url.rstrip("/")
-        if not base_url.endswith("/api") and "api.safespend.app" not in base_url:
+        if not base_url.endswith("/api") and "api.safe-spend.dev" not in base_url:
             # Custom deployment URL (e.g., preview.emergentagent.com) - add /api prefix
             self.base_url = f"{base_url}/api"
         else:

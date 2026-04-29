@@ -25,7 +25,7 @@ def main():
     # Initialize clients
     client = SafeSpendClient(
         api_key=os.environ["SAFESPEND_API_KEY"],
-        base_url=os.environ.get("SAFESPEND_BASE_URL", "https://api.safespend.app"),
+        base_url=os.environ.get("SAFESPEND_BASE_URL", "https://api.safe-spend.dev"),
     )
     
     # Create toolkit with your escrow account
