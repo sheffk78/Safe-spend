@@ -9,5 +9,10 @@ npx prisma db push --accept-data-loss || {
   exit 1
 }
 
+echo "Regenerating Prisma client..."
+npx prisma generate || {
+  echo "WARNING: prisma generate failed"
+}
+
 echo "Starting Node.js server..."
 exec node src/server.js
