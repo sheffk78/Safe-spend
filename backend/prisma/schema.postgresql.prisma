@@ -317,3 +317,46 @@ model FundingEvent {
 
   @@map("funding_events")
 }
+
+// Blog Posts (for AgenticTrust sub-brand content)
+model BlogPost {
+  id                    String   @id @default(uuid())
+  title                 String
+  slug                  String   @unique
+  content               String
+  contentHtml            String   @map("content_html")
+  excerpt               String?
+  status                String   @default("draft") // draft | published | archived
+  authorName            String   @map("author_name")
+  authorBio             String?  @map("author_bio")
+  authorAvatarUrl       String?  @map("author_avatar_url")
+  coverImageUrl         String?  @map("cover_image_url")
+  coverImageAlt         String?  @map("cover_image_alt")
+  tags                  String   @default("[]")
+  category              String?
+  seoMetaTitle           String?  @map("seo_meta_title")
+  seoMetaDescription     String?  @map("seo_meta_description")
+  seoCanonicalUrl        String?  @map("seo_canonical_url")
+  publishedAt            DateTime? @map("published_at")
+  scheduledAt            DateTime? @map("scheduled_at")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+// Admin API Keys (for Kit automation)
+model AdminApiKey {
+  id          String    @id @default(uuid())
+  label       String    @default("Admin Key")
+  description String?
+  keyHash     String    @unique @map("key_hash")
+  keyPrefix   String    @map("key_prefix")
+  scopes      String    @default("[\"*\"]")
+  isActive    Boolean   @default(true) @map("is_active")
+  lastUsedAt  DateTime? @map("last_used_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("admin_api_keys")
+}
