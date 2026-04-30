@@ -57,18 +57,10 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             data: {
                 id: escrowId,
                 orgId: req.org.id,
-                agentId: agent_id || null,
                 name,
                 description,
                 currency,
-                metadata: JSON.stringify(metadata),
-                // AAV fields - full spec
-                aavEnabled: aav_enabled,
-                authorizedAgentIds: JSON.stringify(authorized_agent_ids),
-                aavGrantIds: JSON.stringify(aav_grant_ids),
-                aavEnforcementMode: aav_enforcement_mode,
-                aavApiKey: aav_api_key || null,
-                aavRequireCertificate: aav_require_certificate
+                metadata: JSON.stringify(metadata || {})
             }
         });
         
@@ -241,7 +233,7 @@ router.post('/:id/fund', requireAuth, requireOwnerKey, async (req, res) => {
         });
         
         // Cross-tool event
-        emitEscrowFunded(req.org.id, escrow.agentId, {
+        emitEscrowFunded(req.org.id, null, {
             escrow_id: escrow.id,
             amount_cents,
             balance_after_cents: updated.balanceCents
@@ -400,7 +392,7 @@ router.post('/:id/pause', requireAuth, requireOwnerKey, async (req, res) => {
         });
         
         // Cross-tool event
-        emitEscrowPaused(req.org.id, escrow.agentId, {
+        emitEscrowPaused(req.org.id, null, {
             escrow_id: escrow.id,
             balance_cents: updated.balanceCents
         }).catch(() => {});
@@ -541,7 +533,7 @@ router.post('/:id/close', requireAuth, requireOwnerKey, async (req, res) => {
         });
         
         // Cross-tool event
-        emitEscrowClosed(req.org.id, escrow.agentId, {
+        emitEscrowClosed(req.org.id, null, {
             escrow_id: escrow.id,
             remaining_balance_cents: escrow.balanceCents
         }).catch(() => {});
@@ -565,7 +557,6 @@ router.post('/:id/close', requireAuth, requireOwnerKey, async (req, res) => {
 function formatEscrowAccount(escrow) {
     return {
         id: escrow.id,
-        agent_id: escrow.agentId,
         name: escrow.name,
         description: escrow.description,
         balance_cents: escrow.balanceCents,
@@ -574,14 +565,6 @@ function formatEscrowAccount(escrow) {
         total_funded_cents: escrow.totalFundedCents,
         total_spent_cents: escrow.totalSpentCents,
         total_denied_cents: escrow.totalDeniedCents,
-        // AAV fields - full spec
-        aav_enabled: escrow.aavEnabled,
-        authorized_agent_ids: JSON.parse(escrow.authorizedAgentIds || '[]'),
-        aav_grant_ids: JSON.parse(escrow.aavGrantIds || '[]'),
-        aav_enforcement_mode: escrow.aavEnforcementMode,
-        aav_api_key_configured: !!escrow.aavApiKey, // Don't expose actual key
-        aav_require_certificate: escrow.aavRequireCertificate || false,
-        aav_last_verified_at: escrow.aavLastVerifiedAt,
         metadata: JSON.parse(escrow.metadata || '{}'),
         created_at: escrow.createdAt,
         updated_at: escrow.updatedAt
