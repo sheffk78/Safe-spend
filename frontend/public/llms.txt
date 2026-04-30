@@ -1,14 +1,14 @@
-# Safe-Spend — Fiat-first escrow and spending control for AI agents
+# Safe-Spend — Spending governance for AI agents
 
 > Your agents never overspend.
 
 ## What is Safe-Spend?
 
-Safe-Spend provides fiat-first escrow and spending controls for AI agents. Set budgets, enforce policies, and escrow payments — so your agents never overspend. Part of the [AgenticTrust](https://agentictrust.app) suite.
+Safe-Spend provides spending governance for AI agents. Set budgets, enforce spending policies, and track every transaction — so your agents never overspend. Part of the [AgenticTrust](https://agentictrust.app) suite.
 
 ## Core Features
 
-- **Escrow Accounts**: Deposit funds that agents can draw from with policy controls
+- **Spending Pools**: Set budgets that agents can draw from within policy controls
 - **Spending Policies**: Define rules for what agents can spend, how much, and when
 - **Budget Caps**: Set hard limits so agents can never exceed their allocation
 - **Transaction Logs**: Full audit trail of every agent payment
@@ -20,7 +20,7 @@ Safe-Spend provides fiat-first escrow and spending controls for AI agents. Set b
 - REST API with API key authentication
 - Webhook support for spending events
 - Dashboard for managing agent budgets
-- Integration with AAV for authority + escrow
+- Integration with AAV for authority + spending governance
 
 ## Architecture
 

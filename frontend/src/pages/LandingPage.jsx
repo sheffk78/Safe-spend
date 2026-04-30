@@ -10,7 +10,7 @@ const LandingPage = () => {
         <div className="min-h-screen bg-ss-bg">
             <SeoHelmet
                 title="Safe-Spend — Fiduciary Rails for AI Agents"
-                description="Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
+                description="Connect AI agents to card rails with spending guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
                 structuredData={homepageStructuredData}
             />
             <Navbar />
@@ -26,7 +26,7 @@ const LandingPage = () => {
                         Someone should be watching.
                     </h1>
                     <p className="text-lg md:text-xl text-ss-text-secondary leading-relaxed mb-10 max-w-2xl">
-                        Safe-Spend connects AI agents to card rails with fiduciary guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
+                        Safe-Spend connects AI agents to card rails with spending guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link
@@ -75,7 +75,7 @@ const LandingPage = () => {
                             <div>
                                 <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">No audit trail</h3>
                                 <p className="text-ss-text-secondary leading-relaxed">
-                                    When an agent spends, who approved it? What policy governed it? Without fiduciary documentation, you can't answer your accountant, your board, or your regulator.
+                                    When an agent spends, who approved it? What policy governed it? Without policy documentation, you can't answer your accountant, your board, or your regulator.
                                 </p>
                             </div>
                         </div>
@@ -85,7 +85,7 @@ const LandingPage = () => {
                                 <span className="text-ss-accent font-bold text-sm">3</span>
                             </div>
                             <div>
-                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Card rails ≠ fiduciary rails</h3>
+                                <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Card rails ≠ policy rails</h3>
                                 <p className="text-ss-text-secondary leading-relaxed">
                                     Virtual cards and spend limits are a start. But they don't enforce <em>policy</em>, they don't document <em>intent</em>, and they don't create the paper trail a trustee actually needs. That's the gap Safe-Spend fills.
                                 </p>
@@ -113,7 +113,7 @@ const LandingPage = () => {
                             <div>
                                 <h3 className="font-heading text-xl font-semibold text-ss-text mb-2">Set policy</h3>
                                 <p className="text-ss-text-secondary leading-relaxed">
-                                    Define spending limits, vendor allowlists, category rules, and approval thresholds. Your fiduciary policy — not a credit limit — governs every transaction.
+                                    Define spending limits, vendor allowlists, category rules, and approval thresholds. Your spending policy — not a credit limit — governs every transaction.
                                 </p>
                             </div>
                         </div>
@@ -155,7 +155,7 @@ const LandingPage = () => {
                         One API call. Full control.
                     </h2>
                     <p className="text-ss-text-secondary leading-relaxed mb-8">
-                        Add fiduciary spending controls to any agent with a single function call. Works with LangChain, CrewAI, AutoGPT, and any framework that supports tool use.
+                        Add spending controls to any agent with a single function call. Works with LangChain, CrewAI, AutoGPT, and any framework that supports tool use.
                     </p>
 
                     <div className="bg-ss-code rounded-lg p-6 overflow-x-auto">
@@ -167,7 +167,7 @@ client = SafeSpendClient(api_key="sk_live_...")
 
 # Agent requests a spend
 result = client.spend.create(
-    escrow_id="esc_9f3k2m",
+    spend_id="sp_9f3k2m",
     amount=4999,  # $49.99 in cents
     currency="usd",
     vendor="Anthropic",
@@ -255,7 +255,7 @@ result = client.spend.create(
                         Card rails are for spending.<br />Fiduciary rails are for trust.
                     </h2>
                     <p className="text-ss-text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
-                        Virtual cards and spend limits are necessary but not sufficient. When an agent spends money on your behalf, you need more than a transaction log — you need the documentation that proves the spend was authorized, policy-compliant, and properly overseen. That's what fiduciary rails provide.
+                        Virtual cards and spend limits are necessary but not sufficient. When an agent spends money on your behalf, you need more than a transaction log — you need the documentation that proves the spend was authorized, policy-compliant, and properly overseen. That's what spending rails provide.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div>
@@ -281,7 +281,7 @@ result = client.spend.create(
                         Stop hoping your agents won't overspend.
                     </h2>
                     <p className="text-ss-text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
-                        Start for free. Add fiduciary guardrails to your agents in under 10 minutes. No credit card required.
+                        Start for free. Add spending guardrails to your agents in under 10 minutes. No credit card required.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
