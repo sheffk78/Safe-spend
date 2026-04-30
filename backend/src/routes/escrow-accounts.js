@@ -89,7 +89,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
         res.status(201).json(formatEscrowAccount(escrow));
     } catch (error) {
         console.error('Create escrow error:', error);
-        res.status(500).json({ error: 'Failed to create escrow account' });
+        res.status(500).json({ error: 'Failed to create escrow account', detail: error.message });
     }
 });
 
