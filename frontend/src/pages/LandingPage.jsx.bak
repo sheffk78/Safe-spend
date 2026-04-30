@@ -3,27 +3,25 @@ import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SeoHelmet from '@/components/SeoHelmet';
-import SpendingApprovalCanvas from '@/components/SpendingApprovalCanvas';
 import { homepageStructuredData } from '@/lib/structuredData';
 
 const LandingPage = () => {
     return (
         <div className="min-h-screen bg-ss-bg">
             <SeoHelmet
-                title="Safe-Spend — Spending Governance for AI Agents"
+                title="Safe-Spend — Fiduciary Rails for AI Agents"
                 description="Connect AI agents to card rails with spending guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching."
                 structuredData={homepageStructuredData}
             />
             <Navbar />
 
-            {/* Hero — Spending Approval Canvas behind, text left */}
-            <section className="relative min-h-[90vh] pt-24 pb-20 px-6 overflow-hidden">
-                <SpendingApprovalCanvas className="absolute inset-0 z-0 hidden lg:block" />
-                <div className="relative z-10 max-w-3xl mx-auto lg:mx-0 lg:ml-[6vw] lg:max-w-xl">
+            {/* Hero — Clean, direct, no decorations */}
+            <section className="pt-32 pb-20 px-6">
+                <div className="max-w-3xl mx-auto">
                     <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        Spending governance for AI
+                        Fiduciary spending controls for AI
                     </p>
-                    <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-ss-text leading-[1.08] mb-6">
+                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-ss-text leading-[1.1] mb-6">
                         Agents spend money.<br />
                         Someone should be watching.
                     </h1>
@@ -208,7 +206,7 @@ result = client.spend.create(
                         What you get
                     </p>
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-12">
-                        Spending governance, not just spend limits.
+                        Fiduciary controls, not just spend limits.
                     </h2>
 
                     <div className="space-y-8">
@@ -218,7 +216,7 @@ result = client.spend.create(
                                 desc: 'Per-agent limits, vendor allowlists, category restrictions, and approval thresholds. Your rules, enforced in real time.'
                             },
                             {
-                                title: 'Spending pools',
+                                title: 'Escrow accounts',
                                 desc: 'Pre-funded accounts with balance tracking. Agents can only spend what\'s allocated. No overdraft, no surprises.'
                             },
                             {
@@ -254,7 +252,7 @@ result = client.spend.create(
                         Built for trust
                     </p>
                     <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-6">
-                        Card rails are for spending.<br />Spending rails are for trust.
+                        Card rails are for spending.<br />Fiduciary rails are for trust.
                     </h2>
                     <p className="text-ss-text-secondary leading-relaxed max-w-2xl mx-auto mb-10">
                         Virtual cards and spend limits are necessary but not sufficient. When an agent spends money on your behalf, you need more than a transaction log — you need the documentation that proves the spend was authorized, policy-compliant, and properly overseen. That's what spending rails provide.
