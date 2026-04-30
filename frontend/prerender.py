@@ -13,28 +13,28 @@ BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build")
 
 ROUTES = {
     "/": {
-        "title": "Safe-Spend — Fiduciary Rails for AI Agents",
-        "description": "Connect AI agents to card rails with fiduciary guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching.",
+        "title": "Safe-Spend — Spending Governance for AI Agents",
+        "description": "Connect AI agents to card rails with spending governance guardrails. Spending limits, policy enforcement, and audit trails — so agents spend like they have a trustee watching.",
         "canonical": "https://safe-spend.dev/",
     },
     "/pricing": {
         "title": "Pricing — Safe-Spend",
-        "description": "Start free. Builder plan $29/mo, Scale plan $149/mo. Fiduciary spending controls for AI agents with spending pools, policy engine, and audit trail.",
+        "description": "Start free. Builder plan $29/mo, Scale plan $149/mo. spending governance spending controls for AI agents with spending pools, policy engine, and audit trail.",
         "canonical": "https://safe-spend.dev/pricing",
     },
     "/docs": {
         "title": "Documentation — Safe-Spend",
-        "description": "Complete API documentation, integration guides, SDK reference, and quickstart for Safe-Spend fiduciary rails.",
+        "description": "Complete API documentation, integration guides, SDK reference, and quickstart for Safe-Spend spending governance rails.",
         "canonical": "https://safe-spend.dev/docs",
     },
     "/docs/quickstart": {
         "title": "Quickstart — Safe-Spend Docs",
-        "description": "Create your first escrow, set a policy, and make a spend request in under 5 minutes. Step-by-step quickstart with Python, JavaScript, and cURL examples.",
+        "description": "Create your first spending pool, set a policy, and make a spend request in under 5 minutes. Step-by-step quickstart with Python, JavaScript, and cURL examples.",
         "canonical": "https://safe-spend.dev/docs/quickstart",
     },
     "/docs/api-reference": {
         "title": "API Reference — Safe-Spend Docs",
-        "description": "Full REST API reference for Safe-Spend. Escrow accounts, spending policies, spend requests, approvals, webhooks, and subscriptions.",
+        "description": "Full REST API reference for Safe-Spend. spending pool accounts, spending policies, spend requests, approvals, webhooks, and subscriptions.",
         "canonical": "https://safe-spend.dev/docs/api-reference",
     },
     "/docs/integrations": {
@@ -59,17 +59,17 @@ ROUTES = {
     },
     "/docs/concepts": {
         "title": "Concepts — Safe-Spend Docs",
-        "description": "Escrow accounts, spending policies, approval workflows, and the 14-step rules engine explained.",
+        "description": "spending pool accounts, spending policies, approval workflows, and the 14-step rules engine explained.",
         "canonical": "https://safe-spend.dev/docs/concepts",
     },
     "/docs/trust-law": {
-        "title": "Trust Law & Fiduciary Duty — Safe-Spend Docs",
-        "description": "Why card rails aren't enough — the legal and compliance case for fiduciary spending controls over AI agents.",
+        "title": "Trust Law & spending governance Duty — Safe-Spend Docs",
+        "description": "Why card rails aren't enough — the legal and compliance case for spending governance spending controls over AI agents.",
         "canonical": "https://safe-spend.dev/docs/trust-law",
     },
     "/signup": {
         "title": "Sign Up — Safe-Spend",
-        "description": "Create your Safe-Spend account. Start free, no credit card required. Add fiduciary guardrails to your AI agents in under 10 minutes.",
+        "description": "Create your Safe-Spend account. Start free, no credit card required. Add spending governance guardrails to your AI agents in under 10 minutes.",
         "canonical": "https://safe-spend.dev/signup",
     },
     "/login": {
@@ -79,7 +79,7 @@ ROUTES = {
     },
     "/playground": {
         "title": "Playground — Safe-Spend",
-        "description": "Try Safe-Spend interactively. Create escrow accounts, set policies, and make spend requests — no account needed.",
+        "description": "Try Safe-Spend interactively. Create spending pool accounts, set policies, and make spend requests — no account needed.",
         "canonical": "https://safe-spend.dev/playground",
     },
     "/terms": {
@@ -105,7 +105,7 @@ ORG_JSONLD = {
             "legalName": "Safe-Spend by AgenticTrust",
             "url": "https://safe-spend.dev",
             "logo": "https://safe-spend.dev/logo.svg",
-            "description": "Fiduciary rails for AI agents — spending limits, policy enforcement, and audit trails for autonomous systems.",
+            "description": "spending governance rails for AI agents — spending limits, policy enforcement, and audit trails for autonomous systems.",
             "foundingDate": "2025",
             "email": "support@agentictrust.app",
             "contactPoint": {
@@ -135,8 +135,8 @@ ORG_JSONLD = {
             ],
             "knowsAbout": [
                 "AI agent spending controls",
-                "fiduciary rails",
-                "escrow accounts for AI",
+                "spending governance rails",
+                "spending pool accounts for AI",
                 "spending policy enforcement",
                 "agent authorization",
                 "AI governance",
@@ -145,15 +145,15 @@ ORG_JSONLD = {
                 "audit trails for AI agents",
                 "LangChain spending tools",
                 "agent payment controls",
-                "fiduciary duty AI",
+                "spending governance duty AI",
                 "trust law AI agents",
-                "card rails vs fiduciary rails",
+                "card rails vs spending governance rails",
                 "agent authority vault",
-                "AI escrow management",
+                "AI spending pool management",
                 "autonomous agent compliance",
                 "spending policy automation",
                 "agent budget controls",
-                "fiduciary technology",
+                "spending governance technology",
             ],
             "potentialAction": {
                 "@type": "SearchAction",
@@ -214,7 +214,7 @@ APP_JSONLD = {
     "url": "https://safe-spend.dev",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "description": "Fiduciary rails for AI agents — spending limits, policy enforcement, and audit trails for autonomous systems.",
+    "description": "spending governance rails for AI agents — spending limits, policy enforcement, and audit trails for autonomous systems.",
     "offers": [
         {
             "@type": "Offer",

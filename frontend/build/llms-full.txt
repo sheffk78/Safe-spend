@@ -1,44 +1,49 @@
 # Safe-Spend
 # https://safe-spend.dev
-# Fiat-first escrow and spending control for AI agents
+# Spending governance for AI agents
 
 ## Overview
 Safe-Spend provides policy-based spending governance for autonomous AI agents. Fund a spending pool, define guardrails, and your agent spends within them — with every dollar, every decision, and every receipt logged.
 
 ## Key Features
-- Segregated escrow accounts for AI agent spending
+- Segregated spending accounts for AI agents
 - Policy engine with per-transaction limits, daily/weekly/monthly caps, vendor allowlists, category restrictions
-- Approval workflows with cascading authorization
-- Complete audit trail for every transaction and policy decision
-- SDK support for Python, TypeScript, and MCP
-- Framework integrations: LangChain, CrewAI, OpenAI SDK
-- Dashboard for monitoring agent spending in real-time
+- Dual authorization with Agent Authority Vault
+- HMAC-signed webhook notifications
+- Full audit trail and transaction history
 
-## API
-- Base URL: https://api.safe-spend.dev/v1
-- Authentication: Bearer token (API key)
-- Key endpoints:
-  - POST /v1/spend — Create a spend request
-  - GET /v1/escrow/:id — Get escrow account details
-  - POST /v1/policies — Create a spending policy
-  - GET /v1/transactions — List transactions with filtering
-  - POST /v1/approvals — Request approval for exceeding policy limits
+## API Integration
 
-## SDKs
-- Python: pip install safespend
-- TypeScript: npm install @safespend/sdk
-- MCP: npx @safespend/mcp-server
+### SDK Initialization
+```python
+from safespend import SafeSpendClient
 
-## Pricing
-- Free: Up to 3 agents, $100/mo escrow cap, basic policies
-- Pro: $49/mo — unlimited agents, $10,000/mo escrow, advanced policies, approval workflows
-- Enterprise: $299/mo — custom limits, SSO, dedicated support, compliance reporting
+client = SafeSpendClient(api_key="ss_live_***")
+pool = client.create_spending_pool(name="Marketing Agent", balance_cents=50000)
+```
 
-## Contact
-- Email: support@safe-spend.dev
-- X: @AgenticTrustKit
-- GitHub: github.com/sheffk78/Safe-spend
+### LangChain Integration
+```python
+from safespend.langchain import SafeSpendTool
 
-## Legal
-- Terms: https://safe-spend.dev/terms
-- Privacy: https://safe-spend.dev/privacy
+spend_tool = SafeSpendTool(client=client, pool_id=pool.id)
+# Agent automatically checks budget before spending
+```
+
+### Authorization Flow
+1. Agent requests authorization via AAV
+2. AAV validates identity and permissions
+3. Safe-Spend checks spending policy
+4. Transaction proceeds if both authorize
+
+## Architecture
+- Backend: Python/FastAPI
+- Frontend: React 19 (Vite)
+- Database: PostgreSQL
+- Hosted on Railway
+
+## Owner
+AgenticTrust — https://agentictrust.app
+
+## License
+Proprietary
