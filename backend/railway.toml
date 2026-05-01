@@ -1,3 +1,7 @@
+[build]
+builder = "RAILPACK"
+dockerfilePath = "Dockerfile"
+
 [deploy]
 startCommand = "sh start.sh"
 healthcheckPath = "/api/health"
