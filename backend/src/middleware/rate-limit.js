@@ -81,7 +81,7 @@ const authRateLimiter = rateLimit({
     legacyHeaders: false,
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -96,7 +96,7 @@ const spendRateLimiter = rateLimit({
     legacyHeaders: false,
     handler: rateLimitHandler,
     skip: () => process.env.NODE_ENV === 'test', // Only skip in automated tests
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -109,7 +109,7 @@ const keyCreationRateLimiter = rateLimit({
     legacyHeaders: false,
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -122,7 +122,7 @@ const exportRateLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: orgKeyGenerator,
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
     handler: (req, res) => {
         events.rateLimitExceeded({
             request_id: req.requestId,
@@ -140,7 +140,7 @@ const exportRateLimiter = rateLimit({
         });
     },
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -155,7 +155,7 @@ const standardApiRateLimiter = rateLimit({
     keyGenerator: apiKeyKeyGenerator,
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -170,7 +170,7 @@ const writeRateLimiter = rateLimit({
     keyGenerator: apiKeyKeyGenerator,
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -184,7 +184,7 @@ const publicApiRateLimiter = rateLimit({
     legacyHeaders: false,
     handler: rateLimitHandler,
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 /**
@@ -207,7 +207,7 @@ const adminApiRateLimiter = rateLimit({
     skip: () => config.isDev || process.env.NODE_ENV === 'test',
     validate: { 
         xForwardedForHeader: false,
-        // Disable IPv6 key generator validation - we handle IPv6 via req.ip
+        keyGenerator: false,
     },
 });
 
@@ -226,7 +226,7 @@ const globalRateLimiter = rateLimit({
         if (req.path === '/api/health') return true;
         return false;
     },
-    validate: { xForwardedForHeader: false },
+    validate: { xForwardedForHeader: false, keyGenerator: false },
 });
 
 module.exports = {
