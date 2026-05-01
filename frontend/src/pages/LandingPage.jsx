@@ -16,33 +16,35 @@ const LandingPage = () => {
             />
             <Navbar />
 
-            {/* Hero — Spending Approval Canvas behind, text left */}
+            {/* Hero — Spending Approval Canvas behind, text left with solid card */}
             <section className="relative min-h-[90vh] pt-24 pb-20 px-6 overflow-hidden">
                 <SpendingApprovalCanvas className="absolute inset-0 z-0 hidden lg:block" />
                 <div className="relative z-10 max-w-3xl mx-auto lg:mx-0 lg:ml-[6vw] lg:max-w-xl">
-                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
-                        Spending governance for AI
-                    </p>
-                    <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-ss-text leading-[1.08] mb-6">
-                        Agents spend money.<br />
-                        Someone should be watching.
-                    </h1>
-                    <p className="text-lg md:text-xl text-ss-text-secondary leading-relaxed mb-10 max-w-2xl">
-                        Safe-Spend connects AI agents to card rails with spending guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <Link
-                            to="/signup"
-                            className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center"
-                        >
-                            Start free
-                        </Link>
-                        <a
-                            href="#how-it-works"
-                            className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
-                        >
-                            See how it works
-                        </a>
+                    <div className="bg-ss-surface/95 backdrop-blur-sm rounded-2xl px-8 py-10 shadow-lg">
+                        <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
+                            Spending governance for AI
+                        </p>
+                        <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-ss-text leading-[1.08] mb-6">
+                            Agents spend money.<br />
+                            Someone should be watching.
+                        </h1>
+                        <p className="text-lg md:text-xl text-ss-text-secondary leading-relaxed mb-10 max-w-2xl">
+                            Safe-Spend connects AI agents to card rails with spending guardrails — spending limits, policy enforcement, and a full audit trail. So your agents can move fast without leaving you exposed.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Link
+                                to="/signup"
+                                className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center"
+                            >
+                                Start free
+                            </Link>
+                            <a
+                                href="#how-it-works"
+                                className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
+                            >
+                                See how it works
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
