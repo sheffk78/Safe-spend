@@ -125,7 +125,7 @@ app.use(globalRateLimiter);
 // ============================================
 // Health Check (Enhanced)
 // ============================================
-app.get('/api/health', async (req, res) => {
+async function healthCheck(req, res) {
     const checks = {
         database: 'unknown',
         stripe: 'unknown',
@@ -164,7 +164,10 @@ app.get('/api/health', async (req, res) => {
         uptime_seconds: Math.floor((Date.now() - serverStartTime) / 1000),
         timestamp: new Date().toISOString(),
     });
-});
+}
+
+app.get('/api/health', healthCheck);
+app.get('/api/v1/health', healthCheck);
 
 // ============================================
 // API Routes (with specific rate limiters)

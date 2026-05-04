@@ -211,7 +211,7 @@ const globalRateLimiter = rateLimit({
     skip: (req) => {
         // Skip rate limiting for health checks, in dev, and in tests
         if (config.isDev || process.env.NODE_ENV === 'test') return true;
-        if (req.path === '/api/health') return true;
+        if (req.path === '/api/health' || req.path === '/api/v1/health') return true;
         return false;
     },
 });
