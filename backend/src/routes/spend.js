@@ -311,7 +311,12 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         
         // Get date boundaries for tracking
         const timezone = parsedPolicies[0]?.activeTimezone || 'UTC';
-        const { today, weekStart, monthStart } = getDateBoundaries(currentTime, timezone);
+        const { today: todayDate, weekStart: weekStartDate, monthStart: monthStartDate } = getDateBoundaries(currentTime, timezone);
+        
+        // Convert Date objects to YYYY-MM-DD strings for Prisma (schema uses String, not DateTime)
+        const today = todayDate.toISOString().slice(0, 10);
+        const weekStart = weekStartDate.toISOString().slice(0, 10);
+        const monthStart = monthStartDate.toISOString().slice(0, 10);
         
         // Fetch spend tracking
         const [dailyTracking, weeklyTracking, monthlyTracking] = await Promise.all([
@@ -756,15 +761,7 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         
     } catch (error) {
         console.error('Spend request error:', error);
-        // Temporarily include error details for debugging
-        res.status(500).json({ 
-            error: 'Failed to process spend request',
-            debug: {
-                message: error.message,
-                stack: error.stack?.split('\n').slice(0, 3).join(' | '),
-                name: error.name
-            }
-        });
+        res.status(500).json({ error: 'Failed to process spend request' });
     }
 });
 
