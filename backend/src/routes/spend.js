@@ -761,7 +761,15 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         
     } catch (error) {
         console.error('Spend request error:', error);
-        res.status(500).json({ error: 'Failed to process spend request' });
+        // Debug: include error details in response (remove after fixing)
+        res.status(500).json({ 
+            error: 'Failed to process spend request',
+            debug: {
+                message: error.message,
+                name: error.name,
+                stack: error.stack?.split('\n').slice(0, 5).join(' | ')
+            }
+        });
     }
 });
 
