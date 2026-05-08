@@ -584,7 +584,7 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     SET balance_cents = balance_cents - ${amount_cents},
                         total_spent_cents = total_spent_cents + ${amount_cents},
                         status = CASE WHEN balance_cents - ${amount_cents} <= 0 THEN 'depleted' ELSE status END,
-                        updated_at = ${new Date().toISOString()}
+                        updated_at = NOW()
                     WHERE id = ${escrow_id} 
                       AND balance_cents >= ${amount_cents}
                       AND status = 'active'
