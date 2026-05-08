@@ -389,7 +389,6 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 escrowId: escrow_id,
                 orgId: req.org.id,
                 apiKeyId: req.apiKey?.id,
-                agentId: agent_id || null,
                 amountCents: validatedAmountCents,
                 currency,
                 vendor,
@@ -398,22 +397,24 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                 idempotencyKey: idempotency_key,
                 denialReason: result.denialReason,
                 denialRuleId: result.denialRuleId,
-                denialSource,
                 rulesEvaluated: result.rulesEvaluated,
                 balanceBeforeCents: escrowAccount.balanceCents,
-                metadata,
-                // AAV fields - enhanced
-                aavAgentId: aavClaims?.agent_id || aavApiResult?.agentId,
-                aavGrantId: aavClaims?.grant_id || aavApiResult?.grantId,
-                aavCertificateId: aavClaims?.certificate_id,
-                aavVerificationStatus: aavApiResult?.success ? 
-                    (aavApiResult.authorized ? 'verified' : 'denied') :
-                    (aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null),
-                aavVerificationId: aavApiResult?.verificationId,
-                aavAutonomyLevel: aavApiResult?.autonomyLevel,
-                aavResult: aavApiResult?.result,
-                aavDailySpend: aavApiResult?.dailySpend ? JSON.stringify(aavApiResult.dailySpend) : null,
-                aavCheckedAt: aavApiResult?.success ? new Date() : null
+                metadata: {
+                    ...metadata,
+                    denial_source: denialSource,
+                    agent_id: agent_id || null,
+                    aav_agent_id: aavClaims?.agent_id || aavApiResult?.agentId,
+                    aav_grant_id: aavClaims?.grant_id || aavApiResult?.grantId,
+                    aav_certificate_id: aavClaims?.certificate_id,
+                    aav_verification_status: aavApiResult?.success ? 
+                        (aavApiResult.authorized ? 'verified' : 'denied') :
+                        (aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null),
+                    aav_verification_id: aavApiResult?.verificationId,
+                    aav_autonomy_level: aavApiResult?.autonomyLevel,
+                    aav_result: aavApiResult?.result,
+                    aav_daily_spend: aavApiResult?.dailySpend,
+                    aav_checked_at: aavApiResult?.success ? new Date().toISOString() : null
+                }
             });
             
             // ARL outcome reporting (async, fire-and-forget)
@@ -500,7 +501,6 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     escrowId: escrow_id,
                     orgId: req.org.id,
                     apiKeyId: req.apiKey?.id,
-                    agentId: agent_id || null,
                     amountCents: amount_cents,
                     currency,
                     vendor,
@@ -510,11 +510,13 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                     status: 'pending',
                     rulesEvaluated: JSON.stringify(result.rulesEvaluated),
                     balanceBeforeCents: escrowAccount.balanceCents,
-                    metadata: JSON.stringify(metadata),
-                    // AAV fields
-                    aavAgentId: aavClaims?.agent_id || null,
-                    aavGrantId: aavClaims?.grant_id || null,
-                    aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
+                    metadata: JSON.stringify({
+                        ...metadata,
+                        agent_id: agent_id || null,
+                        aav_agent_id: aavClaims?.agent_id || null,
+                        aav_grant_id: aavClaims?.grant_id || null,
+                        aav_verification_status: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
+                    })
                 }
             });
             
@@ -621,7 +623,6 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                         escrowId: escrow_id,
                         orgId: req.org.id,
                         apiKeyId: req.apiKey?.id,
-                        agentId: agent_id || null,
                         amountCents: amount_cents,
                         currency,
                         vendor,
@@ -634,11 +635,13 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
                         rulesEvaluated: JSON.stringify(result.rulesEvaluated),
                         balanceBeforeCents: actualBalanceBefore,
                         balanceAfterCents: actualBalanceAfter,
-                        metadata: JSON.stringify(metadata),
-                        // AAV fields
-                        aavAgentId: aavClaims?.agent_id || null,
-                        aavGrantId: aavClaims?.grant_id || null,
-                        aavVerificationStatus: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
+                        metadata: JSON.stringify({
+                            ...metadata,
+                            agent_id: agent_id || null,
+                            aav_agent_id: aavClaims?.agent_id || null,
+                            aav_grant_id: aavClaims?.grant_id || null,
+                            aav_verification_status: aavClaims?.agent_id ? (aavClaims.verified ? 'verified' : 'unverified') : null
+                        })
                     }
                 });
                 
@@ -884,7 +887,6 @@ async function createDeniedSpendRequest(data) {
             escrowId: data.escrowId,
             orgId: data.orgId,
             apiKeyId: data.apiKeyId,
-            agentId: data.agentId || null,
             amountCents: data.amountCents,
             currency: data.currency || 'usd',
             vendor: data.vendor,
@@ -896,20 +898,9 @@ async function createDeniedSpendRequest(data) {
             resolvedBy: 'system',
             denialReason: data.denialReason,
             denialRuleId: data.denialRuleId,
-            denialSource: data.denialSource || null,
             rulesEvaluated: JSON.stringify(data.rulesEvaluated || []),
             balanceBeforeCents: data.balanceBeforeCents,
-            metadata: JSON.stringify(data.metadata || {}),
-            // AAV fields - enhanced per spec
-            aavAgentId: data.aavAgentId || null,
-            aavGrantId: data.aavGrantId || null,
-            aavCertificateId: data.aavCertificateId || null,
-            aavVerificationStatus: data.aavVerificationStatus || null,
-            aavVerificationId: data.aavVerificationId || null,
-            aavAutonomyLevel: data.aavAutonomyLevel || null,
-            aavResult: data.aavResult || null,
-            aavDailySpend: data.aavDailySpend || null,
-            aavCheckedAt: data.aavCheckedAt || null
+            metadata: JSON.stringify(data.metadata || {})
         }
     });
 }
@@ -949,10 +940,11 @@ function parseJson(str, defaultValue) {
  * Format spend request for API response
  */
 function formatSpendRequest(sr) {
+    const meta = parseJson(sr.metadata, {});
     return {
         id: sr.id,
         escrow_id: sr.escrowId,
-        agent_id: sr.agentId,
+        agent_id: meta.agent_id || null,
         amount_cents: sr.amountCents,
         currency: sr.currency,
         vendor: sr.vendor,
@@ -964,15 +956,15 @@ function formatSpendRequest(sr) {
         resolved_by: sr.resolvedBy,
         denial_reason: sr.denialReason,
         denial_rule_id: sr.denialRuleId,
-        denial_source: sr.denialSource,
+        denial_source: meta.denial_source || null,
         rules_evaluated: parseJson(sr.rulesEvaluated, []),
         balance_before_cents: sr.balanceBeforeCents,
         balance_after_cents: sr.balanceAfterCents,
-        // AAV fields
-        aav_agent_id: sr.aavAgentId,
-        aav_grant_id: sr.aavGrantId,
-        aav_verification_status: sr.aavVerificationStatus,
-        metadata: parseJson(sr.metadata, {}),
+        // AAV fields (read from metadata)
+        aav_agent_id: meta.aav_agent_id || null,
+        aav_grant_id: meta.aav_grant_id || null,
+        aav_verification_status: meta.aav_verification_status || null,
+        metadata: meta,
         created_at: sr.createdAt
     };
 }
