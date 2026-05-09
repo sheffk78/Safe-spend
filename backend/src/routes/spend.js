@@ -763,8 +763,11 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
         }
         
     } catch (error) {
-        console.error('Spend request error:', error);
-        res.status(500).json({ error: 'Failed to process spend request' });
+        console.error('Spend request error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Failed to process spend request',
+            detail: error.message
+        });
     }
 });
 
@@ -797,8 +800,11 @@ router.get('/', requireAuth, async (req, res) => {
             offset: parseInt(offset)
         });
     } catch (error) {
-        console.error('List spend requests error:', error);
-        res.status(500).json({ error: 'Failed to list spend requests' });
+        console.error('List spend requests error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Failed to list spend requests',
+            detail: error.message
+        });
     }
 });
 
@@ -821,8 +827,11 @@ router.get('/:id', requireAuth, async (req, res) => {
         
         res.json(formatSpendRequest(spendRequest));
     } catch (error) {
-        console.error('Get spend request error:', error);
-        res.status(500).json({ error: 'Failed to get spend request' });
+        console.error('Get spend request error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Failed to get spend request',
+            detail: error.message
+        });
     }
 });
 
@@ -864,8 +873,11 @@ router.post('/:id/cancel', requireAuth, async (req, res) => {
         
         res.json(formatSpendRequest(updated));
     } catch (error) {
-        console.error('Cancel spend request error:', error);
-        res.status(500).json({ error: 'Failed to cancel spend request' });
+        console.error('Cancel spend request error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Failed to cancel spend request',
+            detail: error.message
+        });
     }
 });
 

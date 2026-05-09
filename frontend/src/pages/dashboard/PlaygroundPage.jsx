@@ -162,6 +162,8 @@ const RulesTimeline = ({ rules }) => {
             'allowed_categories': 'Category Allowlist',
             'blocked_categories': 'Category Blocklist',
             'time_window': 'Time Window',
+            'auto_approve_limit': 'Auto-Approve Limit',
+            'auto_approve_limit_exceeded': 'Auto-Approve Limit Exceeded',
             'approval_threshold': 'Approval Threshold',
             'human_approval': 'Human Approval',
             'human_denial': 'Human Denial'
@@ -210,6 +212,22 @@ const RulesTimeline = ({ rules }) => {
         </div>
     );
 };
+
+// Human-readable labels for denial reasons
+const DENIAL_REASON_LABELS = {
+    insufficient_balance: 'Insufficient Balance',
+    vendor_not_allowed: 'Vendor Not Allowed',
+    vendor_blocked: 'Vendor Blocked',
+    over_daily_limit: 'Over Daily Limit',
+    over_weekly_limit: 'Over Weekly Limit',
+    over_monthly_limit: 'Over Monthly Limit',
+    over_per_transaction_limit: 'Over Per-Transaction Limit',
+    auto_approve_limit_exceeded: 'Exceeds Auto-Approve Limit',
+    escrow_not_found: 'Escrow Account Not Found',
+    agent_mismatch: 'Agent Not Authorized'
+};
+
+const getDenialLabel = (reason) => DENIAL_REASON_LABELS[reason] || reason?.replace(/_/g, ' ') || 'Unknown';
 
 const PlaygroundPage = () => {
     const [escrowAccounts, setEscrowAccounts] = useState([]);
@@ -741,12 +759,89 @@ if (result.status === "approved") {
                                                 )}
                                             </div>
 
-                                            {/* Key Fields */}
-                                            {response.data?.denial_reason && (
-                                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                                    <p className="text-xs text-red-400">
-                                                        <strong>Denial Reason:</strong> {response.data.denial_reason}
-                                                    </p>
+                                            {/* Denial Detail */}
+                                            {response.data?.status === 'denied' && (
+                                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg space-y-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <XCircle size={18} className="text-red-400" />
+                                                        <span className="font-semibold text-red-400">
+                                                            {getDenialLabel(response.data.denial_reason)}
+                                                        </span>
+                                                    </div>
+                                                    {response.data.denial_reason && (
+                                                        <p className="text-xs text-red-400/70 font-mono">
+                                                            code: {response.data.denial_reason}
+                                                        </p>
+                                                    )}
+                                                    {response.data.error && (
+                                                        <p className="text-xs text-red-400/80">
+                                                            {response.data.error}
+                                                        </p>
+                                                    )}
+                                                    {response.data.rules_evaluated && response.data.rules_evaluated.length > 0 && (
+                                                        <div className="mt-3 space-y-1.5">
+                                                            <p className="text-xs font-medium text-red-400/90">Rules Evaluated:</p>
+                                                            {response.data.rules_evaluated.map((rule, i) => (
+                                                                <div key={i} className={`flex items-start gap-2 px-2 py-1.5 rounded ${
+                                                                    rule.passed
+                                                                        ? 'bg-green-500/5 border border-green-500/15'
+                                                                        : 'bg-red-500/10 border border-red-500/20'
+                                                                }`}>
+                                                                    <span className={`mt-0.5 ${rule.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                                                        {rule.passed ? <CheckCircle size={13} /> : <XCircle size={13} />}
+                                                                    </span>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <span className={`text-xs font-medium ${rule.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                                                            {rule.rule?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                                                                        </span>
+                                                                        {!rule.passed && (
+                                                                            <span className="ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400">
+                                                                                FAILED
+                                                                            </span>
+                                                                        )}
+                                                                        {rule.reason && (
+                                                                            <p className="text-[11px] text-ss-text-tertiary mt-0.5">{rule.reason}</p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* 500 Server Error Detail */}
+                                            {response.status >= 500 && response.data?.status !== 'denied' && (
+                                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <AlertTriangle size={18} className="text-red-400" />
+                                                        <span className="font-semibold text-red-400">Server Error</span>
+                                                    </div>
+                                                    {(response.data?.detail || response.data?.error) && (
+                                                        <p className="text-xs text-red-400/80">
+                                                            {response.data.detail || response.data.error}
+                                                        </p>
+                                                    )}
+                                                    {response.data?.message && (
+                                                        <p className="text-xs text-red-400/70">
+                                                            {response.data.message}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* 4xx Error Detail (non-denial) */}
+                                            {response.status >= 400 && response.status < 500 && response.data?.status !== 'denied' && (
+                                                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <AlertTriangle size={18} className="text-yellow-400" />
+                                                        <span className="font-semibold text-yellow-400">Request Error</span>
+                                                    </div>
+                                                    {(response.data?.detail || response.data?.error) && (
+                                                        <p className="text-xs text-yellow-400/80">
+                                                            {response.data.detail || response.data.error}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             )}
 
@@ -763,15 +858,39 @@ if (result.status === "approved") {
                                                 </div>
                                             )}
 
+                                            {/* Approved Amount Summary */}
+                                            {response.data?.status === 'approved' && (
+                                                <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <CheckCircle size={16} className="text-green-400" />
+                                                        <span className="text-sm font-medium text-green-400">
+                                                            Spend Approved
+                                                            {response.data.amount_cents != null && (
+                                                                <> — {formatCents(response.data.amount_cents)}</>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    {response.data.rules_evaluated && response.data.rules_evaluated.length > 0 && (
+                                                        <p className="text-xs text-green-400/70 mt-1">
+                                                            {response.data.rules_evaluated.filter(r => r.passed).length}/{response.data.rules_evaluated.length} rules passed
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+
                                             {/* Full JSON */}
-                                            <div>
-                                                <p className="text-xs text-ss-text-tertiary mb-2">Full Response:</p>
-                                                <pre className="bg-ss-code rounded-lg p-4 overflow-x-auto text-xs">
-                                                    <code className="text-ss-text-secondary font-mono">
-                                                        {JSON.stringify(response.data, null, 2)}
-                                                    </code>
-                                                </pre>
-                                            </div>
+                                            <details className="group">
+                                                <summary className="cursor-pointer text-xs text-ss-text-tertiary hover:text-ss-text-secondary transition-colors">
+                                                    ▶ Full Response JSON
+                                                </summary>
+                                                <div className="mt-2">
+                                                    <pre className="bg-ss-code rounded-lg p-4 overflow-x-auto text-xs">
+                                                        <code className="text-ss-text-secondary font-mono">
+                                                            {JSON.stringify(response.data, null, 2)}
+                                                        </code>
+                                                    </pre>
+                                                </div>
+                                            </details>
                                         </div>
                                     ) : (
                                         <div className="text-center py-12 text-ss-text-tertiary">
