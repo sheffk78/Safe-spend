@@ -184,8 +184,8 @@ router.post('/', spendRateLimiter, requireAuth, async (req, res) => {
             prisma.escrowAccount.findFirst({
                 where: { id: escrow_id, orgId: req.org.id }
             }),
-            idempotency_key ? prisma.spendRequest.findUnique({
-                where: { idempotencyKey: idempotency_key }
+            idempotency_key ? prisma.spendRequest.findFirst({
+                where: { idempotencyKey: idempotency_key, orgId: req.org.id }
             }) : null
         ]);
         

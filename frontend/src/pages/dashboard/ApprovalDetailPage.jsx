@@ -349,7 +349,7 @@ const ApprovalDetailPage = () => {
                                     </p>
                                 </div>
                                 <Link
-                                    to={`/dashboard/accounts`}
+                                    to={`/dashboard/accounts/${approval.escrow_account.id}`}
                                     className="block w-full text-center px-4 py-2 bg-ss-elevated hover:bg-[rgba(255,255,255,0.06)] rounded-lg text-ss-text-secondary text-sm transition-all"
                                 >
                                     View Account

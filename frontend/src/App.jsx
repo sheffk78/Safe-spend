@@ -38,6 +38,7 @@ import DashboardOverview from "@/pages/dashboard/DashboardOverview";
 import TransactionsPage from "@/pages/dashboard/TransactionsPage";
 import TransactionDetailPage from "@/pages/dashboard/TransactionDetailPage";
 import EscrowAccountsPage from "@/pages/dashboard/EscrowAccountsPage";
+import EscrowAccountDetailPage from "@/pages/dashboard/EscrowAccountDetailPage";
 import SpendingRulesPage from "@/pages/dashboard/SpendingRulesPage";
 import FiduciaryPoliciesPage from "@/pages/dashboard/FiduciaryPoliciesPage";
 import ApprovalsPage from "@/pages/dashboard/ApprovalsPage";
@@ -152,6 +153,7 @@ function App() {
                     >
                         <Route index element={<DashboardOverview />} />
                         <Route path="accounts" element={<EscrowAccountsPage />} />
+                        <Route path="accounts/:id" element={<EscrowAccountDetailPage />} />
                         <Route path="rules" element={<FiduciaryPoliciesPage />} />
                         <Route path="transactions" element={<TransactionsPage />} />
                         <Route path="transactions/:id" element={<TransactionDetailPage />} />
