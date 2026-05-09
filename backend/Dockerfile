@@ -23,7 +23,12 @@ RUN npx prisma generate
 # Copy application source (overwrites prisma/schema.prisma with original)
 COPY . .
 
-# Switch to PostgreSQL schema for production AFTER full copy
+# Verify schema parity BEFORE switching to PG schema
+# Compares schema.prisma (SQLite) vs schema.postgresql.prisma (PostgreSQL)
+# Blocks build if SQLite has columns missing from PostgreSQL
+RUN node scripts/check_schema_parity.js --ci
+
+# Switch to PostgreSQL schema for production
 RUN if [ -f prisma/schema.postgresql.prisma ]; then \
       cp prisma/schema.postgresql.prisma prisma/schema.prisma; \
     fi
