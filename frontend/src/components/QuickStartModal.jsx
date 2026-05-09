@@ -227,9 +227,11 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
         setLoading(true);
         setError(null);
 
+        let escrowResult = null;
+
         try {
             // Step 1: Create escrow account
-            const escrowResult = await createEscrowAccount({
+            escrowResult = await createEscrowAccount({
                 name: selectedTemplate.escrow.name,
                 currency: 'usd'
             });
@@ -241,7 +243,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
             const policyResult = await createPolicy({
                 ...selectedTemplate.policy,
                 escrow_id: escrowResult.id,
-                is_active: true
+                draft: false
             });
 
             setCreatedItems({
@@ -250,7 +252,13 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
             });
             setStep(4);
         } catch (err) {
-            setError(err.message);
+            // If escrow was created but policy failed, show partial success info
+            const detail = err.message || 'Unknown error';
+            if (escrowResult) {
+                setError(`Escrow account created, but policy creation failed: ${detail}. Your escrow "${selectedTemplate.escrow.name}" is available in the dashboard. You can create a policy manually from the Policies page.`);
+            } else {
+                setError(detail);
+            }
             setStep(2); // Go back to confirm step
         } finally {
             setLoading(false);

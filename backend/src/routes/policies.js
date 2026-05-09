@@ -143,8 +143,11 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
         
         res.status(201).json(formatPolicy(policy));
     } catch (error) {
-        console.error('Create policy error:', error);
-        res.status(500).json({ error: 'Failed to create policy' });
+        console.error('Create policy error:', error.message, error.stack);
+        res.status(500).json({ 
+            error: 'Failed to create policy',
+            detail: process.env.NODE_ENV !== 'production' ? error.message : undefined 
+        });
     }
 });
 
