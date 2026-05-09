@@ -23,7 +23,7 @@ router.post('/', requireAuth, requireOwnerKey, async (req, res) => {
             monthly_limit_cents,
             allowed_vendors = [],
             blocked_vendors = [],
-            vendor_match_mode = 'exact',
+            vendor_match_mode = 'substring',
             allowed_categories = [],
             blocked_categories = [],
             active_days = ['mon', 'tue', 'wed', 'thu', 'fri'],

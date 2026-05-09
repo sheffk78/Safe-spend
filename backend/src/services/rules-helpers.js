@@ -8,10 +8,10 @@
  * Match a vendor against a pattern based on match mode
  * @param {string} vendor - The vendor name from the request
  * @param {string} pattern - The pattern to match against
- * @param {string} mode - 'exact' | 'contains' | 'regex'
+ * @param {string} mode - 'substring' (default, bidirectional) | 'exact' | 'contains' | 'regex'
  * @returns {boolean}
  */
-function matchVendor(vendor, pattern, mode = 'exact') {
+function matchVendor(vendor, pattern, mode = 'substring') {
     if (!vendor || !pattern) return false;
     
     const vendorLower = vendor.toLowerCase();
@@ -21,7 +21,15 @@ function matchVendor(vendor, pattern, mode = 'exact') {
         case 'exact':
             return vendorLower === patternLower;
             
+        case 'substring':
+            // Bidirectional case-insensitive substring matching.
+            // Matches if EITHER string is a substring of the other.
+            // So "Meta" matches "Meta Ads", "google" matches "Google Ads",
+            // and "Anthropic" matches "Anthropic" (exact still works).
+            return vendorLower.includes(patternLower) || patternLower.includes(vendorLower);
+            
         case 'contains':
+            // Unidirectional: checks if the vendor string contains the pattern.
             return vendorLower.includes(patternLower);
             
         case 'regex':
@@ -35,7 +43,7 @@ function matchVendor(vendor, pattern, mode = 'exact') {
             }
             
         default:
-            return vendorLower === patternLower;
+            return vendorLower.includes(patternLower) || patternLower.includes(vendorLower);
     }
 }
 

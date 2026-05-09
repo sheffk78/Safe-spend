@@ -1036,7 +1036,7 @@ function checkVendor(context) {
     for (const policy of applicablePolicies) {
         const allowedVendors = parseJsonField(policy.allowedVendors, []);
         const blockedVendors = parseJsonField(policy.blockedVendors, []);
-        const matchMode = policy.vendorMatchMode || 'exact';
+        const matchMode = policy.vendorMatchMode || 'substring';
         
         // Check blocked vendors first
         if (blockedVendors.length > 0) {

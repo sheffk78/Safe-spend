@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Play,
@@ -252,6 +252,8 @@ const PlaygroundPage = () => {
 
     // Selected API key object (for full key access)
     const [selectedKeyFull, setSelectedKeyFull] = useState(null);
+    const [vendorFocused, setVendorFocused] = useState(false);
+    const vendorRef = useRef(null);
 
     useEffect(() => {
         fetchData();
@@ -505,6 +507,18 @@ if (result.status === "approved") {
         return ['ai_compute', 'advertising', 'saas_subscription', 'developer_tools', 'infrastructure', ...categories];
     };
 
+    // Parse allowed_vendors from the selected escrow's policy
+    const getAllowedVendors = () => {
+        const policy = getSelectedEscrowPolicy();
+        if (!policy?.allowed_vendors) return [];
+        const raw = policy.allowed_vendors;
+        if (Array.isArray(raw)) return raw;
+        if (typeof raw === 'string') {
+            try { return JSON.parse(raw); } catch { return raw.split(',').map(v => v.trim()).filter(Boolean); }
+        }
+        return [];
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -636,14 +650,41 @@ if (result.status === "approved") {
 
                             <div>
                                 <label className="block text-xs text-ss-text-secondary mb-1.5">Vendor</label>
-                                <input
-                                    type="text"
-                                    value={formData.vendor}
-                                    onChange={(e) => handleChange('vendor', e.target.value)}
-                                    placeholder="e.g., Anthropic"
-                                    className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
-                                    data-testid="vendor-input"
-                                />
+                                <div className="relative" ref={vendorRef}>
+                                    <input
+                                        type="text"
+                                        value={formData.vendor}
+                                        onChange={(e) => handleChange('vendor', e.target.value)}
+                                        onFocus={() => setVendorFocused(true)}
+                                        onBlur={() => setTimeout(() => setVendorFocused(false), 150)}
+                                        placeholder="e.g., Anthropic"
+                                        className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm placeholder-ss-text-tertiary focus:outline-none focus:border-ss-accent"
+                                        data-testid="vendor-input"
+                                    />
+                                    {vendorFocused && getAllowedVendors().length > 0 && (() => {
+                                        const vendors = getAllowedVendors().filter(v =>
+                                            !formData.vendor || v.toLowerCase().includes(formData.vendor.toLowerCase())
+                                        );
+                                        if (vendors.length === 0) return null;
+                                        return (
+                                            <div className="absolute z-10 left-0 right-0 top-full mt-1 bg-ss-elevated border border-[rgba(255,255,255,0.12)] rounded-lg shadow-lg shadow-black/30 max-h-48 overflow-y-auto">
+                                                {vendors.map(vendor => (
+                                                    <button
+                                                        key={vendor}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            handleChange('vendor', vendor);
+                                                            setVendorFocused(false);
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-sm text-ss-text-secondary hover:bg-ss-accent/10 hover:text-ss-text transition-colors"
+                                                    >
+                                                        {vendor}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
                             </div>
 
                             <div>
