@@ -58,9 +58,11 @@ model ApiKey {
   keyType     String    @map("key_type") // live | test | agent
   label       String?
   permissions String    @default("[]")
+  isActive    Boolean   @default(true) @map("is_active")
   lastUsedAt  DateTime? @map("last_used_at")
   isRevoked   Boolean   @default(false) @map("is_revoked")
   createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   // Relations
   organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -73,6 +75,7 @@ model ApiKey {
 model EscrowAccount {
   id                    String   @id @default(uuid())
   orgId                 String   @map("org_id")
+  agentId               String?  @map("agent_id") // agt_ format, links escrow to specific agent
   name                  String
   description           String?
   balanceCents          Int      @default(0) @map("balance_cents")
@@ -85,6 +88,15 @@ model EscrowAccount {
   metadata              String   @default("{}")
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
+  
+  // AAV Integration - Full configuration as JSON for flexibility
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array of AAV agent IDs
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array of AAV grant IDs
+  aavEnforcementMode    String   @default("none") @map("aav_enforcement_mode") // none | warn | strict | verify | log_only
+  aavApiKey             String?  @map("aav_api_key")                          // Encrypted AAV API key for server-to-server calls
+  aavRequireCertificate Boolean  @default(false) @map("aav_require_certificate")  // If true, every spend must include certificate_id
+  aavLastVerifiedAt     DateTime? @map("aav_last_verified_at")                // Last successful AAV verification
 
   // Relations
   organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -169,6 +181,7 @@ model SpendRequest {
   escrowId          String   @map("escrow_id")
   orgId             String   @map("org_id")
   apiKeyId          String?  @map("api_key_id")
+  agentId           String?  @map("agent_id") // agt_ format
   amountCents       Int      @map("amount_cents")
   currency          String   @default("usd")
   vendor            String
@@ -188,6 +201,22 @@ model SpendRequest {
   balanceBeforeCents Int?    @map("balance_before_cents")
   balanceAfterCents Int?     @map("balance_after_cents")
   
+  // Stripe integration
+  stripeTransferId  String?  @map("stripe_transfer_id")
+  stripePaymentId   String?  @map("stripe_payment_id")
+  
+  // AAV Integration (captured at request time)
+  aavAgentId            String?  @map("aav_agent_id")           // Agent ID from AAV claim
+  aavGrantId            String?  @map("aav_grant_id")           // Grant ID used for authorization
+  aavCertificateId      String?  @map("aav_certificate_id")     // Certificate ID presented by agent
+  aavVerificationStatus String?  @map("aav_verification_status") // verified | unverified | bypassed | denied
+  aavVerificationId     String?  @map("aav_verification_id")    // verif_... from AAV response
+  aavAutonomyLevel      Int?     @map("aav_autonomy_level")     // 1-4 from AAV response
+  aavResult             String?  @map("aav_result")             // authorized | denied | approval_pending | etc
+  aavDailySpend         String?  @map("aav_daily_spend")        // JSON: { used, limit, currency }
+  aavCheckedAt          DateTime? @map("aav_checked_at")        // When AAV was verified
+  denialSource          String?  @map("denial_source")          // aav | policy | balance | account | key
+  
   metadata          String   @default("{}")
   createdAt         DateTime @default(now()) @map("created_at")
 
@@ -200,6 +229,7 @@ model SpendRequest {
 
   // Ensure idempotency key is unique per org
   @@unique([orgId, idempotencyKey])
+  @@index([agentId])
   @@map("spend_requests")
 }
 
