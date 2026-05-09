@@ -101,47 +101,64 @@ model EscrowAccount {
 
 // Spending Policies (Rules)
 model SpendingPolicy {
-  id                        String   @id @default(uuid())
-  escrowId                  String   @map("escrow_id")
-  orgId                     String   @map("org_id")
-  name                      String
-  isActive                  Boolean  @default(true) @map("is_active")
+  id                      String    @id @default(uuid())
+  escrowId                String    @map("escrow_id")
+  orgId                   String    @map("org_id")
+  name                    String
+  purpose                 String?   // Free-form text describing the trust mandate purpose
+  status                  String    @default("draft") // draft | active | archived
+  isActive                Boolean   @default(true) @map("is_active")
+  lockedAt                DateTime? @map("locked_at")
+  lockedBy                String?   @map("locked_by")
   
-  // Spending limits
-  perTransactionLimitCents  Int?     @map("per_transaction_limit_cents")
-  dailyLimitCents           Int?     @map("daily_limit_cents")
-  weeklyLimitCents          Int?     @map("weekly_limit_cents")
-  monthlyLimitCents         Int?     @map("monthly_limit_cents")
+  // Amount limits
+  perTransactionLimitCents Int?     @map("per_transaction_limit_cents")
+  dailyLimitCents          Int?     @map("daily_limit_cents")
+  weeklyLimitCents         Int?     @map("weekly_limit_cents")
+  monthlyLimitCents        Int?     @map("monthly_limit_cents")
   
-  // Vendor controls
-  allowedVendors            String   @default("[]") @map("allowed_vendors") // JSON array
-  blockedVendors            String   @default("[]") @map("blocked_vendors") // JSON array
-  vendorMatchMode           String   @default("exact") @map("vendor_match_mode") // exact | contains | regex
+  // Vendor controls (stored as JSON strings)
+  allowedVendors    String  @default("[]") @map("allowed_vendors")
+  blockedVendors    String  @default("[]") @map("blocked_vendors")
+  vendorMatchMode   String  @default("exact") @map("vendor_match_mode") // exact | contains | regex
   
   // Category controls
-  allowedCategories         String   @default("[]") @map("allowed_categories") // JSON array
-  blockedCategories         String   @default("[]") @map("blocked_categories") // JSON array
+  allowedCategories String  @default("[]") @map("allowed_categories")
+  blockedCategories String  @default("[]") @map("blocked_categories")
   
-  // Time-based controls
-  activeDays                String   @default("[]") @map("active_days") // JSON array of days ["monday", "tuesday", etc]
-  activeHoursStart          String?  @map("active_hours_start") // "09:00"
-  activeHoursEnd            String?  @map("active_hours_end") // "17:00"
-  activeTimezone            String   @default("UTC") @map("active_timezone")
+  // Time controls
+  activeDays        String  @default("[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"]") @map("active_days")
+  activeHoursStart  String? @map("active_hours_start")
+  activeHoursEnd    String? @map("active_hours_end")
+  activeTimezone    String  @default("America/Denver") @map("active_timezone")
   
-  // Approval thresholds
-  autoApproveUnderCents     Int?     @map("auto_approve_under_cents")
-  requireHumanAboveCents    Int?     @map("require_human_above_cents")
-  approvalTimeoutMinutes    Int      @default(60) @map("approval_timeout_minutes")
+  // Approval controls
+  autoApproveUnderCents   Int?   @map("auto_approve_under_cents")
+  requireHumanAboveCents  Int?   @map("require_human_above_cents")
+  approvalTimeoutMinutes  Int    @default(60) @map("approval_timeout_minutes")
   
-  // Metadata
-  metadata                  String   @default("{}")
-  priority                  Int      @default(0) // Higher priority evaluated first
-  createdAt                 DateTime @default(now()) @map("created_at")
-  updatedAt                 DateTime @updatedAt @map("updated_at")
+  // AAV Integration (overrides escrow-level if set)
+  aavEnabled            Boolean  @default(false) @map("aav_enabled")
+  authorizedAgentIds    String   @default("[]") @map("authorized_agent_ids")  // JSON array
+  aavGrantIds           String   @default("[]") @map("aav_grant_ids")         // JSON array
+  aavEnforcementMode    String?  @map("aav_enforcement_mode")                 // null = inherit from escrow
+  aavRequiredAutonomyLevel Int?  @map("aav_required_autonomy_level")          // Minimum AAV autonomy level (1-4)
+  aavRequiredActions    String   @default("[]") @map("aav_required_actions")  // JSON array of required AAV actions
+  aavMapVendors         Boolean  @default(false) @map("aav_map_vendors")      // Sync approved_vendors from AAV grant
+  aavMapLimits          Boolean  @default(false) @map("aav_map_limits")       // Use AAV limits as additional ceiling
+  
+  // ARL Reputation Integration
+  minReputationScore    Int?     @map("min_reputation_score")                  // 0-100, deny if agent score below this
+  reputationSpendingBoost Boolean @default(false) @map("reputation_spending_boost") // If true, Platinum agents get 2x auto_approve
+  
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
-  organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  escrowAccount  EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  spendRequests  SpendRequest[] @relation("DenialRule")
 
   @@map("spending_policies")
 }
@@ -178,6 +195,7 @@ model SpendRequest {
   escrowAccount EscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
   organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   apiKey        ApiKey?       @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  denialRule    SpendingPolicy? @relation("DenialRule", fields: [denialRuleId], references: [id])
   approval      Approval?
 
   // Ensure idempotency key is unique per org
