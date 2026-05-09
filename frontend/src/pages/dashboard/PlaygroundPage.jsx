@@ -483,6 +483,19 @@ if (result.status === "approved") {
         return styles[status] || 'bg-ss-text-tertiary/20 text-ss-text-tertiary';
     };
 
+    // Get the active policy for the currently selected escrow
+    const getSelectedEscrowPolicy = () => {
+        if (!formData.escrow_id) return null;
+        return policies.find(p => p.escrow_id === formData.escrow_id && p.is_active !== false) || null;
+    };
+
+    // Check if a denial reason is vendor-related
+    const isVendorDenial = (reason) => {
+        if (!reason) return false;
+        const r = reason.toLowerCase();
+        return r.includes('vendor');
+    };
+
     // Get category suggestions based on policies
     const getCategorySuggestions = () => {
         const categories = new Set();
@@ -778,6 +791,24 @@ if (result.status === "approved") {
                                                             {response.data.error}
                                                         </p>
                                                     )}
+                                                    {/* Vendor denial hint: show allowed vendors from policy */}
+                                                    {isVendorDenial(response.data.denial_reason) && (() => {
+                                                        const policy = getSelectedEscrowPolicy();
+                                                        const allowedVendors = policy?.allowed_vendors;
+                                                        const vendors = Array.isArray(allowedVendors)
+                                                            ? allowedVendors
+                                                            : (typeof allowedVendors === 'string' ? (() => { try { return JSON.parse(allowedVendors); } catch { return allowedVendors.split(',').map(v => v.trim()).filter(Boolean); } })() : null);
+                                                        if (!vendors || vendors.length === 0) return null;
+                                                        const vendorList = vendors.join(', ');
+                                                        return (
+                                                            <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                                <Info size={14} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                                                                <p className="text-xs text-blue-400">
+                                                                    <strong>Vendors allowed by policy:</strong> {vendorList}
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                     {response.data.rules_evaluated && response.data.rules_evaluated.length > 0 && (
                                                         <div className="mt-3 space-y-1.5">
                                                             <p className="text-xs font-medium text-red-400/90">Rules Evaluated:</p>

@@ -10,15 +10,21 @@ import {
     Play,
     X,
     Shield,
+    ShieldCheck,
     Key,
     Clock,
     Bot,
     Copy,
-    Check
+    Check,
+    Ban,
+    Store,
+    CalendarDays,
+    Timer
 } from 'lucide-react';
 import {
     getEscrowAccount,
     getFundingHistory,
+    listPolicies,
     formatCents,
     formatDate
 } from '@/lib/api';
@@ -30,6 +36,7 @@ const EscrowAccountDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [copiedId, setCopiedId] = useState(false);
+    const [policies, setPolicies] = useState([]);
 
     useEffect(() => {
         fetchAccount();
@@ -48,6 +55,14 @@ const EscrowAccountDetailPage = () => {
             } catch {
                 // History is non-critical, ignore errors
                 setHistory([]);
+            }
+            // Also fetch spending policies
+            try {
+                const policyData = await listPolicies(id);
+                setPolicies(policyData.data || policyData || []);
+            } catch {
+                // Policies are non-critical, ignore errors
+                setPolicies([]);
             }
         } catch (err) {
             setError(err.message);
@@ -273,6 +288,140 @@ const EscrowAccountDetailPage = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* Spending Policy card */}
+                    {policies.length > 0 && (
+                        <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
+                            <h2 className="font-heading text-lg font-semibold text-ss-text mb-4 flex items-center gap-2">
+                                <ShieldCheck size={18} className="text-ss-accent" />
+                                Spending Policy
+                            </h2>
+                            {policies.map((policy) => {
+                                const allowedVendors = (() => { try { return JSON.parse(policy.allowedVendors || '[]'); } catch { return []; } })();
+                                const blockedVendors = (() => { try { return JSON.parse(policy.blockedVendors || '[]'); } catch { return []; } })();
+                                const activeDays = (() => { try { return JSON.parse(policy.activeDays || '[]'); } catch { return []; } })();
+
+                                return (
+                                    <div key={policy.id} className="space-y-3 mb-4 last:mb-0">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-sm font-medium text-ss-text">{policy.name}</p>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                policy.status === 'active'
+                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                    : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                            }`}>
+                                                {policy.status}
+                                            </span>
+                                        </div>
+
+                                        {/* Spending limits */}
+                                        {(policy.perTransactionLimitCents || policy.dailyLimitCents || policy.weeklyLimitCents || policy.monthlyLimitCents) && (
+                                            <div className="space-y-1.5">
+                                                <p className="text-xs text-ss-text-tertiary">Spending Limits</p>
+                                                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                                    {policy.perTransactionLimitCents != null && (
+                                                        <div className="flex items-center justify-between text-sm">
+                                                            <span className="text-ss-text-secondary">Per transaction</span>
+                                                            <span className="font-mono text-ss-text">{formatCents(policy.perTransactionLimitCents)}</span>
+                                                        </div>
+                                                    )}
+                                                    {policy.dailyLimitCents != null && (
+                                                        <div className="flex items-center justify-between text-sm">
+                                                            <span className="text-ss-text-secondary">Daily</span>
+                                                            <span className="font-mono text-ss-text">{formatCents(policy.dailyLimitCents)}</span>
+                                                        </div>
+                                                    )}
+                                                    {policy.weeklyLimitCents != null && (
+                                                        <div className="flex items-center justify-between text-sm">
+                                                            <span className="text-ss-text-secondary">Weekly</span>
+                                                            <span className="font-mono text-ss-text">{formatCents(policy.weeklyLimitCents)}</span>
+                                                        </div>
+                                                    )}
+                                                    {policy.monthlyLimitCents != null && (
+                                                        <div className="flex items-center justify-between text-sm">
+                                                            <span className="text-ss-text-secondary">Monthly</span>
+                                                            <span className="font-mono text-ss-text">{formatCents(policy.monthlyLimitCents)}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Auto-approve threshold */}
+                                        {policy.autoApproveUnderCents != null && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-ss-text-secondary">Auto-approve under</span>
+                                                <span className="font-mono text-green-400">{formatCents(policy.autoApproveUnderCents)}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Require human approval above */}
+                                        {policy.requireHumanAboveCents != null && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-ss-text-secondary">Human approval above</span>
+                                                <span className="font-mono text-amber-400">{formatCents(policy.requireHumanAboveCents)}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Allowed vendors */}
+                                        {allowedVendors.length > 0 && (
+                                            <div>
+                                                <p className="text-xs text-ss-text-tertiary mb-1 flex items-center gap-1">
+                                                    <Store size={12} />
+                                                    Allowed Vendors
+                                                </p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {allowedVendors.map((vendor, i) => (
+                                                        <span key={i} className="px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-xs text-green-400">
+                                                            {vendor}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Blocked vendors */}
+                                        {blockedVendors.length > 0 && (
+                                            <div>
+                                                <p className="text-xs text-ss-text-tertiary mb-1 flex items-center gap-1">
+                                                    <Ban size={12} />
+                                                    Blocked Vendors
+                                                </p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {blockedVendors.map((vendor, i) => (
+                                                        <span key={i} className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-xs text-red-400">
+                                                            {vendor}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Active schedule */}
+                                        {(activeDays.length > 0 || policy.activeHoursStart || policy.activeHoursEnd) && (
+                                            <div>
+                                                <p className="text-xs text-ss-text-tertiary mb-1 flex items-center gap-1">
+                                                    <CalendarDays size={12} />
+                                                    Active Schedule
+                                                </p>
+                                                <div className="text-sm text-ss-text space-y-0.5">
+                                                    {activeDays.length > 0 && (
+                                                        <p className="text-ss-text-secondary">{activeDays.map(d => d.charAt(0).toUpperCase() + d.slice(1, 3)).join(', ')}</p>
+                                                    )}
+                                                    {(policy.activeHoursStart || policy.activeHoursEnd) && (
+                                                        <p className="flex items-center gap-1 text-ss-text-secondary">
+                                                            <Timer size={12} className="text-ss-text-tertiary" />
+                                                            {policy.activeHoursStart || '00:00'} – {policy.activeHoursEnd || '23:59'}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
 
