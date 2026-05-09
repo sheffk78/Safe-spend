@@ -304,7 +304,16 @@ const EscrowAccountsPage = () => {
                                                     <MoreVertical size={16} />
                                                 </button>
                                                 {actionMenuOpen === account.id && (
-                                                    <div className="absolute right-0 top-full mt-1 w-48 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg shadow-lg z-10" data-testid={`action-dropdown-${account.id}`}>
+                                                    <div className="fixed z-50 mt-1 w-48 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg shadow-lg" data-testid={`action-dropdown-${account.id}`} style={{ top: 'auto', left: 'auto' }} ref={el => {
+                                                        if (el) {
+                                                            const btn = el.parentElement.querySelector('button[data-testid="action-menu-' + account.id + '"]');
+                                                            if (btn) {
+                                                                const rect = btn.getBoundingClientRect();
+                                                                el.style.top = (rect.bottom + 4) + 'px';
+                                                                el.style.left = (rect.right - 192) + 'px';
+                                                            }
+                                                        }
+                                                    }}>
                                                         <button
                                                             onClick={() => openFundModal(account)}
                                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-ss-text hover:bg-[rgba(255,255,255,0.05)] transition-all"
@@ -412,7 +421,7 @@ const EscrowAccountsPage = () => {
             {/* Click outside to close action menu */}
             {actionMenuOpen && (
                 <div 
-                    className="fixed inset-0 z-0" 
+                    className="fixed inset-0 z-40" 
                     onClick={() => setActionMenuOpen(null)}
                 />
             )}
