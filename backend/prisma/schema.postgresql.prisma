@@ -62,7 +62,7 @@ model ApiKey {
   lastUsedAt  DateTime? @map("last_used_at")
   isRevoked   Boolean   @default(false) @map("is_revoked")
   createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
 
   // Relations
   organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
