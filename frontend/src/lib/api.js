@@ -464,7 +464,7 @@ export const acceptInvite = async (token) => {
 // ============ Utility Functions ============
 export const formatCents = (cents) => {
     if (cents === null || cents === undefined) return '$0.00';
-    return `$${(cents / 100).toFixed(2)}`;
+    return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 export const formatDate = (dateStr) => {

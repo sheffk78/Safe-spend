@@ -1467,7 +1467,7 @@ const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
 
 // Step 4: Review & Activate
 const Step4Review = ({ formData, escrowAccounts }) => {
-    const formatCurrency = (val) => val ? `$${parseFloat(val).toFixed(2)}` : 'No limit';
+    const formatCurrency = (val) => val ? `$${parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'No limit';
     const formatList = (val) => val ? val.split(',').map(s => s.trim()).filter(s => s).join(', ') : 'All permitted';
     const escrowName = escrowAccounts.find(a => a.id === formData.escrow_id)?.name || 'Unknown';
 

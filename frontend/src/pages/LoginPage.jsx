@@ -51,11 +51,11 @@ const LoginPage = () => {
             <div className="flex-1 flex items-center justify-center px-6 py-12">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
-                        <Link to="/" className="inline-flex items-center mb-4">
+                        <Link to="/" className="inline-block mb-4">
                             <img 
                                 src="/logo-safespend-compact-light.svg" 
                                 alt="Safe-Spend" 
-                                className="h-10"
+                                className="h-10 mx-auto"
                             />
                         </Link>
                         <h1 className="font-heading text-2xl font-bold text-ss-text">Welcome back</h1>

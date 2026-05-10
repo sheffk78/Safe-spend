@@ -20,8 +20,11 @@ const SignupPage = () => {
         setLoading(true);
 
         try {
-            if (!email || !password || !confirmPassword) {
+            if (!email || !password) {
                 throw new Error('Please fill in all fields');
+            }
+            if (!name.trim()) {
+                throw new Error('Please enter your name');
             }
 
             if (password !== confirmPassword) {
@@ -61,11 +64,11 @@ const SignupPage = () => {
             <div className="flex-1 flex items-center justify-center px-6 py-12">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
-                        <Link to="/" className="inline-flex items-center mb-4">
+                        <Link to="/" className="inline-block mb-4">
                             <img 
                                 src="/logo-safespend-compact-light.svg" 
                                 alt="Safe-Spend" 
-                                className="h-10"
+                                className="h-10 mx-auto"
                             />
                         </Link>
                         <h1 className="font-heading text-2xl font-bold text-ss-text">Create your account</h1>
@@ -82,7 +85,7 @@ const SignupPage = () => {
 
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-ss-text mb-2">
-                                    Name <span className="text-ss-text-tertiary">(optional)</span>
+                                    Name
                                 </label>
                                 <input
                                     id="name"
@@ -92,6 +95,7 @@ const SignupPage = () => {
                                     className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
                                     placeholder="Your name"
                                     data-testid="signup-name-input"
+                                    required
                                 />
                             </div>
 
