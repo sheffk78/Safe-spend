@@ -230,10 +230,10 @@ const AuditLogPage = () => {
                             </select>
                         </div>
 
-                        {/* Escrow Account Filter */}
+                        {/* Protected Account Filter */}
                         <div>
                             <label className="block text-sm font-medium text-ss-text-secondary mb-2">
-                                Escrow Account
+                                Protected Account
                             </label>
                             <select
                                 value={filters.escrow_id}
@@ -426,7 +426,7 @@ const EventDetailPanel = ({ event, escrowName, onClose }) => {
                             <p className="text-sm font-mono text-ss-text-secondary truncate">{event.actor_id}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-ss-text-tertiary mb-1">Escrow Account</p>
+                            <p className="text-xs text-ss-text-tertiary mb-1">Protected Account</p>
                             <p className="text-sm text-ss-text">{escrowName}</p>
                         </div>
                         <div>

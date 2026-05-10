@@ -26,17 +26,17 @@ const TOUR_STEPS = [
     {
         id: 'quick-start',
         title: 'Quick Start Templates',
-        description: 'Click here to create a pre-configured escrow account and spending policy in one click. Choose from Marketing, Procurement, R&D, or DevOps templates.',
+        description: 'Click here to create a pre-configured protected account and spending policy in one click. Choose from Marketing, Procurement, R&D, or DevOps templates.',
         target: '[data-testid="quickstart-btn"]',
         route: '/dashboard',
         position: 'bottom',
         icon: Rocket,
-        action: 'Click "Quick Start" to create your first escrow setup'
+        action: 'Click "Quick Start" to create your first protected account setup'
     },
     {
         id: 'escrow-accounts',
-        title: 'Escrow Accounts',
-        description: 'This is where your agent funds are held. Each escrow account is a segregated pool with its own balance and spending policies.',
+        title: 'Protected Accounts',
+        description: 'This is where your agent funds are held. Each protected account is a segregated pool with its own balance and spending policies.',
         target: 'a[href="/dashboard/accounts"]',
         route: '/dashboard',
         position: 'right',
@@ -45,7 +45,7 @@ const TOUR_STEPS = [
     {
         id: 'spending-rules',
         title: 'Spending Rules',
-        description: 'Define fiduciary policies that control how your agents can spend. Set limits, vendor allowlists, approval thresholds, and more.',
+        description: 'Define spending policies that control how your agents can spend. Set limits, vendor allowlists, approval thresholds, and more.',
         target: 'a[href="/dashboard/rules"]',
         route: '/dashboard',
         position: 'right',
@@ -59,7 +59,7 @@ const TOUR_STEPS = [
         route: '/dashboard',
         position: 'right',
         icon: Play,
-        action: 'Try the Playground after creating an escrow'
+        action: 'Try the Playground after creating a protected account'
     },
     {
         id: 'api-keys',
@@ -74,7 +74,7 @@ const TOUR_STEPS = [
     {
         id: 'complete',
         title: 'You\'re All Set!',
-        description: 'You now know the basics of Safe-Spend. Create an escrow, define policies, generate an API key, and your agent is ready to spend safely.',
+        description: 'You now know the basics of Safe-Spend. Create a protected account, define policies, generate an API key, and your agent is ready to spend safely.',
         target: null,
         route: '/dashboard',
         position: 'center',

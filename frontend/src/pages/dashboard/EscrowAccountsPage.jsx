@@ -98,7 +98,7 @@ const EscrowAccountsPage = () => {
     };
 
     const handleClose = async (id) => {
-        if (!window.confirm('Are you sure you want to close this escrow account? This action cannot be undone.')) {
+        if (!window.confirm('Are you sure you want to close this protected account? This action cannot be undone.')) {
             return;
         }
         try {
@@ -157,8 +157,8 @@ const EscrowAccountsPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="font-heading text-2xl font-bold text-ss-text">Escrow Accounts</h1>
-                    <p className="text-ss-text-secondary mt-1">Manage your segregated escrow accounts and fund balances</p>
+                    <h1 className="font-heading text-2xl font-bold text-ss-text">Protected Accounts</h1>
+                    <p className="text-ss-text-secondary mt-1">Manage your segregated protected accounts and fund balances</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -176,7 +176,7 @@ const EscrowAccountsPage = () => {
                         data-testid="new-account-btn"
                     >
                         <Plus size={16} />
-                        New Escrow Account
+                        New Protected Account
                     </button>
                 </div>
             </div>
@@ -221,7 +221,7 @@ const EscrowAccountsPage = () => {
                     <div className="w-16 h-16 rounded-full bg-ss-accent/10 flex items-center justify-center mx-auto mb-6">
                         <Wallet className="w-8 h-8 text-ss-accent" />
                     </div>
-                    <h2 className="font-heading text-xl font-semibold text-ss-text mb-2">No escrow accounts yet</h2>
+                    <h2 className="font-heading text-xl font-semibold text-ss-text mb-2">No protected accounts yet</h2>
                     <p className="text-ss-text-secondary max-w-md mx-auto mb-6">
                         Create your first trust account to start controlling agent spending.
                     </p>
@@ -231,7 +231,7 @@ const EscrowAccountsPage = () => {
                         data-testid="empty-new-account-btn"
                     >
                         <Plus size={18} />
-                        New Escrow Account
+                        New Protected Account
                     </button>
                 </div>
             )}
@@ -482,7 +482,7 @@ const CreateAccountModal = ({ onClose, onSuccess }) => {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="create-account-modal">
             <div className="bg-ss-code border border-[rgba(255,255,255,0.1)] rounded-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
-                    <h2 className="font-heading text-lg font-semibold text-ss-text">New Escrow Account</h2>
+                    <h2 className="font-heading text-lg font-semibold text-ss-text">New Protected Account</h2>
                     <button onClick={onClose} className="text-ss-text-secondary hover:text-ss-text">
                         <X size={20} />
                     </button>

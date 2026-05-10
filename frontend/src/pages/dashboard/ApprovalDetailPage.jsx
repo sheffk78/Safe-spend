@@ -327,9 +327,9 @@ const ApprovalDetailPage = () => {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Escrow Account */}
+                    {/* Protected Account */}
                     <div className="bg-ss-surface rounded-xl border border-[rgba(255,255,255,0.06)] p-6">
-                        <h2 className="font-heading text-lg font-semibold text-ss-text mb-4">Escrow Account</h2>
+                        <h2 className="font-heading text-lg font-semibold text-ss-text mb-4">Protected Account</h2>
                         {approval?.escrow_account ? (
                             <div className="space-y-3">
                                 <div>

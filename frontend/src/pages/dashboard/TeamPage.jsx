@@ -615,7 +615,7 @@ const TeamPage = () => {
                             href="/docs/trust-law"
                             className="inline-flex items-center gap-1 text-xs text-ss-accent hover:underline mt-2"
                         >
-                            Learn more about fiduciary governance
+                            Learn more about spending governance
                             <ExternalLink size={12} />
                         </a>
                     </div>

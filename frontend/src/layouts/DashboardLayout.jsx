@@ -39,8 +39,8 @@ const ROLE_CONFIG = {
 
 const navItems = [
     { label: 'Overview', icon: LayoutDashboard, path: '/dashboard' },
-    { label: 'Escrow Accounts', icon: Wallet, path: '/dashboard/accounts' },
-    { label: 'Fiduciary Policies', icon: Scale, path: '/dashboard/rules' },
+    { label: 'Protected Accounts', icon: Wallet, path: '/dashboard/accounts' },
+    { label: 'Spending Policies', icon: Scale, path: '/dashboard/rules' },
     { label: 'Transactions', icon: ArrowRightLeft, path: '/dashboard/transactions' },
     { label: 'Approvals', icon: CheckCircle, path: '/dashboard/approvals' },
     { label: 'Playground', icon: Play, path: '/dashboard/playground' },

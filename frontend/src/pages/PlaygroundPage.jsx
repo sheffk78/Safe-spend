@@ -185,7 +185,7 @@ const QUICK_SCENARIOS = [
     },
     {
         id: 'create-escrow',
-        name: 'Create an Escrow Account',
+        name: 'Create a Protected Account',
         description: 'Open a new dedicated wallet',
         endpoint: { method: 'POST', path: '/v1/escrow-accounts' },
         prefill: {
@@ -268,7 +268,7 @@ const QUICK_SCENARIOS = [
 
 const ALL_ENDPOINTS = [
     {
-        category: 'Escrow Accounts',
+        category: 'Protected Accounts',
         endpoints: [
             { method: 'POST', path: '/v1/escrow-accounts', description: 'Create account' },
             { method: 'GET', path: '/v1/escrow-accounts', description: 'List accounts' },
@@ -548,7 +548,7 @@ const simulateSpendRequest = (body) => {
         return {
             status: 200,
             data: spendRequest,
-            plainEnglish: `❌ Spend Denied\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} was denied.\n\n• Escrow Account: ${account.name} (${escrow_id})\n• Amount Requested: ${formatCents(amount_cents)}\n• Vendor: ${vendor}\n• Category: ${category}\n\nRules Failed (${failedCount}):\n${failedRules.map(r => `✗ ${r}`).join('\n')}\n\nRules Passed (${passedCount}):\n${rulesEvaluated.filter(r => r.passed).map(r => `✓ ${r.rule.replace(/_/g, ' ')}`).join(', ')}`
+            plainEnglish: `❌ Spend Denied\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} was denied.\n\n• Protected Account: ${account.name} (${escrow_id})\n• Amount Requested: ${formatCents(amount_cents)}\n• Vendor: ${vendor}\n• Category: ${category}\n\nRules Failed (${failedCount}):\n${failedRules.map(r => `✗ ${r}`).join('\n')}\n\nRules Passed (${passedCount}):\n${rulesEvaluated.filter(r => r.passed).map(r => `✓ ${r.rule.replace(/_/g, ' ')}`).join(', ')}`
         };
     }
     
@@ -571,7 +571,7 @@ const simulateSpendRequest = (body) => {
         return {
             status: 200,
             data: spendRequest,
-            plainEnglish: `⏳ Pending Human Approval\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} has been placed on hold for human review.\n\n• Escrow Account: ${account.name} (${escrow_id})\n• Amount: ${formatCents(amount_cents)}\n• Reason: Exceeds auto-approve threshold (${formatCents(policy.auto_approve_under_cents)})\n• Approval ID: ${spendRequest.approval_id}\n\nThe account owner will be notified. They can approve or deny from the dashboard.`
+            plainEnglish: `⏳ Pending Human Approval\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} has been placed on hold for human review.\n\n• Protected Account: ${account.name} (${escrow_id})\n• Amount: ${formatCents(amount_cents)}\n• Reason: Exceeds auto-approve threshold (${formatCents(policy.auto_approve_under_cents)})\n• Approval ID: ${spendRequest.approval_id}\n\nThe account owner will be notified. They can approve or deny from the dashboard.`
         };
     }
     
@@ -596,7 +596,7 @@ const simulateSpendRequest = (body) => {
     return {
         status: 200,
         data: spendRequest,
-        plainEnglish: `✅ Spend Approved\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} was approved.\n\n• Escrow Account: ${account.name} (${escrow_id})\n• Amount: ${formatCents(amount_cents)}\n• Vendor: ${vendor}\n• Category: ${category}\n• Remaining Balance: ${formatCents(account.balance_cents)}\n\nAll ${rulesEvaluated.length} policy rules passed. The spend was auto-approved because it was under the ${formatCents(policy?.auto_approve_under_cents || 0)} threshold.`
+        plainEnglish: `✅ Spend Approved\n\nYour agent's request to spend ${formatCents(amount_cents)} at ${vendor} was approved.\n\n• Protected Account: ${account.name} (${escrow_id})\n• Amount: ${formatCents(amount_cents)}\n• Vendor: ${vendor}\n• Category: ${category}\n• Remaining Balance: ${formatCents(account.balance_cents)}\n\nAll ${rulesEvaluated.length} policy rules passed. The spend was auto-approved because it was under the ${formatCents(policy?.auto_approve_under_cents || 0)} threshold.`
     };
 };
 
@@ -682,7 +682,7 @@ const PublicPlaygroundPage = () => {
     const [response, setResponse] = useState(null);
     const [sending, setSending] = useState(false);
     
-    const [expandedCategories, setExpandedCategories] = useState(['Escrow Accounts', 'Spend Requests']);
+    const [expandedCategories, setExpandedCategories] = useState(['Protected Accounts', 'Spend Requests']);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showShortcuts, setShowShortcuts] = useState(false);
     

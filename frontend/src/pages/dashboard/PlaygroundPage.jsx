@@ -150,8 +150,8 @@ const RulesTimeline = ({ rules }) => {
 
     const getRuleLabel = (rule) => {
         const labels = {
-            'escrow_exists': 'Escrow Account Exists',
-            'escrow_active': 'Escrow Account Active',
+            'escrow_exists': 'Protected Account Exists',
+            'escrow_active': 'Protected Account Active',
             'sufficient_balance': 'Sufficient Balance',
             'per_transaction_limit': 'Per-Transaction Limit',
             'daily_limit': 'Daily Spending Cap',
@@ -223,7 +223,7 @@ const DENIAL_REASON_LABELS = {
     over_monthly_limit: 'Over Monthly Limit',
     over_per_transaction_limit: 'Over Per-Transaction Limit',
     auto_approve_limit_exceeded: 'Exceeds Auto-Approve Limit',
-    escrow_not_found: 'Escrow Account Not Found',
+    escrow_not_found: 'Protected Account Not Found',
     agent_mismatch: 'Agent Not Authorized'
 };
 
@@ -593,7 +593,7 @@ if (result.status === "approved") {
                         <div className="space-y-3">
                             <div>
                                 <label className="block text-xs text-ss-text-secondary mb-1.5">
-                                    Escrow Account <span className="text-ss-error">*</span>
+                                    Protected Account <span className="text-ss-error">*</span>
                                 </label>
                                 <select
                                     value={formData.escrow_id}

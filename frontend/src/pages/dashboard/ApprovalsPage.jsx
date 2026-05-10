@@ -226,7 +226,7 @@ const ApprovalCard = ({ approval, escrowName, isPending, isExpired, isProcessing
                         {/* Request metadata */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
-                                <p className="text-xs text-ss-text-tertiary mb-0.5">Escrow Account</p>
+                                <p className="text-xs text-ss-text-tertiary mb-0.5">Protected Account</p>
                                 <p className="text-ss-text truncate">{escrowName}</p>
                             </div>
                             <div>

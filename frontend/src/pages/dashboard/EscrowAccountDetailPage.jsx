@@ -95,7 +95,7 @@ const EscrowAccountDetailPage = () => {
                     className="inline-flex items-center gap-2 text-ss-text-secondary hover:text-ss-text transition-colors"
                 >
                     <ArrowLeft size={18} />
-                    Back to Escrow Accounts
+                    Back to Protected Accounts
                 </Link>
                 <div className="p-4 bg-[rgba(239,68,68,0.1)] border border-ss-error/30 rounded-lg text-ss-error">
                     {error}
@@ -114,7 +114,7 @@ const EscrowAccountDetailPage = () => {
                 className="inline-flex items-center gap-2 text-ss-text-secondary hover:text-ss-text transition-colors"
             >
                 <ArrowLeft size={18} />
-                Back to Escrow Accounts
+                Back to Protected Accounts
             </Link>
 
             {/* Header */}

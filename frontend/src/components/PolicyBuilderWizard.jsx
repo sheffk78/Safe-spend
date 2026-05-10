@@ -480,8 +480,8 @@ const PatternSelectionStep = ({ patterns, selectedPattern, onSelect }) => (
 const BasicsStep = ({ formData, escrowAccounts, onChange, selectedPattern }) => (
     <div className="space-y-4">
         <TrustLawCallout title="Trust Identity" type="info">
-            <p>Name your policy (trust instrument) and link it to an escrow account (trust account). 
-            The escrow account holds the segregated funds that this policy will govern.</p>
+            <p>Name your policy (trust instrument) and link it to a protected account (trust account). 
+            The protected account holds the segregated funds that this policy will govern.</p>
         </TrustLawCallout>
 
         <div>
@@ -504,7 +504,7 @@ const BasicsStep = ({ formData, escrowAccounts, onChange, selectedPattern }) => 
 
         <div>
             <label className="block text-sm font-medium text-ss-text-secondary mb-2">
-                Escrow Account (Trust Account) <span className="text-ss-error">*</span>
+                Protected Account <span className="text-ss-error">*</span>
             </label>
             <select
                 value={formData.escrow_id}
@@ -513,7 +513,7 @@ const BasicsStep = ({ formData, escrowAccounts, onChange, selectedPattern }) => 
                 className="w-full px-4 py-2.5 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text focus:outline-none focus:border-ss-accent"
                 data-testid="wizard-escrow-select"
             >
-                <option value="">Select an escrow account...</option>
+                <option value="">Select a protected account...</option>
                 {escrowAccounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name}</option>
                 ))}
@@ -536,7 +536,7 @@ const BasicsStep = ({ formData, escrowAccounts, onChange, selectedPattern }) => 
             </label>
             <div>
                 <span className="text-sm text-ss-text">Activate Policy Immediately</span>
-                <p className="text-xs text-ss-text-tertiary">When active, this policy will immediately govern spending from the linked escrow</p>
+                <p className="text-xs text-ss-text-tertiary">When active, this policy will immediately govern spending from the linked protected account</p>
             </div>
         </div>
     </div>
@@ -545,7 +545,7 @@ const BasicsStep = ({ formData, escrowAccounts, onChange, selectedPattern }) => 
 // Step 2: Limits
 const LimitsStep = ({ formData, onChange, selectedPattern }) => (
     <div className="space-y-4">
-        <TrustLawCallout title="Spending Caps (Fiduciary Limits)" type="info">
+        <TrustLawCallout title="Spending Caps" type="info">
             <p>These limits define the maximum exposure at each time scale. Like a trust that caps disbursements, 
             these prevent runaway spending regardless of what the agent attempts.</p>
         </TrustLawCallout>
@@ -886,7 +886,7 @@ const ReviewStep = ({ formData, selectedPattern }) => {
         <div className="space-y-4">
             <TrustLawCallout title="Review Your Trust Instrument" type="success">
                 <p>Review the policy configuration below. This trust instrument will govern all spend requests 
-                from the linked escrow account according to these rules.</p>
+                from the linked protected account according to these rules.</p>
             </TrustLawCallout>
 
             <div className="bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] overflow-hidden">

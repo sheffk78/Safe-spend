@@ -149,14 +149,14 @@ const SpendingRulesPage = () => {
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Spending Rules</h1>
                     <p className="text-ss-text-secondary mt-1">
-                        Define fiduciary policies for your escrow accounts.{' '}
+                        Define spending policies for your protected accounts.{' '}
                         <Link to="/docs/api#policies" className="text-ss-accent hover:underline inline-flex items-center gap-1">
                             <BookOpen size={14} />
                             Learn how the rules engine works
                         </Link>
                         {' · '}
                         <Link to="/docs/trust-law" className="text-ss-accent hover:underline inline-flex items-center gap-1">
-                            New to fiduciary policies? Read the Trust Law Explainer
+                            New to spending policies? Read the Trust Law Explainer
                         </Link>
                     </p>
                 </div>
@@ -231,7 +231,7 @@ const SpendingRulesPage = () => {
                     </div>
                     <h2 className="font-heading text-xl font-semibold text-ss-text mb-2">No spending rules yet</h2>
                     <p className="text-ss-text-secondary max-w-md mx-auto mb-6">
-                        Add a policy to define fiduciary limits for your agent.
+                        Add a policy to define spending limits for your agent.
                     </p>
                     <button
                         onClick={() => setShowModal(true)}
@@ -747,7 +747,7 @@ const PolicyModal = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-ss-text-secondary mb-2">
-                                        Escrow Account <span className="text-ss-error">*</span>
+                                    Protected Account <span className="text-ss-error">*</span>
                                     </label>
                                     <select
                                         value={formData.escrow_id}
@@ -757,7 +757,7 @@ const PolicyModal = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                                         className="w-full px-4 py-2.5 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text focus:outline-none focus:border-ss-accent disabled:opacity-50"
                                         data-testid="escrow-select"
                                     >
-                                        <option value="">Select an escrow account...</option>
+                                        <option value="">Select a protected account...</option>
                                         {escrowAccounts.map(acc => (
                                             <option key={acc.id} value={acc.id}>{acc.name}</option>
                                         ))}

@@ -107,7 +107,7 @@ const FiduciaryPoliciesPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this fiduciary policy? This action cannot be undone.')) {
+        if (!window.confirm('Are you sure you want to delete this spending policy? This action cannot be undone.')) {
             return;
         }
         try {
@@ -119,7 +119,7 @@ const FiduciaryPoliciesPage = () => {
     };
 
     const handleLock = async (policy) => {
-        if (!window.confirm(`Activate fiduciary policy "${policy.name}"?\n\nOnce activated:\n• The Trust Mandate will be enforced\n• It cannot be modified until unlocked\n• An audit trail entry will be created`)) {
+        if (!window.confirm(`Activate spending policy "${policy.name}"?\n\nOnce activated:\n• The spending rules will be enforced\n• It cannot be modified until unlocked\n• An audit trail entry will be created`)) {
             return;
         }
         try {
@@ -163,10 +163,10 @@ const FiduciaryPoliciesPage = () => {
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text flex items-center gap-3">
                         <Scale className="w-7 h-7 text-ss-accent" />
-                        Fiduciary Policies
+                        Spending Policies
                     </h1>
                     <p className="text-ss-text-secondary mt-1">
-                        Define Trust Mandates that govern how your agents can spend.{' '}
+                        Define spending policies that govern how your agents can spend.{' '}
                         <Link to="/docs/trust-law" className="text-ss-accent hover:underline inline-flex items-center gap-1">
                             <BookOpen size={14} />
                             Learn about Trust Law principles
@@ -253,7 +253,7 @@ const FiduciaryPoliciesPage = () => {
                                 {stats.drafts} draft {stats.drafts === 1 ? 'policy' : 'policies'} pending review
                             </h3>
                             <p className="text-sm text-amber-400/70 mt-1">
-                                Review each draft Trust Mandate and click "Activate & Lock" to begin enforcement.
+                                Review each draft spending policy and click "Activate & Lock" to begin enforcement.
                             </p>
                         </div>
                     </div>
@@ -273,9 +273,9 @@ const FiduciaryPoliciesPage = () => {
                     <div className="w-16 h-16 rounded-full bg-ss-accent/10 flex items-center justify-center mx-auto mb-6">
                         <Scale className="w-8 h-8 text-ss-accent" />
                     </div>
-                    <h2 className="font-heading text-xl font-semibold text-ss-text mb-2">No fiduciary policies yet</h2>
+                    <h2 className="font-heading text-xl font-semibold text-ss-text mb-2">No spending policies yet</h2>
                     <p className="text-ss-text-secondary max-w-md mx-auto mb-6">
-                        Create a Trust Mandate to define purpose-restricted spending rules for your AI agents.
+                        Create a spending policy to define purpose-restricted spending rules for your AI agents.
                     </p>
                     <button
                         onClick={() => setShowWizard(true)}
@@ -283,7 +283,7 @@ const FiduciaryPoliciesPage = () => {
                         data-testid="empty-new-policy-btn"
                     >
                         <Plus size={18} />
-                        Create Trust Mandate
+                        Create Spending Policy
                     </button>
                 </div>
             )}
@@ -367,7 +367,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
             {isDraft && (
                 <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2">
                     <FileText size={14} className="text-amber-400" />
-                    <span className="text-xs font-medium text-amber-400">DRAFT - Review and activate to enforce this Trust Mandate</span>
+                    <span className="text-xs font-medium text-amber-400">DRAFT - Review and activate to enforce this spending policy</span>
                 </div>
             )}
 
@@ -870,9 +870,9 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
                         </div>
                         <div>
                             <h2 className="font-heading text-lg font-semibold text-ss-text">
-                                {isEditing ? 'Edit Fiduciary Policy' : 'Create Fiduciary Policy'}
+                                {isEditing ? 'Edit Spending Policy' : 'Create Spending Policy'}
                             </h2>
-                            <p className="text-xs text-ss-text-tertiary">Define a Trust Mandate for your AI agent</p>
+                            <p className="text-xs text-ss-text-tertiary">Define a spending policy for your AI agent</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="text-ss-text-secondary hover:text-ss-text p-2" data-testid="wizard-close-btn">
@@ -1011,8 +1011,8 @@ const PolicyWizard = ({ policy, escrowAccounts, onClose, onSuccess }) => {
 const Step1Basics = ({ formData, escrowAccounts, onChange }) => (
     <div className="space-y-6">
         <TrustLawCallout>
-            A <strong>Fiduciary Policy</strong> is like a trust instrument that governs how funds can be spent.
-            Define the purpose (Trust Mandate) to ensure spending aligns with your organization's intent.
+            A <strong>Spending Policy</strong> is like a trust instrument that governs how funds can be spent.
+            Define the purpose (spending mandate) to ensure spending aligns with your organization's intent.
         </TrustLawCallout>
 
         <div>
@@ -1053,7 +1053,7 @@ const Step1Basics = ({ formData, escrowAccounts, onChange }) => (
 
         <div>
             <label className="block text-sm font-medium text-ss-text-secondary mb-2">
-                Purpose (Trust Mandate)
+                Purpose (Spending Mandate)
             </label>
             <div className="flex flex-wrap gap-2 mb-3">
                 {PURPOSE_PRESETS.filter(p => p.id !== 'custom').map(preset => (
@@ -1177,7 +1177,7 @@ const Step2Thresholds = ({ formData, onChange }) => {
             <div>
                 <h4 className="text-sm font-medium text-ss-text mb-3 flex items-center gap-2">
                     <DollarSign size={16} className="text-ss-accent" />
-                    Spending Limits (Fiduciary Caps)
+                    Spending Limits
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -1474,7 +1474,7 @@ const Step4Review = ({ formData, escrowAccounts }) => {
     return (
         <div className="space-y-4">
             <TrustLawCallout type="success">
-                Review your Trust Mandate below. You can save as a draft for later review, or activate immediately
+                Review your spending policy below. You can save as a draft for later review, or activate immediately
                 to begin enforcement.
             </TrustLawCallout>
 

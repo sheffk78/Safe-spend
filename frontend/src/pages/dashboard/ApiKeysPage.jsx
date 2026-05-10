@@ -352,7 +352,7 @@ const CreateKeyModal = ({ onClose, onSuccess }) => {
     const [error, setError] = useState(null);
 
     const permissionOptions = [
-        { id: 'manage_escrow', label: 'Manage Escrow Accounts' },
+        { id: 'manage_escrow', label: 'Manage Protected Accounts' },
         { id: 'manage_policies', label: 'Manage Policies' },
         { id: 'create_spend', label: 'Create Spend Requests' },
         { id: 'view_transactions', label: 'View Transactions' },

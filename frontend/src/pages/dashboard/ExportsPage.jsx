@@ -303,10 +303,10 @@ const ExportsPage = () => {
                         </div>
                     </div>
                     
-                    {/* Escrow Filter */}
+                    {/* Protected Account Filter */}
                     <div>
                         <label className="block text-sm text-ss-text-secondary mb-1.5">
-                            Escrow Account
+                            Protected Account
                         </label>
                         <select
                             value={escrowId}
@@ -473,13 +473,13 @@ const ExportsPage = () => {
                         </h3>
                         <p className="text-xs text-ss-text-secondary">
                             CSV exports provide auditable records of all spend activity and system events. 
-                            Use these for quarterly reviews, compliance audits, and fiduciary reporting.
+                            Use these for quarterly reviews, compliance audits, and spending reports.
                         </p>
                         <a 
                             href="/docs/trust-law"
                             className="inline-flex items-center gap-1 text-xs text-ss-accent hover:underline mt-2"
                         >
-                            Learn about fiduciary governance
+                            Learn about spending governance
                             <ExternalLink size={12} />
                         </a>
                     </div>

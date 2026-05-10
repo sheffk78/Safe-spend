@@ -61,7 +61,7 @@ const TransactionDetailPage = () => {
     const getRuleDisplayName = (ruleName) => {
         const names = {
             'key_validation': 'Key Validation',
-            'escrow_account_check': 'Escrow Account Check',
+            'escrow_account_check': 'Protected Account Check',
             'idempotency_check': 'Idempotency Check',
             'balance_check': 'Balance Check',
             'per_transaction_limit': 'Per-Transaction Limit',
@@ -160,7 +160,7 @@ const TransactionDetailPage = () => {
                     <h2 className="font-heading text-lg font-semibold text-ss-text mb-4">Balance Impact</h2>
                     <div className="space-y-3">
                         <div className="flex justify-between">
-                            <span className="text-ss-text-secondary">Escrow Account</span>
+                            <span className="text-ss-text-secondary">Protected Account</span>
                             <span className="text-ss-text font-mono text-sm">{transaction.escrow_id}</span>
                         </div>
                         <div className="flex justify-between">
