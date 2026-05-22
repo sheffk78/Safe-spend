@@ -10,7 +10,7 @@ const DocsOverview = () => {
             
             <DocsText>
                 Safe-Spend is a <strong className="text-ss-text">fiat-first protected-account and spending-control API for AI agents</strong>. 
-                A human funds an escrow account, defines spending policies, and an AI agent spends against it via API. 
+                A human funds a protected account, defines spending policies, and an AI agent spends against it via API. 
                 Every dollar is governed by a trust-grade rules engine and logged in an immutable audit trail.
             </DocsText>
 
@@ -52,7 +52,7 @@ const DocsOverview = () => {
                         <Landmark className="w-5 h-5 text-ss-accent" />
                     </div>
                     <div>
-                        <h4 className="font-semibold text-ss-text mb-1">Escrow Account</h4>
+                        <h4 className="font-semibold text-ss-text mb-1">Protected Account</h4>
                         <p className="text-ss-text-secondary text-sm">
                             A segregated account that holds funds for agent spending. Funds are purpose-restricted and fully auditable. 
                             Think of it as a trust account, not a wallet.
@@ -154,7 +154,7 @@ const DocsOverview = () => {
                             <td className="py-3 px-4 font-medium text-ss-text">Segregated funds</td>
                             <td className="py-3 px-4">❌ No</td>
                             <td className="py-3 px-4">❌ N/A</td>
-                            <td className="py-3 px-4 text-ss-accent">✅ Escrow accounts</td>
+                            <td className="py-3 px-4 text-ss-accent">✅ Protected accounts</td>
                         </tr>
                     </tbody>
                 </table>
@@ -163,7 +163,7 @@ const DocsOverview = () => {
             <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]">
                 <h3 className="font-heading text-lg font-semibold text-ss-text mb-2">Ready to get started?</h3>
                 <p className="text-ss-text-secondary text-sm mb-4">
-                    Create your first escrow account and make a test spend in under 15 minutes.
+                    Create your first protected account and make a test spend in under 15 minutes.
                 </p>
                 <Link
                     to="/docs/quickstart"

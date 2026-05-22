@@ -18,7 +18,7 @@ const docSections = [
     {
         icon: Rocket,
         title: 'Quickstart',
-        description: 'Create your first escrow, set a policy, and make a spend request in 5 minutes.',
+        description: 'Create your first protected account, set a policy, and make a spend request in 5 minutes.',
         link: '/docs/quickstart',
         color: 'text-emerald-400',
         bgColor: 'bg-emerald-500/10',
@@ -26,7 +26,7 @@ const docSections = [
     {
         icon: BookOpen,
         title: 'Concepts',
-        description: 'Escrow accounts, spending policies, approval workflows, and the rules engine explained.',
+        description: 'Protected accounts, spending policies, approval workflows, and the rules engine explained.',
         link: '/docs/concepts',
         color: 'text-blue-400',
         bgColor: 'bg-blue-500/10',
@@ -34,7 +34,7 @@ const docSections = [
     {
         icon: Terminal,
         title: 'API Reference',
-        description: 'Full REST API documentation for every endpoint — escrow, policies, spend, approvals, webhooks.',
+        description: 'Full REST API documentation for every endpoint — protected accounts, policies, spend, approvals, webhooks.',
         link: '/docs/api-reference',
         color: 'text-violet-400',
         bgColor: 'bg-violet-500/10',
@@ -128,7 +128,7 @@ const DocsPage = () => {
                             Just getting started?
                         </h3>
                         <p className="text-ss-text-secondary text-sm mb-4">
-                            The quickstart walks you through creating an escrow, setting a policy, and making your first spend request — in under 5 minutes.
+                            The quickstart walks you through creating a protected account, setting a policy, and making your first spend request — in under 5 minutes.
                         </p>
                         <Link
                             to="/docs/quickstart"

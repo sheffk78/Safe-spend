@@ -14,7 +14,7 @@ const DocsConcepts = () => {
             </DocsText>
 
             {/* Escrow Accounts */}
-            <DocsHeading level={2} id="escrow-accounts">Escrow Accounts</DocsHeading>
+            <DocsHeading level={2} id="escrow-accounts">Protected Accounts</DocsHeading>
 
             <div className="flex gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-ss-accent/10 flex items-center justify-center flex-shrink-0">
@@ -22,8 +22,8 @@ const DocsConcepts = () => {
                 </div>
                 <div>
                     <DocsText>
-                        An <strong className="text-ss-text">Escrow Account</strong> is a segregated holding account for funds 
-                        designated for agent spending. Unlike a wallet, escrow accounts are purpose-restricted and governed 
+                        A <strong className="text-ss-text">Protected Account</strong> is a segregated holding account for funds 
+                        designated for agent spending. Unlike a wallet, protected accounts are purpose-restricted and governed 
                         by policies.
                     </DocsText>
                 </div>
@@ -56,7 +56,7 @@ const DocsConcepts = () => {
                 <div>
                     <DocsText>
                         A <strong className="text-ss-text">Spending Policy</strong> is a trust instrument that defines the rules 
-                        governing how funds can be spent from an escrow account. Think of it as a spending policy document 
+                        governing how funds can be spent from a protected account. Think of it as a spending policy document 
                         encoded as configuration.
                     </DocsText>
                 </div>
@@ -121,9 +121,9 @@ const DocsConcepts = () => {
 
             <div className="bg-ss-code rounded-lg p-4 mb-6 overflow-x-auto">
                 <ol className="text-sm font-mono space-y-1">
-                    <li className="text-ss-text-secondary"><span className="text-ss-accent">01.</span> Check escrow account exists and is active</li>
+                    <li className="text-ss-text-secondary"><span className="text-ss-accent">01.</span> Check protected account exists and is active</li>
                     <li className="text-ss-text-secondary"><span className="text-ss-accent">02.</span> Check sufficient balance</li>
-                    <li className="text-ss-text-secondary"><span className="text-ss-accent">03.</span> Load all active policies for the escrow</li>
+                    <li className="text-ss-text-secondary"><span className="text-ss-accent">03.</span> Load all active policies for the account</li>
                     <li className="text-ss-text-secondary"><span className="text-ss-accent">04.</span> Per-transaction limit check</li>
                     <li className="text-ss-text-secondary"><span className="text-ss-accent">05.</span> Daily spending cap check</li>
                     <li className="text-ss-text-secondary"><span className="text-ss-accent">06.</span> Weekly spending cap check</li>
@@ -165,7 +165,7 @@ const DocsConcepts = () => {
                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">Live</span>
                     </div>
                     <p className="text-ss-text-secondary text-sm">
-                        Full production access. Can create escrows, policies, fund accounts, and make spends.
+                        Full production access. Can create protected accounts, policies, fund accounts, and make spends.
                     </p>
                 </div>
 
@@ -186,7 +186,7 @@ const DocsConcepts = () => {
                     </div>
                     <p className="text-ss-text-secondary text-sm">
                         <strong>Restricted key for AI agents.</strong> Can only make spend requests and view transactions. 
-                        Cannot create escrows, modify policies, or fund accounts.
+                        Cannot create protected accounts, modify policies, or fund accounts.
                     </p>
                 </div>
             </div>
@@ -250,7 +250,7 @@ const DocsConcepts = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h4 className="font-semibold text-ss-text mb-1">Quickstart Guide</h4>
-                            <p className="text-ss-text-secondary text-sm">Create your first escrow and make a test spend</p>
+                            <p className="text-ss-text-secondary text-sm">Create your first protected account and make a test spend</p>
                         </div>
                         <ArrowRight className="text-ss-accent" size={20} />
                     </div>
