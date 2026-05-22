@@ -10,6 +10,7 @@ const SignupPage = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const { signup } = useAuth();
     const navigate = useNavigate();
@@ -19,22 +20,24 @@ const SignupPage = () => {
         setError('');
         setLoading(true);
 
+        // Per-field validation
+        const errors = {};
+        if (!name.trim()) errors.name = 'Name is required';
+        if (!email.trim()) errors.email = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Please enter a valid email';
+        if (!password) errors.password = 'Password is required';
+        else if (password.length < 8) errors.password = 'Must be at least 8 characters';
+        if (!confirmPassword) errors.confirmPassword = 'Please confirm your password';
+        else if (password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            setLoading(false);
+            return;
+        }
+        setFieldErrors({});
+
         try {
-            if (!email || !password) {
-                throw new Error('Please fill in all fields');
-            }
-            if (!name.trim()) {
-                throw new Error('Please enter your name');
-            }
-
-            if (password !== confirmPassword) {
-                throw new Error('Passwords do not match');
-            }
-
-            if (password.length < 8) {
-                throw new Error('Password must be at least 8 characters');
-            }
-
             const result = await signup(email, password, name);
             if (result.success) {
                 navigate('/dashboard');
@@ -91,12 +94,15 @@ const SignupPage = () => {
                                     id="name"
                                     type="text"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({...prev, name: ''})); }}
+                                    className={`w-full px-4 py-3 bg-ss-elevated border ${fieldErrors.name ? 'border-ss-error' : 'border-gray-200'} rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all`}
                                     placeholder="Your name"
                                     data-testid="signup-name-input"
                                     required
                                 />
+                                {fieldErrors.name && (
+                                    <p className="text-ss-error text-xs mt-1">{fieldErrors.name}</p>
+                                )}
                             </div>
 
                             <div>
@@ -107,11 +113,15 @@ const SignupPage = () => {
                                     id="email"
                                     type="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    onChange={(e) => { setEmail(e.target.value); setFieldErrors(prev => ({...prev, email: ''})); }}
+                                    className={`w-full px-4 py-3 bg-ss-elevated border ${fieldErrors.email ? 'border-ss-error' : 'border-gray-200'} rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all`}
                                     placeholder="you@example.com"
                                     data-testid="signup-email-input"
+                                    required
                                 />
+                                {fieldErrors.email && (
+                                    <p className="text-ss-error text-xs mt-1">{fieldErrors.email}</p>
+                                )}
                             </div>
 
                             <div>
@@ -123,10 +133,11 @@ const SignupPage = () => {
                                         id="password"
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12"
+                                        onChange={(e) => { setPassword(e.target.value); setFieldErrors(prev => ({...prev, password: ''})); }}
+                                        className={`w-full px-4 py-3 bg-ss-elevated border ${fieldErrors.password ? 'border-ss-error' : 'border-gray-200'} rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all pr-12`}
                                         placeholder="••••••••"
                                         data-testid="signup-password-input"
+                                        required
                                     />
                                     <button
                                         type="button"
@@ -137,6 +148,9 @@ const SignupPage = () => {
                                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
                                 </div>
+                                {fieldErrors.password && (
+                                    <p className="text-ss-error text-xs mt-1">{fieldErrors.password}</p>
+                                )}
                                 <p className="text-xs text-ss-text-tertiary mt-1">At least 8 characters</p>
                             </div>
 
@@ -148,11 +162,15 @@ const SignupPage = () => {
                                     id="confirmPassword"
                                     type={showPassword ? 'text' : 'password'}
                                     value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all"
+                                    onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors(prev => ({...prev, confirmPassword: ''})); }}
+                                    className={`w-full px-4 py-3 bg-ss-elevated border ${fieldErrors.confirmPassword ? 'border-ss-error' : 'border-gray-200'} rounded-lg text-ss-text placeholder-ss-text-tertiary focus:border-ss-accent focus:ring-2 focus:ring-ss-accent/20 transition-all`}
                                     placeholder="••••••••"
                                     data-testid="signup-confirm-password-input"
+                                    required
                                 />
+                                {fieldErrors.confirmPassword && (
+                                    <p className="text-ss-error text-xs mt-1">{fieldErrors.confirmPassword}</p>
+                                )}
                             </div>
 
                             <button

@@ -204,7 +204,7 @@ result = client.spend.create(
             </section>
 
             {/* Features — Simple list, no card grid */}
-            <section className="py-20 px-6">
+            <section id="features" className="py-20 px-6">
                 <div className="max-w-3xl mx-auto">
                     <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4">
                         What you get
@@ -275,6 +275,128 @@ result = client.spend.create(
                             <p className="text-ss-text-tertiary text-sm">Audit retention</p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* Pricing — 3-tier public summary */}
+            <section id="pricing" className="py-20 px-6 bg-ss-surface border-y border-ss-text-tertiary/15">
+                <div className="max-w-4xl mx-auto">
+                    <p className="text-ss-accent font-semibold text-sm tracking-wide uppercase mb-4 text-center">
+                        Pricing
+                    </p>
+                    <h2 className="font-heading text-3xl md:text-4xl font-bold text-ss-text mb-12 text-center">
+                        From sandbox to scale.
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Sandbox */}
+                        <div className="bg-ss-bg rounded-2xl border border-ss-text-tertiary/15 p-8 flex flex-col">
+                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Sandbox</h3>
+                            <p className="text-ss-text-secondary text-sm mb-4">For testing and development</p>
+                            <div className="flex items-baseline mb-6">
+                                <span className="font-heading text-4xl font-bold text-ss-text">Free</span>
+                            </div>
+                            <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    1 test escrow account
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Full API access
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Webhooks & audit trail
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-text-tertiary mt-0.5">✗</span>
+                                    <span className="text-ss-text-tertiary">No live transactions</span>
+                                </li>
+                            </ul>
+                            <Link
+                                to="/signup"
+                                className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center text-sm"
+                            >
+                                Start free
+                            </Link>
+                        </div>
+
+                        {/* Builder — Most popular */}
+                        <div className="relative bg-ss-bg rounded-2xl border-2 border-ss-accent/40 p-8 flex flex-col shadow-lg">
+                            <div className="absolute top-0 right-0 bg-ss-accent text-white text-xs font-semibold px-3 py-1 rounded-bl-lg rounded-tr-2xl">
+                                MOST POPULAR
+                            </div>
+                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Builder</h3>
+                            <p className="text-ss-text-secondary text-sm mb-4">For indie developers and small teams</p>
+                            <div className="flex items-baseline mb-6">
+                                <span className="font-heading text-4xl font-bold text-ss-text">$29</span>
+                                <span className="text-ss-text-secondary ml-1">/month</span>
+                            </div>
+                            <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    1 live escrow account
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Up to $5,000/mo escrow volume
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    0.5% transaction fee
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Email support
+                                </li>
+                            </ul>
+                            <Link
+                                to="/signup"
+                                className="px-6 py-3 bg-ss-accent hover:bg-ss-accent-hover text-white font-semibold rounded-lg transition-colors text-center text-sm"
+                            >
+                                Get started
+                            </Link>
+                        </div>
+
+                        {/* Scale */}
+                        <div className="bg-ss-bg rounded-2xl border border-ss-text-tertiary/15 p-8 flex flex-col">
+                            <h3 className="font-heading text-lg font-semibold text-ss-text mb-1">Scale</h3>
+                            <p className="text-ss-text-secondary text-sm mb-4">For growing teams and enterprises</p>
+                            <div className="flex items-baseline mb-6">
+                                <span className="font-heading text-4xl font-bold text-ss-text">$149</span>
+                                <span className="text-ss-text-secondary ml-1">/month</span>
+                            </div>
+                            <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Unlimited escrow accounts & volume
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    0.3% transaction fee
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Custom approval workflows
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-ss-accent mt-0.5">✓</span>
+                                    Priority support + SLA
+                                </li>
+                            </ul>
+                            <Link
+                                to="/signup"
+                                className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center text-sm"
+                            >
+                                Get started
+                            </Link>
+                        </div>
+                    </div>
+
+                    <p className="text-ss-text-secondary text-sm text-center mt-10">
+                        All plans include full API access, webhooks, and audit trails.
+                    </p>
                 </div>
             </section>
 

@@ -108,11 +108,11 @@ const Navbar = () => {
                                     Log in
                                 </Link>
                                 <Link
-                                    to="/dashboard"
+                                    to="/signup"
                                     className="px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-lg btn-hover shadow-ss-accent text-sm"
-                                    data-testid="nav-dashboard-cta"
+                                    data-testid="nav-signup-cta"
                                 >
-                                    Dashboard
+                                    Get Started Free
                                 </Link>
                             </>
                         )}
@@ -163,11 +163,11 @@ const Navbar = () => {
                                 </Link>
                             )}
                             <Link
-                                to="/dashboard"
+                                to="/signup"
                                 className="block w-full text-center px-5 py-2.5 bg-ss-accent hover:bg-ss-accent-hover text-white font-medium rounded-lg btn-hover shadow-ss-accent text-sm"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                Dashboard
+                                Get Started Free
                             </Link>
                         </div>
                     </div>
