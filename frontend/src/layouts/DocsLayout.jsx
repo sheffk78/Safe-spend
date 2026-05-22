@@ -32,7 +32,7 @@ const navigation = [
     {
         title: 'Quickstart',
         items: [
-            { name: 'Create your first escrow', href: '/docs/quickstart', icon: Rocket },
+            { name: 'Create your first protected account', href: '/docs/quickstart', icon: Rocket },
         ]
     },
     {

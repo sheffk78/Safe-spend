@@ -11,25 +11,25 @@ export const routeSEO = {
   },
   '/about': {
     title: 'About Safe-Spend | Agentic Trust',
-    description: 'Safe-Spend is built by Agentic Trust — fiduciary-grade infrastructure for autonomous agents. Learn about our team and mission.',
+    description: 'Safe-Spend is built by Agentic Trust — trust-grade infrastructure for autonomous agents. Learn about our team and mission.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
   '/pricing': {
-    title: 'Pricing | Safe-Spend — Escrow & Spend Controls for AI',
+    title: 'Pricing | Safe-Spend — Spend Controls for AI',
     description: 'Transparent pricing for Safe-Spend. Free tier available. Scale as your agent fleet grows. No hidden fees.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
   '/features': {
-    title: 'Features | Safe-Spend — Policy Engine, Escrow, Audit Trail',
-    description: 'Explore Safe-Spend features: policy-based spending rules, segregated escrow accounts, approval workflows, and complete audit trails for AI agents.',
+    title: 'Features | Safe-Spend — Policy Engine, Protected Accounts, Audit Trail',
+    description: 'Explore Safe-Spend features: policy-based spending rules, segregated protected accounts, approval workflows, and complete audit trails for AI agents.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
   '/faq': {
     title: 'FAQ | Safe-Spend',
-    description: 'Common questions about Safe-Spend: how escrow works, policy enforcement, API integration, and security.',
+    description: 'Common questions about Safe-Spend: how protected accounts work, policy enforcement, API integration, and security.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
@@ -41,13 +41,13 @@ export const routeSEO = {
   },
   '/playground': {
     title: 'API Playground | Safe-Spend',
-    description: 'Try the Safe-Spend API in your browser. Create escrow accounts, define policies, and test spend requests — no signup required.',
+    description: 'Try the Safe-Spend API in your browser. Create protected accounts, define policies, and test spend requests — no signup required.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
   '/signup': {
     title: 'Get Started | Safe-Spend — Free API Keys',
-    description: 'Create your free Safe-Spend account. Get API keys, set up your first escrow account, and define spending policies in minutes.',
+    description: 'Create your free Safe-Spend account. Get API keys, set up your first protected account, and define spending policies in minutes.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
@@ -71,7 +71,7 @@ export const routeSEO = {
   },
   '/blog': {
     title: 'Blog | Safe-Spend — AI Spending Governance',
-    description: 'Insights on AI agent spending, escrow infrastructure, policy-based governance, and the future of autonomous financial controls.',
+    description: 'Insights on AI agent spending, protected accounts, policy-based governance, and the future of autonomous financial controls.',
     ogType: 'website',
     ogImage: 'https://safe-spend.dev/og-image.png',
   },
@@ -108,7 +108,7 @@ export const organizationSchema = {
         "width": 512,
         "height": 128
       },
-      "description": "Fiat-first escrow and spending control for AI agents. Policy-based governance, segregated accounts, and complete audit trails.",
+      "description": "Fiat-first protected-account and spending control for AI agents. Policy-based governance, segregated accounts, and complete audit trails.",
       "email": "support@safe-spend.dev",
       "foundingDate": "2025",
       "founder": {
@@ -153,14 +153,14 @@ export const organizationSchema = {
           {
             "@type": "Offer",
             "name": "Free Tier",
-            "description": "Up to 3 agents, $100/mo escrow cap, basic policies",
+            "description": "Up to 3 agents, $100/mo protected account cap, basic policies",
             "price": "0",
             "priceCurrency": "USD"
           },
           {
             "@type": "Offer",
             "name": "Pro",
-            "description": "Unlimited agents, $10,000/mo escrow cap, advanced policies, approval workflows",
+            "description": "Unlimited agents, $10,000/mo protected account cap, advanced policies, approval workflows",
             "price": "49",
             "priceCurrency": "USD"
           },
