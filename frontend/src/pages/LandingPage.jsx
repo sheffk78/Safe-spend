@@ -305,7 +305,7 @@ result = client.spend.create(
                             <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
-                                    1 test escrow account
+                                    1 test protected account
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
@@ -342,11 +342,11 @@ result = client.spend.create(
                             <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
-                                    1 live escrow account
+                                    1 live protected account
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
-                                    Up to $5,000/mo escrow volume
+                                    Up to $5,000/mo protected account volume
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
@@ -376,7 +376,7 @@ result = client.spend.create(
                             <ul className="space-y-3 text-sm text-ss-text-secondary mb-8 flex-1">
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>
-                                    Unlimited escrow accounts & volume
+                                    Unlimited protected accounts & volume
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-ss-accent mt-0.5">✓</span>

@@ -143,7 +143,7 @@ const ApprovalActionPage = () => {
                     
                     {result.new_balance_cents !== undefined && (
                         <div className="bg-ss-bg rounded-lg p-4 mb-6">
-                            <p className="text-xs text-ss-text-tertiary mb-1">New Escrow Balance</p>
+                            <p className="text-xs text-ss-text-tertiary mb-1">New Protected Account Balance</p>
                             <p className="text-2xl font-semibold text-ss-text">
                                 {formatCents(result.new_balance_cents)}
                             </p>
@@ -224,7 +224,7 @@ const ApprovalActionPage = () => {
                             </span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-ss-text-secondary">Escrow</span>
+                            <span className="text-ss-text-secondary">Protected Account</span>
                             <span className="text-ss-text">
                                 {actionDetails?.escrow_name}
                             </span>

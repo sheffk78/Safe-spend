@@ -9,8 +9,8 @@ const DocsOverview = () => {
             <DocsHeading level={1}>What is Safe-Spend?</DocsHeading>
             
             <DocsText>
-                Safe-Spend is a <strong className="text-ss-text">fiat-first escrow and spending-control API for AI agents</strong>. 
-                A human funds an escrow account, defines fiduciary policies, and an AI agent spends against it via API. 
+                Safe-Spend is a <strong className="text-ss-text">fiat-first protected-account and spending-control API for AI agents</strong>. 
+                A human funds an escrow account, defines spending policies, and an AI agent spends against it via API. 
                 Every dollar is governed by a trust-grade rules engine and logged in an immutable audit trail.
             </DocsText>
 

@@ -86,7 +86,7 @@ const DashboardOverview = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-heading text-2xl font-bold text-ss-text">Dashboard</h1>
-                    <p className="text-ss-text-secondary mt-1">Overview of your escrow accounts and activity</p>
+                    <p className="text-ss-text-secondary mt-1">Overview of your protected accounts and activity</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -129,10 +129,10 @@ const DashboardOverview = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Total Escrowed */}
+                {/* Total Protected */}
                 <div className="bg-ss-surface p-6 rounded-xl border border-[rgba(255,255,255,0.06)]" data-testid="stat-total-escrowed">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-ss-text-tertiary text-sm">Total Escrowed</span>
+                        <span className="text-ss-text-tertiary text-sm">Total Protected</span>
                         <DollarSign className="w-5 h-5 text-ss-accent" />
                     </div>
                     <p className="text-2xl font-bold text-ss-accent font-heading">

@@ -395,7 +395,7 @@ const PolicyCard = ({ policy, escrowName, expanded, onToggleExpand, onEdit, onDe
                             </p>
                         )}
                         <p className="text-xs text-ss-text-tertiary mt-0.5">
-                            Trust Account: {escrowName}
+                            Protected Account: {escrowName}
                         </p>
                     </div>
                 </div>
@@ -1032,7 +1032,7 @@ const Step1Basics = ({ formData, escrowAccounts, onChange }) => (
 
         <div>
             <label className="block text-sm font-medium text-ss-text-secondary mb-2">
-                Trust Account (Escrow) <span className="text-ss-error">*</span>
+                Protected Account <span className="text-ss-error">*</span>
             </label>
             <select
                 value={formData.escrow_id}
@@ -1041,7 +1041,7 @@ const Step1Basics = ({ formData, escrowAccounts, onChange }) => (
                 className="w-full px-4 py-2.5 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text focus:outline-none focus:border-ss-accent"
                 data-testid="wizard-escrow-select"
             >
-                <option value="">Select an escrow account...</option>
+                <option value="">Select a protected account...</option>
                 {escrowAccounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name}</option>
                 ))}
@@ -1454,7 +1454,7 @@ const Step3Restrictions = ({ formData, onChange, toggleDay }) => (
                             className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm"
                             data-testid="wizard-aav-mode"
                         >
-                            <option value="">Inherit from escrow</option>
+                            <option value="">Inherit from account</option>
                             <option value="warn">Warn (log but allow)</option>
                             <option value="strict">Strict (deny unauthorized)</option>
                         </select>
@@ -1489,7 +1489,7 @@ const Step4Review = ({ formData, escrowAccounts }) => {
                         {formData.purpose && (
                             <p className="text-xs text-ss-accent mt-0.5">Purpose: {formData.purpose}</p>
                         )}
-                        <p className="text-xs text-ss-text-tertiary">Trust Account: {escrowName}</p>
+                        <p className="text-xs text-ss-text-tertiary">Protected Account: {escrowName}</p>
                     </div>
                 </div>
 

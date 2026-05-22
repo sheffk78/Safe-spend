@@ -38,10 +38,10 @@ const SUPPORTED_EVENTS = [
     { value: 'approval.approved', label: 'Approval Approved', category: 'Approval' },
     { value: 'approval.denied', label: 'Approval Denied', category: 'Approval' },
     { value: 'approval.expired', label: 'Approval Expired', category: 'Approval' },
-    { value: 'escrow.funded', label: 'Escrow Funded', category: 'Escrow' },
-    { value: 'escrow.paused', label: 'Escrow Paused', category: 'Escrow' },
-    { value: 'escrow.resumed', label: 'Escrow Resumed', category: 'Escrow' },
-    { value: 'escrow.closed', label: 'Escrow Closed', category: 'Escrow' }
+    { value: 'escrow.funded', label: 'Protected Account Funded', category: 'Protected Account' },
+    { value: 'escrow.paused', label: 'Protected Account Paused', category: 'Protected Account' },
+    { value: 'escrow.resumed', label: 'Protected Account Resumed', category: 'Protected Account' },
+    { value: 'escrow.closed', label: 'Protected Account Closed', category: 'Protected Account' }
 ];
 
 const WebhooksPage = () => {

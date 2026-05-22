@@ -30,7 +30,7 @@ export const homepageStructuredData = {
             "foundingDate": "2025",
             "knowsAbout": [
                 "AI agent spending controls",
-                "AI agent escrow",
+                "AI agent protected accounts",
                 "spending governance for autonomous agents",
                 "AI agent policy enforcement",
                 "autonomous agent budget management",
@@ -42,7 +42,7 @@ export const homepageStructuredData = {
                 "AI agent budget compliance",
                 "programmatic spending policies",
                 "AI agent transaction monitoring",
-                "agent fiduciary controls",
+                "agent spending controls",
                 "multi-agent spend orchestration"
             ],
             "applicationCategory": "FinanceApplication",

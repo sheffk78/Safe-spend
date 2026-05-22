@@ -58,7 +58,7 @@ const docSections = [
     {
         icon: Code,
         title: 'SDKs',
-        description: 'Python SDK and LangChain toolkit for adding fiduciary controls to any agent.',
+        description: 'Python SDK and LangChain toolkit for adding spending controls to any agent.',
         link: '/docs/sdks',
         color: 'text-cyan-400',
         bgColor: 'bg-cyan-500/10',
@@ -74,7 +74,7 @@ const docSections = [
     {
         icon: ScrollText,
         title: 'Trust Law & Fiduciary Duty',
-        description: 'Why card rails aren\'t enough — the legal and compliance case for fiduciary spending controls.',
+        description: 'Why card rails aren\'t enough — the legal and compliance case for spending controls.',
         link: '/docs/trust-law',
         color: 'text-teal-400',
         bgColor: 'bg-teal-500/10',

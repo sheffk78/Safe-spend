@@ -255,7 +255,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
             // If escrow was created but policy failed, show partial success info
             const detail = err.message || 'Unknown error';
             if (escrowResult) {
-                setError(`Escrow account created, but policy creation failed: ${detail}. Your escrow "${selectedTemplate.escrow.name}" is available in the dashboard. You can create a policy manually from the Policies page.`);
+                setError(`Protected account created, but policy creation failed: ${detail}. Your account "${selectedTemplate.escrow.name}" is available in the dashboard. You can create a policy manually from the Policies page.`);
             } else {
                 setError(detail);
             }
@@ -281,7 +281,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                         </div>
                         <div>
                             <h2 className="font-heading text-lg font-semibold text-ss-text">Quick Start Templates</h2>
-                            <p className="text-xs text-ss-text-tertiary">Create escrow + policy in one click</p>
+                            <p className="text-xs text-ss-text-tertiary">Create protected account + policy in one click</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="text-ss-text-secondary hover:text-ss-text p-2" data-testid="quickstart-close-btn">
@@ -312,7 +312,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                     {step === 1 && (
                         <div className="space-y-3">
                             <p className="text-sm text-ss-text-secondary mb-4">
-                                Choose a template to create a pre-configured escrow account and spending policy:
+                                Choose a template to create a pre-configured protected account and spending policy:
                             </p>
                             {QUICK_START_TEMPLATES.map(template => (
                                 <TemplateCard
@@ -339,8 +339,8 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                             <div className="p-4 bg-ss-surface rounded-lg border border-gray-200">
                                 <h4 className="text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider mb-3 flex items-center gap-2">
                                     <DollarSign size={12} />
-                                    Escrow Account
-                                </h4>
+                                Protected Account
+                            </h4>
                                 <p className="text-ss-text font-medium">{selectedTemplate.escrow.name}</p>
                                 <p className="text-sm text-ss-text-secondary">
                                     Initial Balance: <span className="text-ss-accent">{selectedTemplate.summary.budget}</span>
@@ -386,7 +386,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
 
                             <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                                 <p className="text-xs text-yellow-400">
-                                    <strong>Note:</strong> This will create a simulated escrow balance for testing. 
+                                    <strong>Note:</strong> This will create a simulated protected account balance for testing. 
                                     Use Stripe funding for real money.
                                 </p>
                             </div>
@@ -400,7 +400,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                 <div className="w-8 h-8 border-3 border-ss-accent/30 border-t-ss-accent rounded-full animate-spin" />
                             </div>
                             <h3 className="font-semibold text-ss-text mb-2">Creating your setup...</h3>
-                            <p className="text-sm text-ss-text-secondary">Setting up escrow account and spending policy</p>
+                            <p className="text-sm text-ss-text-secondary">Setting up protected account and spending policy</p>
                         </div>
                     )}
 
@@ -417,7 +417,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
 
                             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto text-left">
                                 <div className="p-3 bg-ss-surface rounded-lg border border-gray-200">
-                                    <p className="text-[10px] text-ss-text-tertiary uppercase">Escrow</p>
+                                    <p className="text-[10px] text-ss-text-tertiary uppercase">Account</p>
                                     <p className="text-sm text-ss-text font-mono truncate">{createdItems.escrow?.id}</p>
                                 </div>
                                 <div className="p-3 bg-ss-surface rounded-lg border border-gray-200">

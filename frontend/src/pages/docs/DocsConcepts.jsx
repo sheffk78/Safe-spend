@@ -56,7 +56,7 @@ const DocsConcepts = () => {
                 <div>
                     <DocsText>
                         A <strong className="text-ss-text">Spending Policy</strong> is a trust instrument that defines the rules 
-                        governing how funds can be spent from an escrow account. Think of it as a fiduciary document 
+                        governing how funds can be spent from an escrow account. Think of it as a spending policy document 
                         encoded as configuration.
                     </DocsText>
                 </div>

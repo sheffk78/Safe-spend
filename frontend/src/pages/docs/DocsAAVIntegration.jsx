@@ -56,7 +56,7 @@ const DocsAAVIntegration = () => {
 
             <DocsText>
                 When both layers are enabled, <strong className="text-ss-text">both must pass</strong> for a spend to be approved. 
-                This ensures the agent has organizational authority (AAV) AND the transaction meets your fiduciary rules (Safe-Spend).
+                This ensures the agent has organizational authority (AAV) AND the transaction meets your spending rules (Safe-Spend).
             </DocsText>
 
             {/* How It Works */}
