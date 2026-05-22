@@ -44,6 +44,12 @@ const LandingPage = () => {
                             >
                                 See how it works
                             </a>
+                            <a
+                                href="#pricing"
+                                className="px-6 py-3 bg-white border border-ss-text-tertiary/30 hover:border-ss-text-secondary text-ss-text font-semibold rounded-lg transition-colors text-center"
+                            >
+                                See plans
+                            </a>
                         </div>
                     </div>
                 </div>
