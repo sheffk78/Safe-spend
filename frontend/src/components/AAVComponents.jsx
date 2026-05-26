@@ -81,7 +81,7 @@ export const EscrowAAVConfig = ({ escrow, onUpdate, loading }) => {
         </div>
         <div>
           <h3 className="text-ss-text font-medium">Agent Authority Vault (AAV)</h3>
-          <p className="text-sm text-ss-text-tertiary">Control which AI agents can spend from this escrow</p>
+          <p className="text-sm text-ss-text-tertiary">Control which AI agents can spend from this protected account</p>
         </div>
       </div>
 
@@ -169,7 +169,7 @@ export const EscrowAAVConfig = ({ escrow, onUpdate, loading }) => {
               <span className="text-ss-text text-sm">Authorized Agent IDs</span>
             </div>
             <p className="text-xs text-gray-500 mb-2">
-              Agent IDs from AAV that can use this escrow (leave empty to allow any authorized agent)
+              Agent IDs from AAV that can use this protected account (leave empty to allow any authorized agent)
             </p>
             <div className="flex gap-2 mb-2">
               <input
@@ -313,14 +313,14 @@ export const PolicyAAVConfig = ({ policy, onUpdate }) => {
       {/* Override Enforcement Mode */}
       <div className="mb-4">
         <label className="text-sm text-ss-text-tertiary block mb-2">
-          Enforcement Mode (leave blank to inherit from escrow)
+          Enforcement Mode (leave blank to inherit from protected account)
         </label>
         <select
           value={config.aav_enforcement_mode || ''}
           onChange={(e) => handleChange('aav_enforcement_mode', e.target.value || null)}
           className="w-full px-4 py-2 bg-ss-elevated border border-gray-200 rounded-lg text-ss-text focus:outline-none focus:bg-ss-accent"
         >
-          <option value="">Inherit from escrow</option>
+          <option value="">Inherit from protected account</option>
           <option value="none">Disabled</option>
           <option value="log_only">Log Only</option>
           <option value="verify">Verify (Strict)</option>

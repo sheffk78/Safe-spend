@@ -213,7 +213,7 @@ const AdminOverviewPage = () => {
                     <p className="text-2xl font-bold text-ss-text font-mono">
                         {metrics?.escrow_accounts?.active || 0}
                     </p>
-                    <p className="text-xs text-[#6B7280] mt-1">Active Escrows</p>
+                    <p className="text-xs text-[#6B7280] mt-1">Active Protected Accounts</p>
                     <p className="text-xs text-ss-text-tertiary mt-1">
                         {metrics?.escrow_accounts?.total || 0} total, {metrics?.escrow_accounts?.paused || 0} paused
                     </p>

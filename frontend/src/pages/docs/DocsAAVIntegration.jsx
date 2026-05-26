@@ -109,10 +109,10 @@ const DocsAAVIntegration = () => {
             {/* Configuration */}
             <DocsHeading level={2} id="configuration">Configuration</DocsHeading>
 
-            <DocsHeading level={3} id="escrow-aav-config">Escrow Account AAV Settings</DocsHeading>
+            <DocsHeading level={3} id="escrow-aav-config">Protected Account AAV Settings</DocsHeading>
 
             <DocsText>
-                AAV is configured at the escrow account level. When creating or updating an escrow, include these fields:
+                AAV is configured at the protected account level. When creating or updating a protected account, include these fields:
             </DocsText>
 
             <CodeBlock
@@ -142,7 +142,7 @@ const DocsAAVIntegration = () => {
                         <tr className="border-b border-[rgba(255,255,255,0.06)]">
                             <td className="py-3 px-4"><InlineCode>aav_enabled</InlineCode></td>
                             <td className="py-3 px-4">boolean</td>
-                            <td className="py-3 px-4">Enable AAV integration for this escrow</td>
+                            <td className="py-3 px-4">Enable AAV integration for this protected account</td>
                         </tr>
                         <tr className="border-b border-[rgba(255,255,255,0.06)]">
                             <td className="py-3 px-4"><InlineCode>aav_enforcement_mode</InlineCode></td>
@@ -162,7 +162,7 @@ const DocsAAVIntegration = () => {
                         <tr className="border-b border-[rgba(255,255,255,0.06)]">
                             <td className="py-3 px-4"><InlineCode>authorized_agent_ids</InlineCode></td>
                             <td className="py-3 px-4">string[]</td>
-                            <td className="py-3 px-4">List of AAV agent IDs allowed to use this escrow</td>
+                            <td className="py-3 px-4">List of AAV agent IDs allowed to use this protected account</td>
                         </tr>
                         <tr className="border-b border-[rgba(255,255,255,0.06)]">
                             <td className="py-3 px-4"><InlineCode>aav_grant_ids</InlineCode></td>
@@ -367,7 +367,7 @@ const DocsAAVIntegration = () => {
             <DocsHeading level={2} id="policy-aav">Policy-Level AAV Settings</DocsHeading>
 
             <DocsText>
-                Spending policies can override escrow-level AAV settings and add additional constraints:
+                Spending policies can override protected account-level AAV settings and add additional constraints:
             </DocsText>
 
             <CodeBlock
@@ -437,7 +437,7 @@ const DocsAAVIntegration = () => {
                     <div>
                         <h4 className="font-semibold text-ss-text mb-1">Use authorized_agent_ids for isolation</h4>
                         <p className="text-ss-text-secondary text-sm">
-                            Restrict each escrow to specific agents by their AAV agent IDs. This prevents one agent from 
+                            Restrict each protected account to specific agents by their AAV agent IDs. This prevents one agent from 
                             accessing another agent's budget.
                         </p>
                     </div>
@@ -463,7 +463,7 @@ const DocsAAVIntegration = () => {
                     <div>
                         <h4 className="font-semibold text-ss-text mb-1">Enable certificates for high-security</h4>
                         <p className="text-ss-text-secondary text-sm">
-                            Set <InlineCode>aav_require_certificate: true</InlineCode> for escrows with high-value transactions. 
+                            Set <InlineCode>aav_require_certificate: true</InlineCode> for protected accounts with high-value transactions. 
                             Certificates provide cryptographic proof of agent identity.
                         </p>
                     </div>
@@ -479,7 +479,7 @@ const DocsAAVIntegration = () => {
                     className="block p-4 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] hover:border-ss-accent/50 transition-colors"
                 >
                     <h4 className="font-semibold text-ss-text mb-1">Concepts</h4>
-                    <p className="text-ss-text-secondary text-sm">Learn about escrow accounts, spending policies, and the rules engine</p>
+                    <p className="text-ss-text-secondary text-sm">Learn about protected accounts, spending policies, and the rules engine</p>
                 </Link>
                 <Link 
                     to="/docs/webhooks" 
@@ -493,7 +493,7 @@ const DocsAAVIntegration = () => {
                     className="block p-4 bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] hover:border-ss-accent/50 transition-colors"
                 >
                     <h4 className="font-semibold text-ss-text mb-1">API Reference</h4>
-                    <p className="text-ss-text-secondary text-sm">Full API documentation for escrow accounts and spend requests</p>
+                    <p className="text-ss-text-secondary text-sm">Full API documentation for protected accounts and spend requests</p>
                 </Link>
                 <a 
                     href="https://agentictrust.app" 
@@ -525,7 +525,7 @@ const DocsAAVIntegration = () => {
             
             <DocsList items={[
                 <><strong className="text-ss-text">Spend Requests</strong>: Pass <InlineCode>agent_id</InlineCode> in the body of POST /v1/spend. Required when AAV_ENABLED=true.</>,
-                <><strong className="text-ss-text">Escrow Accounts</strong>: Pass <InlineCode>agent_id</InlineCode> when creating an escrow to link it to a specific agent. If set, only that agent can spend from it.</>,
+                <><strong className="text-ss-text">Protected Accounts</strong>: Pass <InlineCode>agent_id</InlineCode> when creating a protected account to link it to a specific agent. If set, only that agent can spend from it.</>,
                 <><strong className="text-ss-text">Agent-scoped queries</strong>: Use GET /v1/agents/:agent_id/escrow-accounts and /spend-history to query by agent.</>
             ]} />
 
@@ -640,8 +640,8 @@ const DocsAAVIntegration = () => {
             <DocsList ordered items={[
                 <><strong className="text-ss-text">Step 0</strong>: Authority Verification (AAV) &mdash; skipped when AAV not configured</>,
                 <><strong className="text-ss-text">Step 1</strong>: Key Validation</>,
-                <><strong className="text-ss-text">Step 2</strong>: Escrow Account Check</>,
-                <><strong className="text-ss-text">Step 2.5</strong>: AAV Agent Authorization (escrow-level)</>,
+                <><strong className="text-ss-text">Step 2</strong>: Protected Account Check</>,
+                <><strong className="text-ss-text">Step 2.5</strong>: AAV Agent Authorization (protected account-level)</>,
                 <><strong className="text-ss-text">Step 3</strong>: Idempotency Check</>,
                 <><strong className="text-ss-text">Step 3.5</strong>: Reputation Check (ARL) &mdash; skipped when min_reputation_score not set</>,
                 <><strong className="text-ss-text">Step 4</strong>: Balance Check</>,
@@ -786,9 +786,9 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.approved</InlineCode></td><td className="py-2 px-4">Spend approved</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.denied</InlineCode></td><td className="py-2 px-4">Spend denied by rules engine</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.spend.expired</InlineCode></td><td className="py-2 px-4">Pending spend expired</td></tr>
-                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.paused</InlineCode></td><td className="py-2 px-4">Escrow paused</td></tr>
-                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.closed</InlineCode></td><td className="py-2 px-4">Escrow closed</td></tr>
-                        <tr><td className="py-2 px-4"><InlineCode>safe_spend.escrow.funded</InlineCode></td><td className="py-2 px-4">Escrow funded</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.paused</InlineCode></td><td className="py-2 px-4">Protected Account paused</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4"><InlineCode>safe_spend.escrow.closed</InlineCode></td><td className="py-2 px-4">Protected Account closed</td></tr>
+                        <tr><td className="py-2 px-4"><InlineCode>safe_spend.escrow.funded</InlineCode></td><td className="py-2 px-4">Protected Account funded</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -802,7 +802,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
 
             <DocsText>Accepted event types:</DocsText>
             <DocsList items={[
-                <><InlineCode>aav.grant.revoked</InlineCode>: Pauses linked escrow accounts</>,
+                <><InlineCode>aav.grant.revoked</InlineCode>: Pauses linked protected accounts</>,
                 <><InlineCode>aav.grant.created</InlineCode>: Logs event (auto-provision coming soon)</>,
                 <><InlineCode>arl.score.changed</InlineCode>: Updates cached reputation scores</>
             ]} />
@@ -888,7 +888,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
                     <tbody className="text-ss-text-secondary">
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Agent</td><td className="py-2 px-4"><InlineCode>agt_</InlineCode></td><td className="py-2 px-4">agt_1a2b3c4d5e6f7890abcdef12</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Organization</td><td className="py-2 px-4"><InlineCode>org_</InlineCode></td><td className="py-2 px-4">org_7kawbu8xm1q6</td></tr>
-                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Escrow Account</td><td className="py-2 px-4"><InlineCode>esc_</InlineCode></td><td className="py-2 px-4">esc_94lfhqfhvvg2</td></tr>
+                        <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Protected Account</td><td className="py-2 px-4"><InlineCode>esc_</InlineCode></td><td className="py-2 px-4">esc_94lfhqfhvvg2</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Spend Request</td><td className="py-2 px-4"><InlineCode>spr_</InlineCode></td><td className="py-2 px-4">spr_a1b2c3d4e5f6</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Policy</td><td className="py-2 px-4"><InlineCode>pol_</InlineCode></td><td className="py-2 px-4">pol_x9y8z7w6v5u4</td></tr>
                         <tr className="border-b border-[rgba(255,255,255,0.03)]"><td className="py-2 px-4">Certificate</td><td className="py-2 px-4"><InlineCode>cert_</InlineCode></td><td className="py-2 px-4">cert_abc123def456</td></tr>

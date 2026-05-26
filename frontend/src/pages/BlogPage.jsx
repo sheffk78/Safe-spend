@@ -118,6 +118,11 @@ export const BlogIndexPage = () => {
             <Helmet>
                 <title>Blog | Safe-Spend</title>
                 <meta name="description" content="Insights on AI agent spending controls, spending pools, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible." />
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="Blog | Safe-Spend" />
+                <meta property="og:description" content="Insights on AI agent spending controls, spending pools, financial guardrails, and the infrastructure keeping autonomous agents fiscally responsible." />
+                <meta property="og:url" content="https://safe-spend.dev/blog" />
+                <meta property="og:image" content="https://safe-spend.dev/og-image.png" />
                 <link rel="canonical" href="https://safe-spend.dev/blog" />
                 <link rel="alternate" type="application/rss+xml" title="Safe-Spend Blog" href="/api/blog/rss" />
             </Helmet>
@@ -354,7 +359,7 @@ export const BlogPostPage = () => {
                 <meta property="og:title" content={post.seo?.og_title || post.title} />
                 <meta property="og:description" content={post.seo?.og_description || post.excerpt} />
                 <meta property="og:url" content={post.seo?.canonical_url} />
-                {post.seo?.og_image && <meta property="og:image" content={post.seo.og_image} />}
+                <meta property="og:image" content={post.seo?.og_image || 'https://safe-spend.dev/og-image.png'} />
                 <meta name="twitter:card" content={post.seo?.twitter_card || 'summary_large_image'} />
                 <meta name="twitter:title" content={post.seo?.twitter_title || post.title} />
                 <meta name="twitter:description" content={post.seo?.twitter_description || post.excerpt} />

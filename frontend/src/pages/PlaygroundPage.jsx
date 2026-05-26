@@ -178,10 +178,10 @@ const QUICK_SCENARIOS = [
     {
         id: 'check-balance',
         name: 'Check Account Balance',
-        description: 'View remaining balance in escrow',
+        description: 'View remaining balance in a protected account',
         endpoint: { method: 'GET', path: '/v1/escrow-accounts/:id/balance' },
         prefill: { id: 'esc_demo_mktg01' },
-        plainEnglish: 'Check how much money is left in the Marketing Budget escrow account. Agents call this before spending to make sure they have enough funds.'
+        plainEnglish: 'Check how much money is left in the Marketing Budget protected account. Agents call this before spending to make sure they have enough funds.'
     },
     {
         id: 'create-escrow',
@@ -194,7 +194,7 @@ const QUICK_SCENARIOS = [
             currency: 'usd',
             metadata: { department: 'marketing', quarter: 'Q2-2026' }
         },
-        plainEnglish: "Create a new escrow account to hold funds. Think of this as opening a dedicated wallet with a specific purpose. You'll fund it and attach spending policies next."
+        plainEnglish: "Create a new protected account to hold funds. Think of this as opening a dedicated wallet with a specific purpose. You'll fund it and attach spending policies next."
     },
     {
         id: 'set-policy',
@@ -212,7 +212,7 @@ const QUICK_SCENARIOS = [
             auto_approve_under_cents: 5000,
             require_human_above_cents: 25000
         },
-        plainEnglish: 'Attach a spending policy to an escrow account. This one allows up to $500 per transaction, $1,000/day, and $5,000/month — only for Anthropic, OpenAI, and Google Cloud. Transactions under $50 auto-approve. Over $250 requires human sign-off.'
+        plainEnglish: 'Attach a spending policy to a protected account. This one allows up to $500 per transaction, $1,000/day, and $5,000/month — only for Anthropic, OpenAI, and Google Cloud. Transactions under $50 auto-approve. Over $250 requires human sign-off.'
     },
     {
         id: 'trigger-denial',
@@ -359,7 +359,7 @@ const processRequest = (method, path, body, queryParams) => {
         return {
             status: 200,
             data: { data: demoState.escrowAccounts, total: demoState.escrowAccounts.length },
-            plainEnglish: `Found ${demoState.escrowAccounts.length} escrow accounts. Total balance held: ${formatCents(demoState.escrowAccounts.reduce((sum, a) => sum + a.balance_cents, 0))}.`
+            plainEnglish: `Found ${demoState.escrowAccounts.length} protected accounts. Total balance held: ${formatCents(demoState.escrowAccounts.reduce((sum, a) => sum + a.balance_cents, 0))}.`
         };
     }
     
@@ -368,7 +368,7 @@ const processRequest = (method, path, body, queryParams) => {
         const id = path.split('/')[3];
         const account = demoState.escrowAccounts.find(a => a.id === id);
         if (!account) {
-            return { status: 404, data: { error: { code: 'NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No escrow account found with ID "${id}".` };
+            return { status: 404, data: { error: { code: 'NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No protected account found with ID "${id}".` };
         }
         return {
             status: 200,
@@ -382,7 +382,7 @@ const processRequest = (method, path, body, queryParams) => {
         const id = path.split('/')[3];
         const account = demoState.escrowAccounts.find(a => a.id === id);
         if (!account) {
-            return { status: 404, data: { error: { code: 'NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No escrow account found with ID "${id}".` };
+            return { status: 404, data: { error: { code: 'NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No protected account found with ID "${id}".` };
         }
         return { status: 200, data: account, plainEnglish: `Retrieved details for "${account.name}" — ${formatCents(account.balance_cents)} balance, status: ${account.status}.` };
     }
@@ -402,7 +402,7 @@ const processRequest = (method, path, body, queryParams) => {
             created_at: new Date().toISOString()
         };
         demoState.escrowAccounts.push(newAccount);
-        return { status: 201, data: newAccount, plainEnglish: `Created new escrow account "${newAccount.name}" with ID ${newAccount.id}. Fund it with POST /v1/escrow-accounts/${newAccount.id}/fund.` };
+        return { status: 201, data: newAccount, plainEnglish: `Created new protected account "${newAccount.name}" with ID ${newAccount.id}. Fund it with POST /v1/escrow-accounts/${newAccount.id}/fund.` };
     }
     
     // GET /v1/policies
@@ -419,7 +419,7 @@ const processRequest = (method, path, body, queryParams) => {
             created_at: new Date().toISOString()
         };
         demoState.policies.push(newPolicy);
-        return { status: 201, data: newPolicy, plainEnglish: `Created policy "${newPolicy.name}" for escrow ${newPolicy.escrow_id}. It's now active and will govern all spend requests.` };
+        return { status: 201, data: newPolicy, plainEnglish: `Created policy "${newPolicy.name}" for protected account ${newPolicy.escrow_id}. It's now active and will govern all spend requests.` };
     }
     
     // POST /v1/spend
@@ -458,7 +458,7 @@ const simulateSpendRequest = (body) => {
     
     const account = demoState.escrowAccounts.find(a => a.id === escrow_id);
     if (!account) {
-        return { status: 404, data: { error: { code: 'ESCROW_NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No escrow account found with ID "${escrow_id}".` };
+        return { status: 404, data: { error: { code: 'ESCROW_NOT_FOUND', message: 'Escrow account not found' } }, plainEnglish: `No protected account found with ID "${escrow_id}".` };
     }
     
     const policy = demoState.policies.find(p => p.escrow_id === escrow_id && p.is_active);
@@ -1298,7 +1298,7 @@ ${Object.entries(formData).map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'
                                     <span>·</span>
                                     <span>Marketing Budget: {formatCents(currentEscrow?.balance_cents || 0)}</span>
                                     <span>·</span>
-                                    <span>{demoState.escrowAccounts.length} escrow accounts</span>
+                                    <span>{demoState.escrowAccounts.length} protected accounts</span>
                                 </>
                             ) : (
                                 <>

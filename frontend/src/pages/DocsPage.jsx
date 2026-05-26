@@ -73,7 +73,7 @@ const docSections = [
     },
     {
         icon: ScrollText,
-        title: 'Trust Law & Fiduciary Duty',
+        title: 'Trust Law & Trust Duty',
         description: 'Why card rails aren\'t enough — the legal and compliance case for spending controls.',
         link: '/docs/trust-law',
         color: 'text-teal-400',

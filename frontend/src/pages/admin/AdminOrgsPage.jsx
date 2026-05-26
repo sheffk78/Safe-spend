@@ -226,7 +226,7 @@ const AdminOrgsPage = () => {
                             <p className="text-2xl font-bold text-ss-text">
                                 {orgs.reduce((sum, o) => sum + (o.escrowCount || 0), 0)}
                             </p>
-                            <p className="text-xs text-ss-text-tertiary">Total Escrows</p>
+                            <p className="text-xs text-ss-text-tertiary">Total Protected Accounts</p>
                         </div>
                     </div>
                 </div>
@@ -251,7 +251,7 @@ const AdminOrgsPage = () => {
                                     <SortHeader field="name">Organization</SortHeader>
                                     <SortHeader field="createdAt">Created</SortHeader>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider">
-                                        Escrows
+                                        Protected Accounts
                                     </th>
                                     <th className="text-left py-3 px-4 text-xs font-semibold text-ss-text-tertiary uppercase tracking-wider">
                                         Policies

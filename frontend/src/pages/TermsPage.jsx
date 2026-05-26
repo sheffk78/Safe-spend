@@ -21,7 +21,7 @@ const TermsPage = () => {
         { id: 'definitions', title: '1. Definitions' },
         { id: 'account-registration', title: '2. Account Registration & Organizations' },
         { id: 'api-keys', title: '3. API Keys & Agent Access' },
-        { id: 'escrow-accounts', title: '4. Escrow Accounts & Funds' },
+        { id: 'escrow-accounts', title: '4. Protected Accounts & Funds' },
         { id: 'spending-policies', title: '5. Spending Policies & the Rules Engine' },
         { id: 'approvals', title: '6. Approvals & Human-in-the-Loop Controls' },
         { id: 'payment-terms', title: '7. Payment Terms & Fees' },
@@ -87,13 +87,13 @@ const TermsPage = () => {
                         <Section id="definitions" title="1. Definitions">
                             <p className="mb-4">In these Terms, the following terms have the specified meanings:</p>
                             <ul className="space-y-3">
-                                <li><strong className="text-ss-text">"Safe-Spend"</strong> — the escrow and spending-control API service operated by Agentic Trust.</li>
+                                <li><strong className="text-ss-text">"Safe-Spend"</strong> — the protected account and spending-control API service operated by Agentic Trust.</li>
                                 <li><strong className="text-ss-text">"Organization"</strong> or <strong className="text-ss-text">"you"</strong> — a business or individual who creates an account.</li>
-                                <li><strong className="text-ss-text">"Escrow Account"</strong> — a segregated balance held by Safe-Spend on behalf of an Organization to fund agent spending.</li>
+                                <li><strong className="text-ss-text">"Protected Account"</strong> — a segregated balance held by Safe-Spend on behalf of an Organization to fund agent spending.</li>
                                 <li><strong className="text-ss-text">"AI Agent"</strong> or <strong className="text-ss-text">"Agent"</strong> — an automated software process authorized by an Organization to make spend requests.</li>
                                 <li><strong className="text-ss-text">"Spending Policy"</strong> — a set of rules defined by an Organization governing how an Agent may spend.</li>
                                 <li><strong className="text-ss-text">"API Key"</strong> — a credential issued by Safe-Spend that authorizes API access.</li>
-                                <li><strong className="text-ss-text">"Spend Request"</strong> — a request by an Agent to disburse funds from an Escrow Account.</li>
+                                <li><strong className="text-ss-text">"Spend Request"</strong> — a request by an Agent to disburse funds from a Protected Account.</li>
                                 <li><strong className="text-ss-text">"Platform"</strong> — the Safe-Spend web dashboard, API, and associated services.</li>
                             </ul>
                         </Section>
@@ -121,13 +121,13 @@ const TermsPage = () => {
                         </Section>
 
                         {/* Section 4 */}
-                        <Section id="escrow-accounts" title="4. Escrow Accounts & Funds">
+                        <Section id="escrow-accounts" title="4. Protected Accounts & Funds">
                             <ul className="space-y-3">
-                                <li>Escrow Accounts hold funds you deposit to enable agent spending.</li>
+                                <li>Protected Accounts hold funds you deposit to enable agent spending.</li>
                                 <li>Funds are not FDIC insured unless explicitly noted for your tier (Safe-Spend uses Stripe for payment processing; applicable Stripe Issuing/Treasury terms may apply in future tiers).</li>
-                                <li>Safe-Spend does not commingle escrow funds with its own operating funds in its accounting records, though actual custody is managed through Stripe's infrastructure.</li>
-                                <li>You may withdraw unused funds by closing an Escrow Account, subject to any pending spend requests.</li>
-                                <li>Safe-Spend reserves the right to freeze Escrow Accounts in cases of suspected fraud, legal requirement, or policy violation.</li>
+                                <li>Safe-Spend does not commingle protected account funds with its own operating funds in its accounting records, though actual custody is managed through Stripe's infrastructure.</li>
+                                <li>You may withdraw unused funds by closing a Protected Account, subject to any pending spend requests.</li>
+                                <li>Safe-Spend reserves the right to freeze Protected Accounts in cases of suspected fraud, legal requirement, or policy violation.</li>
                             </ul>
                         </Section>
 
@@ -224,7 +224,7 @@ const TermsPage = () => {
                             <ul className="space-y-3">
                                 <li>You may cancel your account at any time by contacting <a href="mailto:support@agentictrust.app" className="text-ss-accent hover:underline">support@agentictrust.app</a>.</li>
                                 <li>Agentic Trust may suspend or terminate your account for violation of these Terms with or without notice.</li>
-                                <li>On termination, any unused escrow balance will be returned to you net of fees and pending transactions.</li>
+                                <li>On termination, any unused protected account balance will be returned to you net of fees and pending transactions.</li>
                                 <li>Sections 9–15 survive termination.</li>
                             </ul>
                         </Section>

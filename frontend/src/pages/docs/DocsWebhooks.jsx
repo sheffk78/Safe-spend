@@ -160,25 +160,25 @@ def handle_webhook():
                 </div>
 
                 <div>
-                    <h4 className="font-semibold text-ss-text mb-2">Escrow Events</h4>
+                    <h4 className="font-semibold text-ss-text mb-2">Protected Account Events</h4>
                     <div className="bg-ss-surface rounded-lg border border-[rgba(255,255,255,0.06)] overflow-hidden">
                         <table className="w-full text-sm">
                             <tbody>
                                 <tr className="border-b border-[rgba(255,255,255,0.03)]">
                                     <td className="py-2 px-4"><InlineCode>escrow.funded</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">Funds were added to an escrow account</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Funds were added to a protected account</td>
                                 </tr>
                                 <tr className="border-b border-[rgba(255,255,255,0.03)]">
                                     <td className="py-2 px-4"><InlineCode>escrow.paused</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">An escrow account was paused</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">A protected account was paused</td>
                                 </tr>
                                 <tr className="border-b border-[rgba(255,255,255,0.03)]">
                                     <td className="py-2 px-4"><InlineCode>escrow.resumed</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">A paused escrow account was resumed</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">A paused protected account was resumed</td>
                                 </tr>
                                 <tr>
                                     <td className="py-2 px-4"><InlineCode>escrow.closed</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">An escrow account was closed</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">A protected account was closed</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -229,15 +229,15 @@ def handle_webhook():
                                 </tr>
                                 <tr className="border-b border-[rgba(255,255,255,0.03)]">
                                     <td className="py-2 px-4"><InlineCode>safe_spend.escrow.paused</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow paused</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: protected account paused</td>
                                 </tr>
                                 <tr className="border-b border-[rgba(255,255,255,0.03)]">
                                     <td className="py-2 px-4"><InlineCode>safe_spend.escrow.closed</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow closed</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: protected account closed</td>
                                 </tr>
                                 <tr>
                                     <td className="py-2 px-4"><InlineCode>safe_spend.escrow.funded</InlineCode></td>
-                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: escrow funded</td>
+                                    <td className="py-2 px-4 text-ss-text-secondary">Cross-tool: protected account funded</td>
                                 </tr>
                             </tbody>
                         </table>

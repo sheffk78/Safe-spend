@@ -238,13 +238,13 @@ const AdminOrgDetailPage = () => {
                     <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                         <h2 className="font-semibold text-ss-text flex items-center gap-2">
                             <Wallet size={18} className="text-ss-accent" />
-                            Escrow Accounts ({escrows.length})
+                            Protected Accounts ({escrows.length})
                         </h2>
                     </div>
                     <div className="divide-y divide-[rgba(255,255,255,0.04)]">
                         {escrows.length === 0 ? (
                             <div className="p-6 text-center text-ss-text-tertiary">
-                                No escrow accounts
+                                No protected accounts
                             </div>
                         ) : (
                             escrows.map((escrow) => (

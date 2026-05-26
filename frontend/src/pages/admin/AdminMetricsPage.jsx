@@ -144,7 +144,7 @@ const AdminMetricsPage = () => {
                     </div>
                 </div>
 
-                {/* Escrow Accounts */}
+                {/* Protected Accounts */}
                 <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-[rgba(16,185,129,0.1)] flex items-center justify-center">

@@ -74,8 +74,8 @@ const ConceptTable = () => {
         },
         {
             safespend: 'AI Agent',
-            trustlaw: 'Agent / Fiduciary',
-            meaning: 'The automated process that must act within the defined scope. Like a fiduciary, it has obligations to act in the principal\'s interest, within limits.',
+            trustlaw: 'Agent / Trust Holder',
+            meaning: 'The automated process that must act within the defined scope. Like a trust holder, it has obligations to act in the principal\'s interest, within limits.',
             icon: Bot
         },
         {
@@ -87,12 +87,12 @@ const ConceptTable = () => {
         {
             safespend: 'Audit Trail',
             trustlaw: 'Trust Accounting Ledger',
-            meaning: 'The record of every disbursement and decision. Provides the transparency and accountability required of any fiduciary relationship.',
+            meaning: 'The record of every disbursement and decision. Provides the transparency and accountability required of any trust relationship.',
             icon: FileText
         },
         {
             safespend: 'Rule Violation',
-            trustlaw: 'Breach of Fiduciary Duty',
+            trustlaw: 'Breach of Trust Duty',
             meaning: 'An attempt to act outside the authorized scope. The rules engine blocks violations before they occur, preventing breaches.',
             icon: AlertTriangle
         }
@@ -274,7 +274,7 @@ const DocsTrustLaw = () => {
             <DocsText>
                 Traditional trust law solves a fundamental problem: <strong className="text-ss-text">How do you let someone 
                 manage assets for a specific purpose without giving them unlimited power?</strong> Trusts create segregated 
-                pools of assets, governed by explicit rules, with clear fiduciary duties and accountability mechanisms.
+                pools of assets, governed by explicit rules, with clear trust duties and accountability mechanisms.
             </DocsText>
 
             <DocsText>
@@ -285,7 +285,7 @@ const DocsTrustLaw = () => {
             <ul className="list-disc list-inside space-y-2 mb-6 text-ss-text-secondary">
                 <li><strong className="text-ss-text">Escrow</strong> = Trust account (segregated, purpose-restricted funds)</li>
                 <li><strong className="text-ss-text">Policy</strong> = Trust instrument (the rules governing disbursements)</li>
-                <li><strong className="text-ss-text">Agent</strong> = Fiduciary (must act within defined scope)</li>
+                <li><strong className="text-ss-text">Agent</strong> = Trust Holder (must act within defined scope)</li>
                 <li><strong className="text-ss-text">Rules Engine</strong> = Trustee's enforcement duties (validates every request)</li>
             </ul>
 
@@ -310,7 +310,7 @@ const DocsTrustLaw = () => {
                     <strong className="text-ss-text"> Total bill: $82,437.</strong>
                 </p>
                 <p className="mt-2 text-ss-text-tertiary">
-                    With Safe-Spend's fiduciary controls — per-transaction limits, daily caps, vendor restrictions — this 
+                    With Safe-Spend's spending controls — per-transaction limits, daily caps, vendor restrictions — this 
                     would have been stopped after $100 or $500, not $82K. The rules engine would have denied the requests 
                     once limits were hit.
                 </p>
@@ -378,7 +378,7 @@ const DocsTrustLaw = () => {
                 <h5 className="text-ss-text font-semibold mb-2">Trust Law Mapping</h5>
                 <ul className="list-disc list-inside space-y-2 mb-4 text-ss-text-secondary">
                     <li><strong className="text-ss-text">Vendor Whitelist:</strong> Only known, vetted vendors can receive funds — like a trust that only permits investments in approved securities</li>
-                    <li><strong className="text-ss-text">Approval Thresholds:</strong> Larger commitments (&gt;$150) require human trustee sign-off — fiduciary duty for material decisions</li>
+                    <li><strong className="text-ss-text">Approval Thresholds:</strong> Larger commitments (&gt;$150) require human trustee sign-off — trust duty for material decisions</li>
                     <li><strong className="text-ss-text">Business Hours:</strong> Procurement happens during working hours when humans are available for escalations</li>
                     <li><strong className="text-ss-text">Monthly Caps:</strong> Total exposure is bounded — the trust can't be depleted beyond the limit</li>
                 </ul>
@@ -435,7 +435,7 @@ const DocsTrustLaw = () => {
 
                 <h5 className="text-ss-text font-semibold mb-2">How It Works</h5>
                 <ul className="list-disc list-inside space-y-2 mb-4 text-ss-text-secondary">
-                    <li><strong className="text-ss-text">Single Escrow, Multiple Policies:</strong> One <InlineCode>esc_shared_ops</InlineCode> account holds funds for both agents</li>
+                    <li><strong className="text-ss-text">Single Protected Account, Multiple Policies:</strong> One <InlineCode>esc_shared_ops</InlineCode> account holds funds for both agents</li>
                     <li><strong className="text-ss-text">Policy + Key Context:</strong> The rules engine uses both the policy rules AND the API key to determine scope</li>
                     <li><strong className="text-ss-text">Distinct Scopes:</strong> Marketing agent can only spend on advertising/content; DevOps can only spend on infrastructure</li>
                     <li><strong className="text-ss-text">Shared Balance:</strong> Both draw from the same pool, but each is limited by their own monthly cap</li>
@@ -465,7 +465,7 @@ const DocsTrustLaw = () => {
                     </div>
                     <ul className="list-disc list-inside space-y-2 text-ss-text-secondary text-sm">
                         <li>Safe-Spend gives us <strong className="text-ss-text">trust-like controls</strong> over AI-controlled funds</li>
-                        <li>Funds are held in <strong className="text-ss-text">segregated escrow accounts</strong> with purpose-specific policies</li>
+                        <li>Funds are held in <strong className="text-ss-text">segregated protected accounts</strong> with purpose-specific policies</li>
                         <li>Every spend attempt is validated against a <strong className="text-ss-text">13-point rules engine</strong> before execution</li>
                         <li>We maintain an <strong className="text-ss-text">immutable audit log</strong> of every disbursement and decision</li>
                         <li>Human approval workflows provide <strong className="text-ss-text">oversight for material transactions</strong></li>
@@ -495,7 +495,7 @@ const DocsTrustLaw = () => {
                     </div>
                     <ul className="list-disc list-inside space-y-2 text-ss-text-secondary text-sm">
                         <li>Agents never hold <strong className="text-ss-text">primary payment credentials</strong></li>
-                        <li>They get <strong className="text-ss-text">scoped API keys</strong> that can only create spend requests against escrow</li>
+                        <li>They get <strong className="text-ss-text">scoped API keys</strong> that can only create spend requests against a protected account</li>
                         <li>The rules engine enforces <strong className="text-ss-text">least privilege</strong> — agents can only do what policies permit</li>
                         <li>Keys can be <strong className="text-ss-text">instantly revoked</strong> without affecting other systems</li>
                         <li>All API requests are <strong className="text-ss-text">rate-limited and logged</strong> for anomaly detection</li>
@@ -515,7 +515,7 @@ const DocsTrustLaw = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h4 className="font-semibold text-ss-text mb-1">Quickstart Guide</h4>
-                            <p className="text-ss-text-secondary text-sm">Create your first escrow and policy in 5 minutes</p>
+                            <p className="text-ss-text-secondary text-sm">Create your first protected account and policy in 5 minutes</p>
                         </div>
                         <ArrowRight className="text-ss-accent" size={20} />
                     </div>
@@ -543,7 +543,7 @@ const DocsTrustLaw = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h4 className="font-semibold text-ss-text mb-1">Open Spending Rules Dashboard</h4>
-                            <p className="text-ss-text-secondary text-sm">Configure policies for your escrow accounts</p>
+                            <p className="text-ss-text-secondary text-sm">Configure policies for your protected accounts</p>
                         </div>
                         <ArrowRight className="text-ss-accent" size={20} />
                     </div>

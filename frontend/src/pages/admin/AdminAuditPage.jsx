@@ -52,8 +52,8 @@ const EVENT_TYPES = [
     { value: 'approval.requested', label: 'Approval Requested' },
     { value: 'approval.approved', label: 'Approval Approved' },
     { value: 'approval.denied', label: 'Approval Denied' },
-    { value: 'escrow.created', label: 'Escrow Created' },
-    { value: 'escrow.funded', label: 'Escrow Funded' },
+    { value: 'escrow.created', label: 'Protected Account Created' },
+    { value: 'escrow.funded', label: 'Protected Account Funded' },
     { value: 'policy.created', label: 'Policy Created' },
     { value: 'org.created', label: 'Org Created' },
     { value: 'key.created', label: 'Key Created' },
@@ -320,7 +320,7 @@ const AdminAuditPage = () => {
                                                             )}
                                                             {event.escrow_id && (
                                                                 <div>
-                                                                    <p className="text-[#6B7280] mb-1">Escrow ID</p>
+                                                                    <p className="text-[#6B7280] mb-1">Protected Account ID</p>
                                                                     <p className="text-ss-text-tertiary font-mono text-xs">{event.escrow_id}</p>
                                                                 </div>
                                                             )}

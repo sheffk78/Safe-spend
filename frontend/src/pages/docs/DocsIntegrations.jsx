@@ -57,7 +57,7 @@ class SafeSpendClient:
         response.raise_for_status()
         return response.json()
     
-    # Escrow Accounts
+    # Protected Accounts
     def create_escrow(self, name: str, description: str = "") -> Dict[str, Any]:
         return self._request("POST", "/v1/escrow-accounts", json={
             "name": name,
@@ -236,7 +236,7 @@ from safespend import SafeSpendClient  # or use the client above
 
 # Initialize the client (use agent key for spend operations)
 client = SafeSpendClient(api_key="sk_agent_...")
-ESCROW_ID = "esc_9f3k2m"  # Your escrow account
+ESCROW_ID = "esc_9f3k2m"  # Your protected account
 
 @tool("safe_spend")
 def safe_spend_tool(
@@ -246,7 +246,7 @@ def safe_spend_tool(
     category: str = "general"
 ) -> dict:
     """
-    Request a spend from the Safe-Spend escrow account.
+    Request a spend from the Safe-Spend protected account.
     
     Use this tool when you need to make a payment or purchase.
     The spend will be validated against the organization's policies.
@@ -316,7 +316,7 @@ ESCROW_ID = "esc_9f3k2m"
 @tool("Safe-Spend")
 def spend_money(amount_cents: int, vendor: str, category: str, description: str = "") -> str:
     """
-    Execute a spend request through Safe-Spend escrow.
+    Execute a spend request through Safe-Spend.
     
     Args:
         amount_cents: Amount in cents (e.g., 5000 = $50.00)
@@ -368,7 +368,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "safe_spend",
-            "description": "Request a disbursement from the Safe-Spend escrow account. Use when you need to make a payment.",
+            "description": "Request a disbursement from the Safe-Spend protected account. Use when you need to make a payment.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -446,7 +446,7 @@ def handle_safe_spend(arguments):
                 The most direct way to interact with Safe-Spend. Great for testing and shell scripts.
             </DocsText>
 
-            <DocsHeading level={3}>Create Escrow Account</DocsHeading>
+            <DocsHeading level={3}>Create Protected Account</DocsHeading>
             <CodeBlock language="bash" code={curlExamples.createEscrow} />
 
             <DocsHeading level={3}>Create Policy</DocsHeading>

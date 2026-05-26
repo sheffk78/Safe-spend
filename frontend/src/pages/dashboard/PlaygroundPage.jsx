@@ -601,7 +601,7 @@ if (result.status === "approved") {
                                     className="w-full px-3 py-2 bg-ss-elevated border border-[rgba(255,255,255,0.1)] rounded-lg text-ss-text text-sm focus:outline-none focus:border-ss-accent"
                                     data-testid="escrow-select"
                                 >
-                                    <option value="">Select escrow...</option>
+                                    <option value="">Select protected account...</option>
                                     {escrowAccounts.filter(e => e.status === 'active').map(acc => (
                                         <option key={acc.id} value={acc.id}>
                                             {acc.name} ({formatCents(acc.balance_cents)})

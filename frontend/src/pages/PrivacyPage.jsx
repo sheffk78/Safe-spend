@@ -105,7 +105,7 @@ const PrivacyPage = () => {
 
                             <SubSection title="Transaction & Spend Data">
                                 <ul className="space-y-2">
-                                    <li>Escrow account balances and funding history.</li>
+                                    <li>Protected account balances and funding history.</li>
                                     <li>Spend request details: amount, vendor, category, description, idempotency key.</li>
                                     <li>Rules engine evaluation results per transaction.</li>
                                     <li>Approval decisions and notes.</li>
@@ -129,7 +129,7 @@ const PrivacyPage = () => {
                         {/* Section 2 */}
                         <Section id="how-we-use" title="2. How We Use Your Information">
                             <ul className="space-y-3">
-                                <li>To operate and deliver Safe-Spend's services (escrow management, spend validation, approvals).</li>
+                                <li>To operate and deliver Safe-Spend's services (protected account management, spend validation, approvals).</li>
                                 <li>To authenticate and authorize API access.</li>
                                 <li>To detect and prevent fraud, abuse, and unauthorized access.</li>
                                 <li>To process payments via Stripe.</li>
@@ -175,7 +175,7 @@ const PrivacyPage = () => {
                         {/* Section 5 */}
                         <Section id="stripe" title="5. Stripe & Third-Party Services">
                             <p className="mb-4">
-                                Safe-Spend uses <strong className="text-ss-text">Stripe</strong> for payment processing. When you fund an Escrow Account, 
+                                Safe-Spend uses <strong className="text-ss-text">Stripe</strong> for payment processing. When you fund a Protected Account, 
                                 your payment details are submitted directly to Stripe. Stripe's privacy policy is available at{' '}
                                 <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-ss-accent hover:underline">
                                     stripe.com/privacy

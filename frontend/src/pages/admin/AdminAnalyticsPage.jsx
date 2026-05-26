@@ -218,7 +218,7 @@ const AdminAnalyticsPage = () => {
                     icon={Building2}
                 />
                 <StatCard
-                    title="Active Escrow Accounts"
+                    title="Active Protected Accounts"
                     value={formatNumber(overview?.escrow_accounts?.active || 0)}
                     subValue={`${formatNumber(overview?.escrow_accounts?.total || 0)} total`}
                     icon={Users}
@@ -349,7 +349,7 @@ const AdminAnalyticsPage = () => {
             <div className="bg-ss-surface border border-ss-border rounded-lg p-5">
                 <h3 className="font-medium text-ss-text mb-4 flex items-center gap-2">
                     <DollarSign size={18} className="text-ss-accent" />
-                    Top Escrow Accounts by Balance
+                    Top Protected Accounts by Balance
                 </h3>
                 {escrowBalances?.top_escrows?.length > 0 ? (
                     <div className="overflow-x-auto">
@@ -388,7 +388,7 @@ const AdminAnalyticsPage = () => {
                         </table>
                     </div>
                 ) : (
-                    <p className="text-ss-text-tertiary text-sm">No escrow accounts found</p>
+                    <p className="text-ss-text-tertiary text-sm">No protected accounts found</p>
                 )}
             </div>
 
@@ -405,7 +405,7 @@ const AdminAnalyticsPage = () => {
                                 <tr className="text-left text-ss-text-tertiary border-b border-ss-border">
                                     <th className="pb-2 font-medium">Organization</th>
                                     <th className="pb-2 font-medium">Plan</th>
-                                    <th className="pb-2 font-medium text-right">Escrows</th>
+                                    <th className="pb-2 font-medium text-right">Protected Accounts</th>
                                     <th className="pb-2 font-medium text-right">API Keys</th>
                                     <th className="pb-2 font-medium text-right">Recent Requests</th>
                                     <th className="pb-2 font-medium text-right">Recent Approved</th>
