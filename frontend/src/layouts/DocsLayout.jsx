@@ -50,7 +50,7 @@ const navigation = [
         title: 'API Reference',
         items: [
             { name: 'Auth & API Keys', href: '/docs/api#auth', icon: Code },
-            { name: 'Escrow Accounts', href: '/docs/api#escrow', icon: Code },
+            { name: 'Protected Accounts', href: '/docs/api#escrow', icon: Code },
             { name: 'Spending Policies', href: '/docs/api#policies', icon: Code },
             { name: 'Spend Requests', href: '/docs/api#spend', icon: Code },
             { name: 'Agents', href: '/docs/api#agents', icon: Code },

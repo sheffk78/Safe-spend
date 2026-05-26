@@ -438,7 +438,7 @@ const QuickStartModal = ({ onClose, onSuccess }) => {
                                     to="/dashboard/accounts"
                                     className="flex items-center gap-2 px-4 py-2 bg-ss-accent hover:bg-ss-accent-hover rounded-lg text-ss-text text-sm font-medium transition-all"
                                 >
-                                    View Escrow
+                                    View Account
                                     <ArrowRight size={14} />
                                 </Link>
                             </div>

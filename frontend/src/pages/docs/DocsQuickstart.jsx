@@ -212,7 +212,7 @@ console.log(\`Status: \${result.status}\`);
                 <div className="w-8 h-8 rounded-full bg-ss-accent text-ss-bg font-bold flex items-center justify-center flex-shrink-0">1</div>
                 <div>
                     <DocsText>
-                        Sign up at <Link to="/signup" className="text-ss-accent hover:underline">safespend.app/signup</Link> and 
+                        Sign up at <Link to="/signup" className="text-ss-accent hover:underline">safe-spend.dev/signup</Link> and 
                         create your organization.
                     </DocsText>
                 </div>
