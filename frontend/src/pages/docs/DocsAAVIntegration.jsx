@@ -514,7 +514,7 @@ const DocsAAVIntegration = () => {
             <DocsText>
                 Every AI agent interacting with Safe-Spend is identified by a unique <InlineCode>agent_id</InlineCode> in 
                 the format <InlineCode>agt_</InlineCode> followed by 24 hexadecimal characters. 
-                Agent IDs are used to link escrows, track spend history, and enable AAV/ARL integrations.
+                Agent IDs are used to link escrows, track spend history, and enable AAV/RepLedger integrations.
             </DocsText>
 
             <Callout type="info" title="Format Reference">
@@ -643,7 +643,7 @@ const DocsAAVIntegration = () => {
                 <><strong className="text-ss-text">Step 2</strong>: Protected Account Check</>,
                 <><strong className="text-ss-text">Step 2.5</strong>: AAV Agent Authorization (protected account-level)</>,
                 <><strong className="text-ss-text">Step 3</strong>: Idempotency Check</>,
-                <><strong className="text-ss-text">Step 3.5</strong>: Reputation Check (ARL) &mdash; skipped when min_reputation_score not set</>,
+                <><strong className="text-ss-text">Step 3.5</strong>: Reputation Check (RepLedger) &mdash; skipped when min_reputation_score not set</>,
                 <><strong className="text-ss-text">Step 4</strong>: Balance Check</>,
                 <><strong className="text-ss-text">Step 5</strong>: Per-Transaction Limit</>,
                 <><strong className="text-ss-text">Step 6</strong>: Daily Cap</>,
@@ -657,13 +657,13 @@ const DocsAAVIntegration = () => {
             ]} />
 
             {/* ================================================= */}
-            {/* ARL REPUTATION SECTION                             */}
+            {/* REPLEDGER REPUTATION SECTION                             */}
             {/* ================================================= */}
-            <DocsHeading level={2} id="arl-reputation">ARL Reputation Integration</DocsHeading>
+            <DocsHeading level={2} id="arl-reputation">RepLedger Reputation Integration</DocsHeading>
             
             <DocsText>
-                The Agent Reputation Ledger (ARL) tracks agent trustworthiness based on their spending history. 
-                Safe-Spend integrates with ARL in two ways:
+                RepLedger tracks agent trustworthiness based on their spending history. 
+                Safe-Spend integrates with RepLedger in two ways:
             </DocsText>
 
             <div className="grid md:grid-cols-2 gap-4 mb-8">
@@ -675,7 +675,7 @@ const DocsAAVIntegration = () => {
                         <h4 className="font-semibold text-ss-text">Outcome Reporting</h4>
                     </div>
                     <p className="text-ss-text-secondary text-sm">
-                        After every spend (approved, denied, expired), Safe-Spend reports the outcome to ARL asynchronously. 
+                        After every spend (approved, denied, expired), Safe-Spend reports the outcome to RepLedger asynchronously. 
                         This builds the agent's reputation score over time.
                     </p>
                 </div>
@@ -696,7 +696,7 @@ const DocsAAVIntegration = () => {
             <DocsHeading level={3} id="arl-env">Environment Variables</DocsHeading>
             <CodeBlock
                 language="bash"
-                title="ARL Configuration"
+                title="RepLedger Configuration"
                 code={`ARL_API_URL="https://repledger.agentictrust.app"
 ARL_API_KEY="arl_your_key_here"
 ARL_ENABLED="true"   # Set to "true" to enable`}
@@ -748,7 +748,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
             <DocsHeading level={2} id="cross-tool-events">Cross-Tool Events</DocsHeading>
             
             <DocsText>
-                Safe-Spend emits and receives cross-tool events for integration with AAV and ARL. 
+                Safe-Spend emits and receives cross-tool events for integration with AAV and RepLedger. 
                 Events use a standard envelope format for inter-service communication.
             </DocsText>
 
@@ -796,7 +796,7 @@ ARL_ENABLED="true"   # Set to "true" to enable`}
             <DocsHeading level={3} id="internal-events-endpoint">Receiving Internal Events</DocsHeading>
             <ApiEndpoint method="POST" path="/v1/internal/events" />
             <DocsText>
-                Receives events from AAV and ARL via HMAC-SHA256 authenticated requests. 
+                Receives events from AAV and RepLedger via HMAC-SHA256 authenticated requests. 
                 The signature is sent in the <InlineCode>X-AgenticTrust-Signature</InlineCode> header.
             </DocsText>
 

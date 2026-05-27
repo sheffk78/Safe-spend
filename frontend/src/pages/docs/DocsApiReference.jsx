@@ -159,7 +159,7 @@ const DocsApiReference = () => {
             <DocsHeading level={2} id="policies">Spending Policies</DocsHeading>
 
             <DocsText>
-                Policies define the rules that govern spending from an escrow account. Each policy is evaluated in a 14-step validation cascade (steps 0-13). New fields include <InlineCode>min_reputation_score</InlineCode> and <InlineCode>reputation_spending_boost</InlineCode> for ARL reputation integration.
+                Policies define the rules that govern spending from an escrow account. Each policy is evaluated in a 14-step validation cascade (steps 0-13). New fields include <InlineCode>min_reputation_score</InlineCode> and <InlineCode>reputation_spending_boost</InlineCode> for RepLedger reputation integration.
             </DocsText>
 
             <DocsHeading level={3}>Create Policy</DocsHeading>
@@ -436,7 +436,7 @@ const DocsApiReference = () => {
             <DocsHeading level={2} id="internal-events">Internal Events</DocsHeading>
 
             <DocsText>
-                Receives cross-tool events from AAV and ARL via HMAC-SHA256 authenticated requests.
+                Receives cross-tool events from AAV and RepLedger via HMAC-SHA256 authenticated requests.
             </DocsText>
 
             <DocsHeading level={3}>Receive Internal Event</DocsHeading>

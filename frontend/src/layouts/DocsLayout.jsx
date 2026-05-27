@@ -43,7 +43,7 @@ const navigation = [
             { name: 'LangChain', href: '/docs/sdks#langchain', icon: Puzzle },
             { name: 'MCP Server', href: '/docs/sdks#mcp-server', icon: Puzzle },
             { name: 'AAV Integration', href: '/docs/aav-integration', icon: Shield },
-            { name: 'ARL Reputation', href: '/docs/aav-integration#arl-reputation', icon: Shield },
+            { name: 'RepLedger Reputation', href: '/docs/aav-integration#arl-reputation', icon: Shield },
         ]
     },
     {

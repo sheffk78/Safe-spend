@@ -56,7 +56,7 @@ const Footer = () => {
                         <ul className="space-y-2">
                             <li><a href="https://agentictrust.app" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-accent text-sm transition-colors link-underline" data-testid="footer-link-agentic-trust">Agentic Trust</a></li>
                             <li><a href="https://agentauthority.dev" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-accent text-sm transition-colors link-underline" data-testid="footer-link-aav">Agent Authority Vault</a></li>
-                            <li><a href="https://reputationledger.dev" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-accent text-sm transition-colors link-underline" data-testid="footer-link-arl">Agent Reputation Ledger</a></li>
+                            <li><a href="https://reputationledger.dev" target="_blank" rel="noopener noreferrer" className="text-ss-text-secondary hover:text-ss-accent text-sm transition-colors link-underline" data-testid="footer-link-arl">RepLedger</a></li>
                             <li><a href="mailto:support@agentictrust.app" className="text-ss-text-secondary hover:text-ss-accent text-sm transition-colors link-underline" data-testid="footer-link-support">Support</a></li>
                         </ul>
                     </div>
