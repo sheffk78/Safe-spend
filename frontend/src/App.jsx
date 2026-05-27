@@ -1,6 +1,6 @@
 import React from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -109,6 +109,7 @@ function App() {
                     <Route path="/signup" element={<SignupPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
                     <Route path="/invite/:token" element={<InviteAcceptPage />} />
                     <Route path="/approval-action" element={<ApprovalActionPage />} />
 
