@@ -228,7 +228,7 @@ model SpendingPolicy {
   // Vendor controls (stored as JSON strings)
   allowedVendors    String  @default("[]") @map("allowed_vendors")
   blockedVendors    String  @default("[]") @map("blocked_vendors")
-  vendorMatchMode   String  @default("exact") @map("vendor_match_mode") // exact | contains | regex
+  vendorMatchMode   String  @default("substring") @map("vendor_match_mode") // substring (bidirectional) | exact | contains | regex
   
   // Category controls
   allowedCategories String  @default("[]") @map("allowed_categories")
