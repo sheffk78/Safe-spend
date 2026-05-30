@@ -29,8 +29,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Copy built assets
+# Copy built assets and fix permissions for nginx
 COPY --from=build /app/build /usr/share/nginx/html
+RUN chmod -R 755 /usr/share/nginx/html && \
+    find /usr/share/nginx/html -type f -exec chmod 644 {} \;
 
 # Default PORT, Railway will override it
 ENV PORT=80
