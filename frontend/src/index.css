@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 :root {
     /* ── Safe-Spend Light Design System ── */
-    --ss-bg: #FAFBFA;
+    --ss-bg: #FAFAF8;
     --ss-surface: #FFFFFF;
     --ss-elevated: #F3F4F3;
     --ss-code: #F7F8F7;
@@ -31,7 +31,7 @@
     --ss-glass-border: rgba(16, 185, 129, 0.12);
 
     /* HSL tokens for shadcn/ui compatibility */
-    --background: 120 10% 98%;
+    --background: 40 33% 98%;
     --foreground: 220 14% 10%;
     --card: 0 0% 100%;
     --card-foreground: 220 14% 10%;
@@ -78,7 +78,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Playfair Display', 'Space Grotesk', system-ui, sans-serif;
     font-weight: 600;
     line-height: 1.2;
 }

@@ -1,7 +1,7 @@
 # AgenticTrust Product State
 
-> Last updated: 2026-05-28T21:40:00Z (weekly audit)
-> Next scheduled check: Tuesday 2026-06-02 08:00 MT
+> Last updated: 2026-05-31T14:10:00Z (weekly audit)
+> Next scheduled check: Tuesday 2026-06-07 08:00 MT
 
 ### Operating Rule
 
@@ -9,24 +9,24 @@
 
 ---
 
-## Overall Status: 🟡 OPERATIONAL WITH DEPLOY RISK
+## Overall Status: 🟡 OPERATIONAL WITH ARL STALE
 
-All four products are live and functional. All APIs healthy. Schema parity 26/26, 0 missing models. All auth endpoints validate. All browser flows verified on live containers. **However, ALL Railway deploy pipelines are broken** — sites run on stale pre-failure containers. Any code fix pushed to main will NOT deploy until Railway is fixed.
+All four products are live and functional. All APIs healthy. Schema parity 26/26, 0 missing models. vendorMatchMode now aligned (both "substring"). **SS and AAV are deploying fresh** (JS bundles dated May 30, SS backend uptime ~18h). **ARL is the remaining stale product** (JS bundle from May 26, emergent.sh regression, undeployed terms/privacy fix). Hub is clean and current.
 
-### ⚠️ CRITICAL: Railway Deploy Pipeline Failure
+### ⚠️ Deploy Pipeline — Partially Recovered
 
-All four Railway services have FAILED deploys since April/May 2026:
-- **AAV Frontend**: ALL FAILED since May 1 (5+ consecutive failures)
-- **AAV Backend**: ALL FAILED since April 24
-- **SS Frontend**: ALL FAILED since May 2
-- **SS Backend**: ALL FAILED since April 23
-- **ARL**: No Railway token access (different project). Container is stale from ~May 26.
+The Railway deploy API still reports all tracked deploys as FAILED since April/May. **However, actual site freshness tells a different story:**
 
-**Impact**: Sites appear healthy because Railway keeps old containers running. But any code changes pushed since the last successful deploy are NOT live. This means the following fixes exist in source code but are NOT deployed:
-- ARL `/terms` and `/privacy` pages (committed May 26, not deployed)
-- All other ARL, SS, and AAV code changes since last successful deploy
+| Service | Tracked Deploy Status | JS Bundle / Container Freshness | Actually Live? |
+|---------|----------------------|--------------------------------|----------------|
+| SS Frontend | ❌ FAILED (API) | May 30, 17:33 UTC | ✅ FRESH |
+| SS Backend | ❌ FAILED (API) | ~18h uptime | ✅ FRESH |
+| AAV Frontend | ❌ FAILED (API) | May 30, 17:30 UTC | ✅ FRESH |
+| AAV Backend | ❌ FAILED (API) | Healthy, responding | ✅ LIVE |
+| ARL Frontend | Unknown (no token) | May 26, 14:13 UTC | ❌ STALE 5 days |
+| ARL Backend | Unknown (no token) | Healthy but stale | ⚠️ STALE |
 
-**Action required**: Jeff needs to `railway login` and diagnose the build failures. The stored token only covers AAV and SS projects.
+**SS and AAV are receiving manual/untracked deploys.** The Railway GraphQL API may be tracking the wrong service IDs or an old project config. ARL has no Railway token access and is genuinely stale.
 
 ---
 
@@ -34,52 +34,54 @@ All four Railway services have FAILED deploys since April/May 2026:
 
 | Product | Domain | Status | Health API | Frontend | Auth | Notes |
 |---------|--------|--------|-----------|----------|------|-------|
-| **Safe-Spend** | safe-spend.dev | 🟢 LIVE | ✅ DB ok, Stripe ok | ✅ 200 | ✅ 400 (validates) | Uptime ~1.8 days, 2 blog posts, public pricing, all UX checks pass |
-| **AAV** | agentauthority.dev | 🟢 LIVE | ✅ healthy | ✅ 200 | ✅ 422 (Pydantic) | Consulting funnel live, $375 audit, 2 blog posts, Tidycal verified |
-| **ARL** | reputationledger.dev | 🟡 LIVE (stale) | ✅ healthy | ✅ 200 | ✅ 422 (validates) | ⚠️ /terms + /privacy show "Page not found" (fix in source, NOT deployed). Ecosystem footer links verified. |
-| **Hub** | agentictrust.app | 🟢 LIVE | N/A | ✅ 200 | N/A | All 3 LIVE, 3 COMING SOON. Terminology soft. /governance-review redirect verified. |
+| **Safe-Spend** | safe-spend.dev | 🟢 LIVE | ✅ DB ok, Stripe ok | ✅ 200 (May 30) | ✅ 400 (validates) | Uptime ~18h, 2 blog posts, public pricing, all UX checks pass |
+| **AAV** | agentauthority.dev | 🟢 LIVE | ✅ healthy | ✅ 200 (May 30) | ✅ 422 (Pydantic) | Consulting funnel live, $375 audit, pricing checkmarks still missing |
+| **ARL** | reputationledger.dev | 🟡 LIVE (stale) | ✅ healthy | ✅ 200 (May 26) | ✅ 422 (validates) | ⚠️ /terms + /privacy "Page not found". emergent.sh REGRESSION. hello@agentictrust.com. Container 5 days stale. |
+| **Hub** | agentictrust.app | 🟢 LIVE | N/A | ✅ 200 (Cloudflare) | N/A | All 3 LIVE, 3 COMING SOON. Timeline current. Footer complete. Clean. |
 
 ---
 
-## Browser Flow Verification — 2026-05-28
+## Browser Flow Verification — 2026-05-31
 
 | Check | SS | AAV | ARL | Hub |
-|-------|----|-----|-----|-----|
+|-------|----|-----|-----|------|
 | Landing page loads | ✅ | ✅ | ✅ | ✅ |
 | /signup renders form | ✅ | ✅ | ✅ | N/A |
-| Pricing public | ✅ (#pricing section) | ✅ (4 tiers: Free, Builder, Teams, Custom) | N/A | ✅ (3 LIVE, 3 COMING SOON) |
-| Footer cross-product links | ✅ (3 links) | ✅ (AG Family: SS, RepLedger, AT) | ✅ (Ecosystem: SS, AAV, AT) | ✅ (3 products) |
+| Pricing public | ✅ (#pricing section) | ✅ (4 tiers) — ❌ checkmarks missing | N/A | ✅ (3 LIVE, 3 COMING SOON) |
+| Footer cross-product links | ✅ (3 links) | ✅ (AG Family: SS, RepLedger, AT) | ✅ (Ecosystem: SS, AAV, AT) | ✅ (4 links + Terms/Privacy) |
 | Nav CTA: "Get Started Free" | ✅ | ✅ | ✅ | N/A |
-| Terms/Privacy | ✅ | ✅ | ❌ ("Page not found" — fix NOT deployed) | N/A |
+| Terms/Privacy | ✅ | ✅ | ❌ ("Page not found" — fix NOT deployed) | ✅ |
 | Blog active | ✅ (2 posts) | ✅ (2 posts) | ✅ (2 posts) | — |
 | Schema parity | 26/26, 0 missing | N/A | N/A | N/A |
 | Auth endpts validate | ✅ 400 | ✅ 422 | ✅ 422 | N/A |
-| Consulting funnel | — | ✅ (Free Review + $375 Audit) | — | — |
+| Consulting funnel | — | ✅ (Free Review + $375 Audit) | — | ✅ (links to AAV review) |
+| emergent.sh tracker | ✅ Clean | ✅ Clean | ❌ REGRESSION | ✅ Clean |
+| Email references | — | — | ❌ hello@agentictrust.com | — |
 | No console errors | ✅ | ⚠️ (9 empty JS exceptions) | ✅ | — |
-| Wrong domain references | — | — | ✅ (clean) | — |
 
 ### Notable Findings
 
-- **ARL `/terms` and `/privacy` show "Page not found"**: Code fix committed May 26 but NOT deployed because all Railway deploys are failing. The fix exists in source (TermsPage.jsx, PrivacyPage.jsx, App.js routes) but the production container is stale.
-- **AAV footer uses "RepLedger"**: This appears to be an intentional rebrand from "ARL".
-- **AAV has 4 pricing tiers** (Free, Builder at $29/mo, Teams at $79/mo, Custom) instead of the expected 3.
-- **AAV 9 empty JS exceptions** on homepage — likely benign (analytics/third-party scripts).
-- **Price consistency**: All 5 locations show $375. No $500 mismatch found.
+- **ARL `/terms` and `/privacy` still show "Page not found"**: Code fix exists in source (TermsPage.jsx, PrivacyPage.jsx) but the stale container hasn't picked it up. Container is 5 days old (May 26).
+- **ARL emergent.sh is BACK (regression)**: Was previously removed, now loads `emergent-main.js` from `assets.emergent.sh`. Two references found in HTML.
+- **ARL still uses `hello@agentictrust.com`**: Should be `support@agentictrust.app`. In the JS bundle alongside `kit@agentictrust.com`.
+- **AAV pricing comparison table missing checkmarks**: Builder, Teams, and Custom columns have empty cells where ✓ marks should appear for Custom Templates, Webhook Notifications, Role-Based Access, SSO/SAML, and On-Premise rows. Free column correctly shows "—".
+- **AAV footer uses "RepLedger"**: Consistent with Hub branding. Likely intentional.
+- **SS and AAV are actually deploying**: Despite Railway API showing FAILED, JS bundles are dated May 30 and SS backend has ~18h uptime. Manual or untracked deploys are working.
 
 ---
 
-## Cross-Product Link Audit — 2026-05-28 (Verified)
+## Cross-Product Link Audit — 2026-05-31 (Verified)
 
 | From ↓ / To → | Hub | SS | AAV | ARL |
 |---|---|---|---|---|
-| **Safe-Spend** | ⚠️ (Cloudflare anti-bot, but 200 via browser) | — | ✅ | ✅ |
-| **AAV** | ✅ | ✅ | — | ✅ |
+| **Safe-Spend** | ✅ | — | ✅ | ✅ |
+| **AAV** | ✅ | ✅ | — | ✅ (as "RepLedger") |
 | **ARL** | ✅ | ✅ | ✅ | — |
-| **Hub** | — | ✅ | ✅ | ✅ |
+| **Hub** | — | ✅ | ✅ | ✅ (as "RepLedger") |
 
 ---
 
-## Consulting Funnel Audit — 2026-05-28
+## Consulting Funnel Audit — 2026-05-31
 
 | Check | Status | Details |
 |-------|--------|---------|
@@ -92,48 +94,57 @@ All four Railway services have FAILED deploys since April/May 2026:
 
 ---
 
-## Schema Parity — 2026-05-28
+## Schema Parity — 2026-05-31
 
 - **Models**: 26/26 (SQLite and PostgreSQL match)
 - **Missing models from PG**: 0
 - **Dangerous field drifts**: 0
+- ✅ **vendorMatchMode ALIGNED**: Both SQLite and PG now default to `"substring"` (was previously `"exact"` in PG — **FIXED since last audit**)
 - **Known benign differences**:
   - SpendRequest: `@@unique([orgId, idempotencyKey])` in PG vs `@unique` on `idempotencyKey` alone in SQLite (intentional, org-scoped)
   - PG has extra fields on some models (indexes, updatedAt, etc.) — these are intentional enhancements
-- ⚠️ **vendorMatchMode mismatch**: SQLite `@default("substring")` vs PG `@default("exact")`. This is a **functional bug** — vendor matching behaves differently in dev (substring match) vs prod (exact match). Needs alignment.
 
 ---
 
-## Railway Deploy Pipeline Status — 2026-05-28
+## Railway Deploy Pipeline Status — 2026-05-31
 
-| Service | Last Deploy Status | Date | Container Age |
-|---------|-------------------|------|---------------|
-| AAV Frontend | ❌ FAILED | 2026-05-01 | ~27 days stale |
-| AAV Backend | ❌ FAILED | 2026-04-24 | ~34 days stale |
-| SS Backend | ❌ FAILED | 2026-04-23 | ~35 days stale |
-| SS Frontend | ❌ FAILED | 2026-05-02 | ~26 days stale |
-| ARL | Unknown (no Railway token) | Stale | Container from ~May 26 |
+| Service | Tracked API Status | Last Tracked Deploy | Actual Freshness | Container Age |
+|---------|-------------------|-------------------|-----------------|---------------|
+| AAV Frontend | ❌ FAILED | 2026-05-01 | May 30 JS bundle | ~1 day |
+| AAV Backend | ❌ FAILED | 2026-04-24 | Healthy, responding | Unknown |
+| SS Backend | ❌ FAILED | 2026-04-23 | ~18h uptime | ~1 day |
+| SS Frontend | ❌ FAILED | 2026-05-02 | May 30 JS bundle | ~1 day |
+| ARL | Unknown (no token) | ~May 26 | May 26 JS bundle | **5 days stale** |
 
-**All sites are running on pre-failure containers.** Code changes committed after these dates are NOT live.
+**Key finding**: The Railway deploy tracking API appears to be monitoring stale/incorrect service IDs. SS and AAV are actually receiving fresh deploys through an alternative mechanism. ARL is genuinely stale with no Railway token access.
 
 ---
 
 ## Open Issues
 
-| # | Issue | Severity | Product | Status |
-|---|-------|----------|---------|--------|
-| 1 | ALL Railway deploy pipelines broken | 🔴 Critical | All | Needs Jeff `railway login` |
-| 2 | ARL /terms and /privacy show "Page not found" | 🔴 Critical | ARL | Fix in source, NOT deployed |
-| 3 | Tidycal has 7 booking types (should be 3) | 🟡 Medium | AAV | Needs Jeff manual cleanup |
-| 4 | Tidycal Monthly Check-In is 45 min (should be 30) | 🟡 Medium | AAV | Needs Jeff manual fix |
-| 5 | vendorMatchMode mismatch (substring vs exact) | 🟡 Medium | SS | Functional bug in prod |
-| 6 | AAV 9 empty JS exceptions on homepage | ⚪ Low | AAV | Likely benign, investigate |
-| 7 | SS Playground is a dead end without escrow | 🟡 Medium | SS | Open (conversion killer) |
-| 8 | AAV footer uses "RepLedger" not "ARL" | ⚪ Info | AAV | May be intentional rebrand |
+| # | Issue | Severity | Product | Status | Changed Since Last Audit |
+|---|-------|----------|---------|--------|------------------------|
+| 1 | ARL container stale (5 days), no Railway token | 🔴 Critical | ARL | Needs Jeff `railway login` | Unchanged |
+| 2 | ARL /terms and /privacy show "Page not found" | 🔴 Critical | ARL | Fix in source, NOT deployed | Unchanged |
+| 3 | ARL emergent.sh tracker REGRESSION | 🟡 Medium | ARL | Was removed, now back | **NEW** |
+| 4 | ARL hello@agentictrust.com (should be support@agentictrust.app) | 🟡 Medium | ARL | Still in JS bundle | Unchanged |
+| 5 | AAV pricing checkmarks missing on paid tiers | 🟡 Medium | AAV | Builder/Teams/Custom rows render empty cells | Unchanged |
+| 6 | Tidycal has 7 booking types (should be 3) | 🟡 Medium | AAV | Needs Jeff manual cleanup | Unchanged |
+| 7 | Tidycal Monthly Check-In is 45 min (should be 30) | 🟡 Medium | AAV | Needs Jeff manual fix | Unchanged |
+| 8 | SS Playground is a dead end without escrow | 🟡 Medium | SS | Open (conversion killer) | Unchanged |
+| 9 | Railway deploy API tracking mismatch | ⚪ Low | SS/AAV | Deploys succeed but API says FAILED | **NEW** |
+| 10 | AAV 9 empty JS exceptions on homepage | ⚪ Low | AAV | Likely benign | Unchanged |
 
 ---
 
-## Fixed Since Last Audit (2026-05-22)
+## Fixed Since Last Audit (2026-05-28)
+
+- ✅ **vendorMatchMode mismatch RESOLVED**: Both SQLite and PG schemas now default to `"substring"`. Previously PG had `"exact"` — a functional bug causing different vendor matching behavior in dev vs prod.
+- ✅ **SS and AAV actually deploying**: JS bundles are 1 day old (May 30). SS backend uptime ~18h. Despite Railway API showing all deploys as FAILED, sites are receiving fresh deploys.
+
+---
+
+## Previously Fixed (2026-05-22 → 2026-05-28)
 
 - ✅ AAV signup CTAs now route to `/signup`
 - ✅ AAV pricing CTAs handle Stripe checkout for logged-in users
@@ -142,16 +153,18 @@ All four Railway services have FAILED deploys since April/May 2026:
 - ✅ AAV duplicate footer removed
 - ✅ AAV 404 page added (NotFoundPage)
 - ✅ ARL footer labels use product names
-- ✅ ARL contact email fixed to support@agentictrust.app
+- ✅ ARL contact email fixed to support@agentictrust.app (in source, not deployed)
 - ✅ Hub terminology softened (no "fiduciary" or "escrow")
 - ✅ Hub og:image, canonical, schema.org added
-- ✅ Emergent.sh tracker removed from ARL and Hub
+- ✅ Emergent.sh tracker removed from ARL and Hub (ARL has REGRESSED)
 - ✅ AAV terms/privacy links now use `<Link>` components
 
 ---
 
 ## Priority Actions
 
-1. **🔴 Jeff: Fix Railway deploy pipelines** — All products are on stale containers. No code changes can go live until Railway build failures are resolved. Requires `railway login` and diagnosing build errors.
-2. **🟡 Jeff: Clean up Tidycal** — Remove 4 off-brand booking types, change Monthly Check-In from 45→30 minutes.
-3. **🟡 Fix vendorMatchMode mismatch** — Align PG and SQLite schemas to use the same default (recommend "substring").
+1. **🔴 Jeff: Fix ARL Railway deploy pipeline** — Container is 5 days stale. Terms/privacy fix, emergent.sh removal, and email fix are all committed to source but NOT live. Requires `railway login` for the ARL project.
+2. **🔴 Jeff: Investigate Railway deploy API mismatch** — The tracked deploy API shows all deploys as FAILED since April, but SS and AAV are clearly getting fresh deploys. The API may be tracking wrong/duplicate service IDs.
+3. **🟡 Fix AAV pricing checkmarks** — Builder/Teams/Custom columns in the Compare Plans table show empty cells where ✓ marks should appear.
+4. **🟡 Jeff: Clean up Tidycal** — Remove 4 off-brand booking types, change Monthly Check-In from 45→30 minutes.
+5. **🟡 Fix SS Playground empty state** — Users who skip Quick Start see a dead-end form with no guidance.

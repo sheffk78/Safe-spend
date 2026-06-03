@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowLeft } from 'lucide-react';
@@ -38,6 +39,10 @@ const TermsPage = () => {
 
     return (
         <div className="min-h-screen bg-ss-bg">
+            <Helmet>
+                <title>Terms of Service | Safe-Spend</title>
+                <meta name="description" content="Terms of Service for Safe-Spend by Agentic Trust — governing your use of our protected accounts, spending controls, API keys, and escrow infrastructure for AI agents." />
+            </Helmet>
             <Navbar />
             
             <main className="pt-24 pb-20 px-6">

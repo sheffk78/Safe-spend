@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowLeft } from 'lucide-react';
@@ -34,6 +35,10 @@ const PrivacyPage = () => {
 
     return (
         <div className="min-h-screen bg-ss-bg">
+            <Helmet>
+                <title>Privacy Policy | Safe-Spend</title>
+                <meta name="description" content="Safe-Spend Privacy Policy — how Agentic Trust collects, uses, and protects your data including API usage, transaction records, and agent spend data." />
+            </Helmet>
             <Navbar />
             
             <main className="pt-24 pb-20 px-6">

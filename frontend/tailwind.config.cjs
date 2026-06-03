@@ -14,7 +14,7 @@ module.exports = {
             },
             colors: {
                 // Safe-Spend Light Design System
-                'ss-bg': '#FAFBFA',
+                'ss-bg': '#FAFAF8',
                 'ss-surface': '#FFFFFF',
                 'ss-elevated': '#F3F4F3',
                 'ss-code': '#F7F8F7',
@@ -69,7 +69,7 @@ module.exports = {
                 }
             },
             fontFamily: {
-                heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+                heading: ['"Playfair Display"', 'Space Grotesk', 'system-ui', 'sans-serif'],
                 body: ['Inter', 'system-ui', 'sans-serif'],
                 mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
                 serif: ['"Playfair Display"', 'Georgia', 'serif'],
